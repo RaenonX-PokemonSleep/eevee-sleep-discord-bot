@@ -1,0 +1,11 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+/.idea
+
+# This file should still exist in the project, but shouldn't be updated
+appsettings.Development.json
+
+.mongo
