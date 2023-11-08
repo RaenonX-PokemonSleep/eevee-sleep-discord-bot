@@ -31,7 +31,6 @@ public static class ConfigHelper {
         return GetDiscordChannelSection().GetRequiredValue<ulong>("AdminAlert");
     }
 
-
     public static string GetAllowedOrigin() {
         return Config.GetRequiredValue<string>("AllowedOrigin");
     }
