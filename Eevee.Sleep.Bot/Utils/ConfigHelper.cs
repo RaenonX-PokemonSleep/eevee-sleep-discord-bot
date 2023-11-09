@@ -46,9 +46,17 @@ public static class ConfigHelper {
     public static string GetInternalApiGenerateActivation() {
         return GetInternalApiEndpoints().GetRequiredValue<string>("GenerateActivation");
     }
+    
+    private static IConfigurationSection GetInternalApiTokenSection() {
+        return GetInternalApiSection().GetRequiredSection("Token");
+    }
 
-    public static string GetInternalApiToken() {
-        return GetInternalApiSection().GetRequiredValue<string>("Token");
+    public static string GetInternalInboundApiToken() {
+        return GetInternalApiTokenSection().GetRequiredValue<string>("Inbound");
+    }
+
+    public static string GetInternalOutboundApiToken() {
+        return GetInternalApiTokenSection().GetRequiredValue<string>("Outbound");
     }
 
     public static string GetAllowedOrigin() {

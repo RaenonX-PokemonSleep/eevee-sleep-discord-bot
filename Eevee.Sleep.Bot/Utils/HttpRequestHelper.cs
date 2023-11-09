@@ -10,7 +10,7 @@ public static class HttpRequestHelper {
         var response = await Client.PostAsync(
             ConfigHelper.GetInternalApiGenerateActivation(),
             new FormUrlEncodedContent(new Dictionary<string, string> {
-                { "token", ConfigHelper.GetInternalApiToken() },
+                { "token", ConfigHelper.GetInternalOutboundApiToken() },
                 { "roleIds", string.Join(",", roleIds) },
                 { "discordId", discordId }
             })
