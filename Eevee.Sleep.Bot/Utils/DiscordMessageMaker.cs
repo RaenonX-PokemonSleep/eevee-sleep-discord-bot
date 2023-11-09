@@ -10,6 +10,7 @@ public static class DiscordMessageMaker {
             .WithColor(Colors.Danger)
             .WithTitle($"Error - {result.Error}")
             .WithDescription(result.ErrorReason)
+            .WithCurrentTimestamp()
             .Build();
     }
 
@@ -68,5 +69,44 @@ public static class DiscordMessageMaker {
                 )
                 .Build()
         };
+    }
+
+    public static Embed MakeUserDataNotCached(ulong userId, IUser updated) {
+        return new EmbedBuilder()
+            .WithColor(Colors.Warning)
+            .WithAuthor(updated)
+            .WithTitle("Member Update - User data not cached")
+            .AddField("User", updated.Mention)
+            .WithFooter($"ID: {userId}")
+            .WithCurrentTimestamp()
+            .Build();
+    }
+
+    public static Embed MakeUserSubscribed(IUser user, IEnumerable<string> roleIds) {
+        return new EmbedBuilder()
+            .WithColor(Colors.Success)
+            .WithAuthor(user)
+            .WithTitle("Member Subscribed")
+            .AddField("User", user.Mention)
+            .AddField("Role", string.Join(" / ", roleIds.Select(x => $"<@&{x}>")))
+            .WithFooter($"ID: {user.Id}")
+            .WithCurrentTimestamp()
+            .Build();
+    }
+
+    public static Embed MakeUserUnsubscribed(IUser user, IEnumerable<string>? roleIds = null) {
+        var builder = new EmbedBuilder()
+            .WithColor(Colors.Danger)
+            .WithAuthor(user)
+            .WithTitle("Member Unsubscribed")
+            .AddField("User", user.Mention)
+            .WithFooter($"ID: {user.Id}")
+            .WithCurrentTimestamp();
+
+        if (!(roleIds is null)) {
+            builder = builder.AddField("Role", string.Join(" / ", roleIds.Select(x => $"<@&{x}>")));
+        }
+
+        return builder.Build();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
+using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Utils;
 
 namespace Eevee.Sleep.Bot.Handlers.EventHandlers;
@@ -51,10 +52,17 @@ public static class GuildMemberUpdatedEventHandler {
         return ActivationController.RemoveDiscordActivationData(user.Id.ToString());
     }
 
-    public static Task OnEvent(Cacheable<SocketGuildUser, ulong> original, SocketGuildUser updated) {
+    public static async Task OnEvent(
+        IDiscordClient client,
+        Cacheable<SocketGuildUser, ulong> original,
+        SocketGuildUser updated
+    ) {
         if (!original.HasValue) {
             Logger.LogWarning("User data of {UserId} not cached", original.Id);
-            return Task.CompletedTask;
+            await client.SendMessageInAdminAlertChannel(
+                embed: DiscordMessageMaker.MakeUserDataNotCached(original.Id, updated)
+            );
+            return;
         }
 
         var taggedRoleIds = ActivationPresetController.GetTaggedRoleIds();
@@ -69,13 +77,18 @@ public static class GuildMemberUpdatedEventHandler {
             .ToList();
 
         if (rolesAdded.Any(taggedRoleIds.Contains)) {
-            return HandleRolesAdded(rolesAdded, updated);
+            await HandleRolesAdded(rolesAdded, updated);
+            await client.SendMessageInAdminAlertChannel(
+                embed: DiscordMessageMaker.MakeUserSubscribed(updated, rolesAdded)
+            );
+            return;
         }
 
         if (rolesRemoved.Any(taggedRoleIds.Contains)) {
-            return HandleRolesRemoved(updated);
+            await client.SendMessageInAdminAlertChannel(
+                embed: DiscordMessageMaker.MakeUserUnsubscribed(updated, rolesRemoved)
+            );
+            await HandleRolesRemoved(updated);
         }
-
-        return Task.CompletedTask;
     }
 }

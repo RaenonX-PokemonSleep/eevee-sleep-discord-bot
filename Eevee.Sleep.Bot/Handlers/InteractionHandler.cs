@@ -31,8 +31,10 @@ public class InteractionHandler {
 
         _client.InteractionCreated += OnInteractionCreated;
         _client.ModalSubmitted += OnModalSubmitted;
-        _client.GuildMemberUpdated += GuildMemberUpdatedEventHandler.OnEvent;
-        _client.UserLeft += GuildMemberLeftEventHandler.OnEvent;
+        _client.GuildMemberUpdated += (cached, updated) => 
+            GuildMemberUpdatedEventHandler.OnEvent(_client, cached, updated);
+        _client.UserLeft += (_, user) =>
+            GuildMemberLeftEventHandler.OnEvent(_client, user);
 
         _handler.SlashCommandExecuted += OnSlashCommandExecuted;
     }
