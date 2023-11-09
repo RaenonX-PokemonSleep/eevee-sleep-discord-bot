@@ -14,7 +14,7 @@ public record ActivationPropertiesModel {
     public required string? Source { get; init; }
     
     [UsedImplicitly]
-    public required Dictionary<string, string> Contact { get; init; }
+    public required ActivationContactModel Contact { get; init; }
 
     [UsedImplicitly]
     public required bool IsSpecial { get; init; }
