@@ -1,12 +1,13 @@
-﻿using Eevee.Sleep.Bot.Models;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Controllers.Mongo;
 
 public static class ActivationPresetController {
-    public static Task<List<ActivationPresetModel>> GetTaggedPreset() {
+    public static HashSet<string> GetTaggedRoleIds() {
         return MongoConst.AuthActivationPresetCollection
             .Find(x => x.Source == "discord")
-            .ToListAsync();
+            .ToEnumerable()
+            .Select(x => x.Tag)
+            .ToHashSet();
     }
 }
