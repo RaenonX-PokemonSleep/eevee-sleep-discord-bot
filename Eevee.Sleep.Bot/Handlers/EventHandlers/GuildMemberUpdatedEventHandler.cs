@@ -8,42 +8,47 @@ namespace Eevee.Sleep.Bot.Handlers.EventHandlers;
 public static class GuildMemberUpdatedEventHandler {
     private static readonly ILogger Logger = LogHelper.CreateLogger(typeof(GuildMemberUpdatedEventHandler));
 
-    private static async Task HandleRolesAdded(string[] roleIdsAdded, IUser updated) {
+    private static async Task HandleRolesAdded(string[] roleIdsAdded, IUser user) {
         Logger.LogInformation(
             "Handing subscriber role addition of {RoleIds} for user {UserId} (@{UserName})",
             roleIdsAdded,
-            updated.Id,
-            updated.Username
+            user.Id,
+            user.Username
         );
 
         var activationLink = await HttpRequestHelper.GenerateDiscordActivationLink(
-            updated.Id.ToString(),
+            user.Id.ToString(),
             roleIdsAdded
         );
         if (string.IsNullOrEmpty(activationLink)) {
             Logger.LogWarning(
                 "Activation link failed to generate for user {UserId} (@{UserName})",
-                updated.Id,
-                updated.Username
+                user.Id,
+                user.Username
             );
             return;
         }
 
-        await updated.SendMessageAsync(
+        await user.SendMessageAsync(
             activationLink,
             embeds: DiscordMessageMaker.MakeActivationNote()
         );
 
         Logger.LogInformation(
             "Activation link generated for user {UserId} (@{UserName}) - {Link}",
-            updated.Id,
-            updated.Username,
+            user.Id,
+            user.Username,
             string.IsNullOrEmpty(activationLink) ? "(empty - check for error)" : activationLink
         );
     }
 
-    private static Task HandleRolesRemoved() {
-        return Task.CompletedTask;
+    private static Task HandleRolesRemoved(IUser user) {
+        Logger.LogInformation(
+            "User {UserId} (@{Username}) activation expired (role dropped), removing associated activation",
+            user.Id,
+            user.Username
+        );
+        return ActivationController.RemoveDiscordActivationData(user.Id.ToString());
     }
 
     public static Task OnEvent(Cacheable<SocketGuildUser, ulong> original, SocketGuildUser updated) {
@@ -68,7 +73,7 @@ public static class GuildMemberUpdatedEventHandler {
         }
 
         if (rolesRemoved.Any(taggedRoleIds.Contains)) {
-            return HandleRolesRemoved();
+            return HandleRolesRemoved(updated);
         }
 
         return Task.CompletedTask;
