@@ -15,9 +15,12 @@ public static class GuildMemberLeftEventHandler {
             user.Id,
             user.Username
         );
-        await ActivationController.RemoveDiscordActivationData(user.Id.ToString());
-        await client.SendMessageInAdminAlertChannel(
-            embed: DiscordMessageMaker.MakeUserUnsubscribed(user)
-        );
+        var results = await ActivationController.RemoveDiscordActivationData(user.Id.ToString());
+
+        if (results.Any(x => x.DeletedCount > 0)) {
+            await client.SendMessageInAdminAlertChannel(
+                embed: DiscordMessageMaker.MakeUserUnsubscribed(user)
+            );
+        }
     }
 }
