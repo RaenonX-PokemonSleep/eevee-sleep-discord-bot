@@ -12,7 +12,17 @@ public static class DiscordExtensions {
         return channel;
     }
 
-    public static Task<IMessageChannel> GetAdminAlertChannelAsync(this IDiscordClient client) {
+    private static Task<IMessageChannel> GetAdminAlertChannelAsync(this IDiscordClient client) {
         return client.GetMessageChannel(ConfigHelper.GetDiscordAdminAlertChannelId());
+    }
+
+    public static async Task<IUserMessage> SendMessageInAdminAlertChannel(
+        this IDiscordClient client,
+        string? message = null,
+        Embed? embed = null,
+        Embed[]? embeds = null
+    ) {
+        return await (await client.GetAdminAlertChannelAsync())
+            .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 }

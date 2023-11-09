@@ -17,13 +17,11 @@ public class DiscordClientWorker : BackgroundService {
     }
 
     private async Task SendTestMessage() {
-        var messages = await Task.WhenAll(
-            (await _client.GetAdminAlertChannelAsync()).SendMessageAsync("`SYSTEM` Admin alert sending test")
-        );
+        var message = await _client.SendMessageInAdminAlertChannel("`SYSTEM` Admin alert sending test");
 
         await Task.Delay(TimeSpan.FromSeconds(30));
 
-        await Task.WhenAll(messages.Select(x => x.DeleteAsync()));
+        await message.DeleteAsync();
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
