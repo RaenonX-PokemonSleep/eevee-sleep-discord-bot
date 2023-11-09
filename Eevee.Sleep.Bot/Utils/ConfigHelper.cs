@@ -31,6 +31,26 @@ public static class ConfigHelper {
         return GetDiscordChannelSection().GetRequiredValue<ulong>("AdminAlert");
     }
 
+    private static IConfigurationSection GetApiSection() {
+        return Config.GetRequiredSection("Api");
+    }
+
+    private static IConfigurationSection GetInternalApiSection() {
+        return GetApiSection().GetRequiredSection("Internal");
+    }
+
+    private static IConfigurationSection GetInternalApiEndpoints() {
+        return GetInternalApiSection().GetRequiredSection("Endpoints");
+    }
+
+    public static string GetInternalApiGenerateActivation() {
+        return GetInternalApiEndpoints().GetRequiredValue<string>("GenerateActivation");
+    }
+
+    public static string GetInternalApiToken() {
+        return GetInternalApiSection().GetRequiredValue<string>("Token");
+    }
+
     public static string GetAllowedOrigin() {
         return Config.GetRequiredValue<string>("AllowedOrigin");
     }

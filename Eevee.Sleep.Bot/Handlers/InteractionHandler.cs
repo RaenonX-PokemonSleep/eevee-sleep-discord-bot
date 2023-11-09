@@ -4,6 +4,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
+using Eevee.Sleep.Bot.Handlers.EventHandlers;
 using Eevee.Sleep.Bot.Utils;
 using IResult = Discord.Interactions.IResult;
 
@@ -30,6 +31,7 @@ public class InteractionHandler {
 
         _client.InteractionCreated += OnInteractionCreated;
         _client.ModalSubmitted += OnModalSubmitted;
+        _client.GuildMemberUpdated += GuildMemberUpdatedEventHandler.OnEvent;
 
         _handler.SlashCommandExecuted += OnSlashCommandExecuted;
     }
