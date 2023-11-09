@@ -83,8 +83,12 @@ public static class DiscordMessageMaker {
     }
 
     public static Embed MakeUserSubscribed(IUser user, IEnumerable<string> roleIds) {
+        return MakeUserSubscribed(user, roleIds, Colors.Success);
+    }
+
+    public static Embed MakeUserSubscribed(IUser user, IEnumerable<string> roleIds, Color color) {
         return new EmbedBuilder()
-            .WithColor(Colors.Success)
+            .WithColor(color)
             .WithAuthor(user)
             .WithTitle("Member Subscribed")
             .AddField("User", user.Mention)

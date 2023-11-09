@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
+using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Utils;
 
@@ -9,19 +10,27 @@ namespace Eevee.Sleep.Bot.Handlers.EventHandlers;
 public static class GuildMemberUpdatedEventHandler {
     private static readonly ILogger Logger = LogHelper.CreateLogger(typeof(GuildMemberUpdatedEventHandler));
 
-    private static async Task HandleRolesAdded(string[] roleIdsAdded, IUser user) {
+    private static async Task HandleRolesAdded(
+        IDiscordClient client,
+        string[] roleIds,
+        IUser user
+    ) {
         Logger.LogInformation(
             "Handing subscriber role addition of {RoleIds} for user {UserId} (@{UserName})",
-            roleIdsAdded,
+            roleIds,
             user.Id,
             user.Username
         );
 
         var activationLink = await HttpRequestHelper.GenerateDiscordActivationLink(
             user.Id.ToString(),
-            roleIdsAdded
+            roleIds
         );
         if (string.IsNullOrEmpty(activationLink)) {
+            await client.SendMessageInAdminAlertChannel(
+                $"Activation link failed to generate for user <@{user.Id}> (@{user.Username})",
+                embed: DiscordMessageMaker.MakeUserSubscribed(user, roleIds, Colors.Warning)
+            );
             Logger.LogWarning(
                 "Activation link failed to generate for user {UserId} (@{UserName})",
                 user.Id,
@@ -34,7 +43,9 @@ public static class GuildMemberUpdatedEventHandler {
             activationLink,
             embeds: DiscordMessageMaker.MakeActivationNote()
         );
-
+        await client.SendMessageInAdminAlertChannel(
+            embed: DiscordMessageMaker.MakeUserSubscribed(user, roleIds)
+        );
         Logger.LogInformation(
             "Activation link generated for user {UserId} (@{UserName}) - {Link}",
             user.Id,
@@ -43,13 +54,23 @@ public static class GuildMemberUpdatedEventHandler {
         );
     }
 
-    private static Task HandleRolesRemoved(IUser user) {
-        Logger.LogInformation(
-            "User {UserId} (@{Username}) activation expired (role dropped), removing associated activation",
-            user.Id,
-            user.Username
+    private static async Task HandleRolesRemoved(
+        IDiscordClient client,
+        string[] roleIds,
+        IUser user
+    ) {
+        await client.SendMessageInAdminAlertChannel(
+            embed: DiscordMessageMaker.MakeUserUnsubscribed(user, roleIds)
         );
-        return ActivationController.RemoveDiscordActivationData(user.Id.ToString());
+        Logger.LogInformation(
+            "User {UserId} (@{Username}) activation expired ({RoleCount} roles dropped: {RoleIds}), removing associated activation",
+            user.Id,
+            user.Username,
+            roleIds.Length,
+            string.Join(" / ", roleIds)
+        );
+
+        await ActivationController.RemoveDiscordActivationData(user.Id.ToString());
     }
 
     public static async Task OnEvent(
@@ -74,21 +95,15 @@ public static class GuildMemberUpdatedEventHandler {
         var rolesRemoved = original.Value.Roles
             .ExceptBy(updated.Roles.Select(x => x.Id), role => role.Id)
             .Select(x => x.Id.ToString())
-            .ToList();
+            .ToArray();
 
         if (rolesAdded.Any(taggedRoleIds.Contains)) {
-            await HandleRolesAdded(rolesAdded, updated);
-            await client.SendMessageInAdminAlertChannel(
-                embed: DiscordMessageMaker.MakeUserSubscribed(updated, rolesAdded)
-            );
+            await HandleRolesAdded(client, rolesAdded, updated);
             return;
         }
 
         if (rolesRemoved.Any(taggedRoleIds.Contains)) {
-            await client.SendMessageInAdminAlertChannel(
-                embed: DiscordMessageMaker.MakeUserUnsubscribed(updated, rolesRemoved)
-            );
-            await HandleRolesRemoved(updated);
+            await HandleRolesRemoved(client, rolesRemoved, updated);
         }
     }
 }
