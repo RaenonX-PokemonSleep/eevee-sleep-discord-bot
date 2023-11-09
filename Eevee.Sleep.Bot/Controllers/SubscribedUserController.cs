@@ -40,8 +40,8 @@ public class SubscribedUserController : ControllerBase {
             }))
             .DistinctBy(x => x.Member.Id)
             .Select(x => new SubscribedUserModel {
-                RoleId = x.RoleId,
-                UserId = x.Member.Id,
+                RoleId = x.RoleId.ToString(),
+                UserId = x.Member.Id.ToString(),
                 Discriminator = x.Member.DiscriminatorValue,
                 Username = x.Member.Username
             });

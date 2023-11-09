@@ -4,10 +4,10 @@ namespace Eevee.Sleep.Bot.Models;
 
 public record SubscribedUserModel {
     [UsedImplicitly]
-    public required ulong RoleId { get; init; }
+    public required string RoleId { get; init; }
     
     [UsedImplicitly]
-    public required ulong UserId { get; init; }
+    public required string UserId { get; init; }
     
     [UsedImplicitly]
     public required ushort Discriminator { get; init; }
