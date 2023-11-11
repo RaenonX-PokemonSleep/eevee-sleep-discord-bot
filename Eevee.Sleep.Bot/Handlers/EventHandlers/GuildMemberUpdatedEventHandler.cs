@@ -12,6 +12,7 @@ public static class GuildMemberUpdatedEventHandler {
 
     private static async Task HandleRolesAdded(
         IDiscordClient client,
+        IHostEnvironment environment,
         string[] roleIds,
         IUser user
     ) {
@@ -39,18 +40,21 @@ public static class GuildMemberUpdatedEventHandler {
             return;
         }
 
-        await user.SendMessageAsync(
-            activationLink,
-            embeds: DiscordMessageMaker.MakeActivationNote()
-        );
-        await client.SendMessageInAdminAlertChannel(
-            embed: DiscordMessageMaker.MakeUserSubscribed(user, roleIds)
-        );
         Logger.LogInformation(
             "Activation link generated for user {UserId} (@{UserName}) - {Link}",
             user.Id,
             user.Username,
             string.IsNullOrEmpty(activationLink) ? "(empty - check for error)" : activationLink
+        );
+        // Prevent accidentally sending messages to the users
+        if (environment.IsProduction()) {
+            await user.SendMessageAsync(
+                activationLink,
+                embeds: DiscordMessageMaker.MakeActivationNote()
+            );
+        }
+        await client.SendMessageInAdminAlertChannel(
+            embed: DiscordMessageMaker.MakeUserSubscribed(user, roleIds)
         );
     }
 
@@ -75,6 +79,7 @@ public static class GuildMemberUpdatedEventHandler {
 
     public static async Task OnEvent(
         IDiscordClient client,
+        IHostEnvironment environment,
         Cacheable<SocketGuildUser, ulong> original,
         SocketGuildUser updated
     ) {
@@ -98,7 +103,7 @@ public static class GuildMemberUpdatedEventHandler {
             .ToArray();
 
         if (rolesAdded.Any(taggedRoleIds.Contains)) {
-            await HandleRolesAdded(client, rolesAdded, updated);
+            await HandleRolesAdded(client, environment, rolesAdded, updated);
             return;
         }
 

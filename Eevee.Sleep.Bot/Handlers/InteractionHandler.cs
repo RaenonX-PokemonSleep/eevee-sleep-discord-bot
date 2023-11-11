@@ -17,10 +17,18 @@ public class InteractionHandler {
 
     private readonly IServiceProvider _services;
 
-    public InteractionHandler(DiscordSocketClient client, InteractionService handler, IServiceProvider services) {
+    private readonly IHostEnvironment _env;
+
+    public InteractionHandler(
+        DiscordSocketClient client,
+        InteractionService handler,
+        IServiceProvider services,
+        IHostEnvironment env
+    ) {
         _client = client;
         _handler = handler;
         _services = services;
+        _env = env;
     }
 
     public async Task InitializeAsync() {
@@ -31,8 +39,8 @@ public class InteractionHandler {
 
         _client.InteractionCreated += OnInteractionCreated;
         _client.ModalSubmitted += OnModalSubmitted;
-        _client.GuildMemberUpdated += (cached, updated) => 
-            GuildMemberUpdatedEventHandler.OnEvent(_client, cached, updated);
+        _client.GuildMemberUpdated += (cached, updated) =>
+            GuildMemberUpdatedEventHandler.OnEvent(_client, _env, cached, updated);
         _client.UserLeft += (_, user) =>
             GuildMemberLeftEventHandler.OnEvent(_client, user);
 

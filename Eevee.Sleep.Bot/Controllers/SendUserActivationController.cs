@@ -14,12 +14,16 @@ public class SendUserActivationController : ControllerBase {
 
     private readonly DiscordSocketClient _client;
 
+    private readonly IHostEnvironment _env;
+
     public SendUserActivationController(
         ILogger<SubscribedUserController> logger,
-        DiscordSocketClient client
-    ) {
+        DiscordSocketClient client, 
+        IHostEnvironment env
+        ) {
         _logger = logger;
         _client = client;
+        _env = env;
     }
 
     [HttpPost(Name = "SendActivationMessage")]
@@ -43,15 +47,18 @@ public class SendUserActivationController : ControllerBase {
                 return;
             }
 
-            await user.SendMessageAsync(
-                x.Link,
-                embeds: DiscordMessageMaker.MakeActivationNote()
-            );
             _logger.LogInformation(
                 "Activation message sent to {UserId} with link {ActivationLink} - requested via API",
                 x.UserId,
                 x.Link
             );
+            // Prevent accidentally sending messages to the users
+            if (_env.IsProduction()) {
+                await user.SendMessageAsync(
+                    x.Link,
+                    embeds: DiscordMessageMaker.MakeActivationNote()
+                );
+            }
             await _client.SendMessageInAdminAlertChannel(
                 $"Activation message sent to <@{x.UserId}> with [link]({x.Link}) - requested via API"
             );
