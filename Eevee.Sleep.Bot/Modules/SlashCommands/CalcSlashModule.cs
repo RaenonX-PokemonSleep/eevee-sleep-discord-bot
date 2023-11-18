@@ -11,6 +11,6 @@ public class CalcSlashModule : InteractionModuleBase<SocketInteractionContext> {
     public Task MathCalcAsync([Summary(description: "Math expression to evaluate.")] string expression) =>
         RespondAsync(
             text: $"Result: **{Evaluator.Execute(expression, EvalConfiguration.DecimalConfiguration)}**\n" +
-                  $"> Evaluated expression: {expression}"
+                  $"> Evaluated expression: `{expression}`"
         );
 }
