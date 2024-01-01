@@ -8,30 +8,21 @@ namespace Eevee.Sleep.Bot.Controllers;
 
 [ApiController]
 [Route("/subscribed-users")]
-public class SubscribedUserController : ControllerBase {
-    private readonly ILogger<SubscribedUserController> _logger;
-
-    private readonly DiscordSocketClient _client;
-
-    public SubscribedUserController(
-        ILogger<SubscribedUserController> logger,
-        DiscordSocketClient client
-    ) {
-        _logger = logger;
-        _client = client;
-    }
-
+public class SubscribedUserController(
+    ILogger<SubscribedUserController> logger,
+    DiscordSocketClient client
+) : ControllerBase {
     [HttpGet(Name = "GetSubscribedUsers")]
     public IEnumerable<SubscribedUserModel> Get() {
         var taggedRoleIds = ActivationPresetController.GetTaggedRoleIds();
 
-        _logger.LogInformation(
+        logger.LogInformation(
             "Getting users with role ID ({taggedRoleCount}): {taggedRoleIds}",
             string.Join(" / ", taggedRoleIds),
             taggedRoleIds.Count
         );
 
-        return _client.GetGuild(ConfigHelper.GetDiscordWorkingGuild())
+        return client.GetGuild(ConfigHelper.GetDiscordWorkingGuild())
             .Roles
             .Where(x => taggedRoleIds.Contains(x.Id.ToString()))
             .SelectMany(x => x.Members.Select(member => new {
