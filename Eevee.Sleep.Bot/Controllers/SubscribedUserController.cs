@@ -24,7 +24,7 @@ public class SubscribedUserController(
 
         return client.GetGuild(ConfigHelper.GetDiscordWorkingGuild())
             .Roles
-            .Where(x => taggedRoleIds.Contains(x.Id.ToString()))
+            .Where(x => taggedRoleIds.Contains(x.Id))
             .SelectMany(x => x.Members.Select(member => new {
                 Member = member,
                 RoleId = x.Id

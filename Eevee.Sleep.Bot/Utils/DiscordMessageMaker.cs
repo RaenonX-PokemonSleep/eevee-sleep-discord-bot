@@ -83,23 +83,23 @@ public static class DiscordMessageMaker {
             .Build();
     }
 
-    public static Embed MakeUserSubscribed(IUser user, IEnumerable<string> roleIds) {
+    public static Embed MakeUserSubscribed(IUser user, IEnumerable<ulong> roleIds) {
         return MakeUserSubscribed(user, roleIds, Colors.Success);
     }
 
-    public static Embed MakeUserSubscribed(IUser user, IEnumerable<string> roleIds, Color color) {
+    public static Embed MakeUserSubscribed(IUser user, IEnumerable<ulong> roleIds, Color color) {
         return new EmbedBuilder()
             .WithColor(color)
             .WithAuthor(user)
             .WithTitle("Member Subscribed")
             .AddField("User", user.Mention)
-            .AddField("Role", string.Join(" / ", roleIds.Select(x => $"<@&{x}>")))
+            .AddField("Role", string.Join(" / ", roleIds.Select(MentionUtils.MentionRole)))
             .WithFooter($"ID: {user.Id}")
             .WithCurrentTimestamp()
             .Build();
     }
 
-    public static Embed MakeUserUnsubscribed(IUser user, IEnumerable<string>? roleIds = null) {
+    public static Embed MakeUserUnsubscribed(IUser user, IEnumerable<ulong>? roleIds = null) {
         var builder = new EmbedBuilder()
             .WithColor(Colors.Danger)
             .WithAuthor(user)
@@ -109,7 +109,7 @@ public static class DiscordMessageMaker {
             .WithCurrentTimestamp();
 
         if (roleIds is not null) {
-            builder = builder.AddField("Role", string.Join(" / ", roleIds.Select(x => $"<@&{x}>")));
+            builder = builder.AddField("Role", string.Join(" / ", roleIds.Select(MentionUtils.MentionRole)));
         }
 
         return builder.Build();

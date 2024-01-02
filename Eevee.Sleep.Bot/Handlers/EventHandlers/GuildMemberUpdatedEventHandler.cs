@@ -13,7 +13,7 @@ public static class GuildMemberUpdatedEventHandler {
     private static async Task HandleRolesAdded(
         IDiscordClient client,
         IHostEnvironment environment,
-        string[] roleIds,
+        ulong[] roleIds,
         IUser user
     ) {
         Logger.LogInformation(
@@ -60,7 +60,7 @@ public static class GuildMemberUpdatedEventHandler {
 
     private static async Task HandleRolesRemoved(
         IDiscordClient client,
-        string[] roleIds,
+        ulong[] roleIds,
         IUser user
     ) {
         await client.SendMessageInAdminAlertChannel(
@@ -95,11 +95,11 @@ public static class GuildMemberUpdatedEventHandler {
 
         var rolesAdded = updated.Roles
             .ExceptBy(original.Value.Roles.Select(x => x.Id), role => role.Id)
-            .Select(x => x.Id.ToString())
+            .Select(x => x.Id)
             .ToArray();
         var rolesRemoved = original.Value.Roles
             .ExceptBy(updated.Roles.Select(x => x.Id), role => role.Id)
-            .Select(x => x.Id.ToString())
+            .Select(x => x.Id)
             .ToArray();
 
         if (rolesAdded.Any(taggedRoleIds.Contains)) {
