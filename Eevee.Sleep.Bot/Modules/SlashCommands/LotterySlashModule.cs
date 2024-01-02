@@ -25,7 +25,10 @@ public class LotterySlashModule : InteractionModuleBase<SocketInteractionContext
                 .GetRandomElements(count)
                 .ToArray();
 
-            return RespondAsync(embed: DiscordMessageMaker.MakeLotteryResult(targetRoleId, count, result));
+            return RespondAsync(
+                text: string.Join(" ", result.Select(x => MentionUtils.MentionUser(x.Id))),
+                embed: DiscordMessageMaker.MakeLotteryResult(targetRoleId, count, result)
+            );
         } catch (ArgumentException e) {
             return RespondAsync(e.Message, ephemeral: true);
         }
