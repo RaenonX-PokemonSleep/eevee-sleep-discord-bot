@@ -10,45 +10,30 @@ using IResult = Discord.Interactions.IResult;
 
 namespace Eevee.Sleep.Bot.Handlers;
 
-public class InteractionHandler {
-    private readonly DiscordSocketClient _client;
-
-    private readonly InteractionService _handler;
-
-    private readonly IServiceProvider _services;
-
-    private readonly IHostEnvironment _env;
-
-    public InteractionHandler(
-        DiscordSocketClient client,
-        InteractionService handler,
-        IServiceProvider services,
-        IHostEnvironment env
-    ) {
-        _client = client;
-        _handler = handler;
-        _services = services;
-        _env = env;
-    }
-
+public class InteractionHandler(
+    DiscordSocketClient client,
+    InteractionService handler,
+    IServiceProvider services,
+    IHostEnvironment env
+) {
     public async Task InitializeAsync() {
-        _client.Ready += ReadyAsync;
-        _handler.Log += OnLogHandler.OnLogAsync;
+        client.Ready += ReadyAsync;
+        handler.Log += OnLogHandler.OnLogAsync;
 
-        await _handler.AddModulesAsync(Assembly.GetEntryAssembly(), _services);
+        await handler.AddModulesAsync(Assembly.GetEntryAssembly(), services);
 
-        _client.InteractionCreated += OnInteractionCreated;
-        _client.ModalSubmitted += OnModalSubmitted;
-        _client.GuildMemberUpdated += (cached, updated) =>
-            GuildMemberUpdatedEventHandler.OnEvent(_client, _env, cached, updated);
-        _client.UserLeft += (_, user) =>
-            GuildMemberLeftEventHandler.OnEvent(_client, user);
+        client.InteractionCreated += OnInteractionCreated;
+        client.ModalSubmitted += OnModalSubmitted;
+        client.GuildMemberUpdated += (cached, updated) =>
+            GuildMemberUpdatedEventHandler.OnEvent(client, env, cached, updated);
+        client.UserLeft += (_, user) =>
+            GuildMemberLeftEventHandler.OnEvent(client, user);
 
-        _handler.SlashCommandExecuted += OnSlashCommandExecuted;
+        handler.SlashCommandExecuted += OnSlashCommandExecuted;
     }
 
     private async Task ReadyAsync() {
-        await _handler.RegisterCommandsGloballyAsync();
+        await handler.RegisterCommandsGloballyAsync();
     }
 
     private static Task OnInteractionExecuted(IInteractionContext context, IResult result) {
@@ -66,9 +51,9 @@ public class InteractionHandler {
 
     private async Task OnInteractionCreated(SocketInteraction interaction) {
         try {
-            var context = new SocketInteractionContext(_client, interaction);
+            var context = new SocketInteractionContext(client, interaction);
 
-            var result = await _handler.ExecuteCommandAsync(context, _services);
+            var result = await handler.ExecuteCommandAsync(context, services);
 
             await OnInteractionExecuted(context, result);
         } catch {
@@ -113,12 +98,12 @@ public class InteractionHandler {
                     throw new ArgumentException("Guild ID is null from modal!");
                 }
 
-                using var client = new HttpClient();
+                using var client1 = new HttpClient();
 
-                var emoteHttpResponse = await client.GetAsync(emoteLink);
+                var emoteHttpResponse = await client1.GetAsync(emoteLink);
                 var stream = await emoteHttpResponse.Content.ReadAsStreamAsync();
 
-                await _client.GetGuild(guildId.Value).CreateEmoteAsync(
+                await client.GetGuild(guildId.Value).CreateEmoteAsync(
                     emoteName,
                     new Image(stream)
                 );
