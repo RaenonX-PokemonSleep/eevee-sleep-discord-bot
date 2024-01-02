@@ -15,6 +15,15 @@ public static class DiscordMessageMaker {
             .Build();
     }
 
+    public static Embed MakeErrorFromLog(LogMessage message) {
+        return new EmbedBuilder()
+            .WithColor(Colors.Warning)
+            .WithTitle($"{message.Source}: {message.Message}")
+            .WithDescription($"```{message.Exception}```")
+            .WithCurrentTimestamp()
+            .Build();
+    }
+
     public static Embed[] MakeActivationNote() {
         return [
             new EmbedBuilder()

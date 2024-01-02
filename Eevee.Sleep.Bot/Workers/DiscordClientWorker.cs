@@ -16,7 +16,7 @@ public class DiscordClientWorker(IServiceProvider services, DiscordSocketClient 
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
-        client.Log += OnLogHandler.OnLogAsync;
+        client.Log += message => OnLogHandler.OnLogAsync(client, message);
 
         await services.GetRequiredService<InteractionHandler>().InitializeAsync();
 

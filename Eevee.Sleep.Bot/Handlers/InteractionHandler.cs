@@ -18,7 +18,7 @@ public class InteractionHandler(
 ) {
     public async Task InitializeAsync() {
         client.Ready += ReadyAsync;
-        handler.Log += OnLogHandler.OnLogAsync;
+        handler.Log += message => OnLogHandler.OnLogAsync(client, message);
 
         await handler.AddModulesAsync(Assembly.GetEntryAssembly(), services);
 
