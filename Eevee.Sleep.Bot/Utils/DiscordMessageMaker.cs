@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using Eevee.Sleep.Bot.Enums;
 using IResult = Discord.Interactions.IResult;
 
@@ -15,7 +16,7 @@ public static class DiscordMessageMaker {
     }
 
     public static Embed[] MakeActivationNote() {
-        return new[] {
+        return [
             new EmbedBuilder()
                 .WithColor(Colors.Danger)
                 .WithTitle("中文")
@@ -68,7 +69,7 @@ public static class DiscordMessageMaker {
                     """
                 )
                 .Build()
-        };
+        ];
     }
 
     public static Embed MakeUserDataNotCached(ulong userId, IUser updated) {
@@ -107,10 +108,23 @@ public static class DiscordMessageMaker {
             .WithFooter($"ID: {user.Id}")
             .WithCurrentTimestamp();
 
-        if (!(roleIds is null)) {
+        if (roleIds is not null) {
             builder = builder.AddField("Role", string.Join(" / ", roleIds.Select(x => $"<@&{x}>")));
         }
 
         return builder.Build();
+    }
+
+    public static Embed MakeLotteryResult(ulong roleId, int count, IEnumerable<SocketGuildUser> members) {
+        return new EmbedBuilder()
+            .WithColor(Colors.Info)
+            .WithDescription(
+                $"""
+                 # {MentionUtils.MentionRole(roleId)} x {count}
+                 {string.Join("\n", members.Select(x => $"- {MentionUtils.MentionUser(x.Id)}"))}
+                 """
+            )
+            .WithCurrentTimestamp()
+            .Build();
     }
 }
