@@ -6,18 +6,9 @@ using Eevee.Sleep.Bot.Utils;
 
 namespace Eevee.Sleep.Bot.Workers;
 
-public class DiscordClientWorker : BackgroundService {
-    private readonly IServiceProvider _services;
-
-    private readonly DiscordSocketClient _client;
-
-    public DiscordClientWorker(IServiceProvider services, DiscordSocketClient client) {
-        _services = services;
-        _client = client;
-    }
-
+public class DiscordClientWorker(IServiceProvider services, DiscordSocketClient client) : BackgroundService {
     private async Task SendTestMessage() {
-        var message = await _client.SendMessageInAdminAlertChannel("`SYSTEM` Admin alert sending test");
+        var message = await client.SendMessageInAdminAlertChannel("`SYSTEM` Admin alert sending test");
 
         await Task.Delay(TimeSpan.FromSeconds(30));
 
@@ -25,12 +16,12 @@ public class DiscordClientWorker : BackgroundService {
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
-        _client.Log += OnLogHandler.OnLogAsync;
+        client.Log += OnLogHandler.OnLogAsync;
 
-        await _services.GetRequiredService<InteractionHandler>().InitializeAsync();
+        await services.GetRequiredService<InteractionHandler>().InitializeAsync();
 
-        await _client.LoginAsync(TokenType.Bot, ConfigHelper.GetDiscordToken());
-        await _client.StartAsync();
+        await client.LoginAsync(TokenType.Bot, ConfigHelper.GetDiscordToken());
+        await client.StartAsync();
 
         await SendTestMessage();
 
