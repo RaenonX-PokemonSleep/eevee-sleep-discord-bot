@@ -118,12 +118,10 @@ public static class DiscordMessageMaker {
     public static Embed MakeLotteryResult(ulong roleId, int count, IEnumerable<SocketGuildUser> members) {
         return new EmbedBuilder()
             .WithColor(Colors.Info)
-            .WithDescription(
-                $"""
-                 # {MentionUtils.MentionRole(roleId)} x {count}
-                 {string.Join("\n", members.Select(x => $"- {MentionUtils.MentionUser(x.Id)}"))}
-                 """
-            )
+            .WithDescription(string.Join("\n", [
+                $"# {MentionUtils.MentionRole(roleId)} x {count}",
+                string.Join("\n", members.Select(x => $"- {MentionUtils.MentionUser(x.Id)}"))
+            ]))
             .WithCurrentTimestamp()
             .Build();
     }
