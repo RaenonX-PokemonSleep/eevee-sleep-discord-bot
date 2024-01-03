@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using Discord.WebSocket;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Utils;
 using JetBrains.Annotations;
@@ -11,11 +12,11 @@ public class LotterySlashModule : InteractionModuleBase<SocketInteractionContext
     [SlashCommand("role", "Do a role-based member lottery.")]
     [UsedImplicitly]
     public Task RoleBasedLotteryAsync(
-        [Summary(name: "role", description: "Lottery target role.")] string roleExpression,
+        [Summary(name: "role", description: "Lottery target role.")] SocketRole role,
         [Summary(name: "count", description: "Count of members to pull.")] int count
     ) {
         try {
-            var targetRoleId = MentionUtils.ParseRole(roleExpression);
+            var targetRoleId = role.Id;
 
             var result = Context.Client.GetGuild(ConfigHelper.GetDiscordWorkingGuild())
                 .Roles
