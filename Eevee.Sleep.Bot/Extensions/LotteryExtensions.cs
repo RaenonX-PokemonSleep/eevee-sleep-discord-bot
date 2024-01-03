@@ -4,17 +4,13 @@ public static class LotteryExtensions {
     private static readonly Random Random = new();
 
     public static IEnumerable<T> GetRandomElements<T>(this IList<T> list, int count) {
-        var rolledCount = 0;
+        var result = new HashSet<T>();
 
-        foreach (var element in list) {
-            var result = Random.Next(list.Count - rolledCount);
-
-            if (result >= count - rolledCount) {
-                continue;
-            }
-
-            yield return element;
-            rolledCount += 1;
+        while (result.Count < count) {
+            var idx = Random.Next(0, list.Count);
+            result.Add(list[idx]);
         }
+
+        return result;
     }
 }
