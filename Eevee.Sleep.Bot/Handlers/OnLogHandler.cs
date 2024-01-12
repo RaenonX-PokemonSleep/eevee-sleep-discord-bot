@@ -9,7 +9,11 @@ public static class OnLogHandler {
     private static readonly ILogger Logger = LogHelper.CreateLogger(typeof(OnLogHandler));
 
     public static async Task OnLogAsync(DiscordSocketClient client, LogMessage message) {
-        if (message.Exception is not null && message.Exception is not GatewayReconnectException) {
+        if (
+            message.Exception is not null &&
+            message.Exception is not GatewayReconnectException &
+            message.Exception.Message != "WebSocket connection was closed"
+        ) {
             await client.SendMessageInAdminAlertChannel(embed: DiscordMessageMaker.MakeErrorFromLog(message));
         }
 
