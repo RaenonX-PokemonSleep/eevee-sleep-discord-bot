@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Enums;
+using Eevee.Sleep.Bot.Models;
 using IResult = Discord.Interactions.IResult;
 
 namespace Eevee.Sleep.Bot.Utils;
@@ -92,20 +93,30 @@ public static class DiscordMessageMaker {
             .Build();
     }
 
-    public static Embed MakeUserSubscribed(IUser user, IEnumerable<ulong> roleIds) {
-        return MakeUserSubscribed(user, roleIds, Colors.Success);
+    public static Embed MakeUserSubscribed(IUser user, HashSet<ActivationPresetRole> roles) {
+        return MakeUserSubscribed(user, roles, Colors.Success);
     }
 
-    public static Embed MakeUserSubscribed(IUser user, IEnumerable<ulong> roleIds, Color color) {
-        return new EmbedBuilder()
+    public static Embed MakeUserSubscribed(IUser user, HashSet<ActivationPresetRole> roles, Color color) {
+        var builder = new EmbedBuilder()
             .WithColor(color)
             .WithAuthor(user)
             .WithTitle("Member Subscribed")
             .AddField("User", user.Mention)
-            .AddField("Role", string.Join(" / ", roleIds.Select(MentionUtils.MentionRole)))
             .WithFooter($"ID: {user.Id}")
-            .WithCurrentTimestamp()
-            .Build();
+            .WithCurrentTimestamp();
+
+        foreach (var presetRole in roles) {
+            var roleMention = MentionUtils.MentionRole(presetRole.RoleId);
+            var suffix = presetRole.Suspended ? " (Suspended)" : "";
+
+            builder = builder.AddField(
+                "Role",
+                $"{roleMention}{suffix}"
+            );
+        }
+
+        return builder.Build();
     }
 
     public static Embed MakeUserUnsubscribed(IUser user, IEnumerable<ulong>? roleIds = null) {

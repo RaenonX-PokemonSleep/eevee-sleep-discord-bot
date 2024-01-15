@@ -20,4 +20,7 @@ public record ActivationPresetModel {
     
     [UsedImplicitly]
     public required Dictionary<string, bool> Activation { get; init; }
+
+    [UsedImplicitly]
+    public required bool Suspended { get; init; }
 }

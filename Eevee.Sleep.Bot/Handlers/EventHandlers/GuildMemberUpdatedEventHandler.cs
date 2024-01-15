@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
+using Eevee.Sleep.Bot.Models;
 using Eevee.Sleep.Bot.Utils;
 
 namespace Eevee.Sleep.Bot.Handlers.EventHandlers;
@@ -13,24 +14,41 @@ public static class GuildMemberUpdatedEventHandler {
     private static async Task HandleRolesAdded(
         IDiscordClient client,
         IHostEnvironment environment,
-        ulong[] roleIds,
+        HashSet<ActivationPresetRole> rolesAdded,
         IUser user
     ) {
         Logger.LogInformation(
             "Handing subscriber role addition of {RoleIds} for user {UserId} (@{UserName})",
-            roleIds,
+            string.Join(" / ", rolesAdded.Select(x => x.RoleId)),
             user.Id,
             user.Username
         );
 
+        var activeRoles = rolesAdded
+            .Where(x => !x.Suspended)
+            .ToHashSet();
+
+        if (activeRoles.Count <= 0) {
+            await client.SendMessageInAdminAlertChannel(
+                $"All roles to add to <@{user.Id}> (@{user.Username}) are suspended",
+                embed: DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded, Colors.Info)
+            );
+            Logger.LogInformation(
+                "Skipped generating activation link due to role suspension for user {UserId} (@{UserName})",
+                user.Id,
+                user.Username
+            );
+            return;
+        }
+
         var activationLink = await HttpRequestHelper.GenerateDiscordActivationLink(
             user.Id.ToString(),
-            roleIds
+            activeRoles.Select(x => x.RoleId)
         );
         if (string.IsNullOrEmpty(activationLink)) {
             await client.SendMessageInAdminAlertChannel(
                 $"Activation link failed to generate for user <@{user.Id}> (@{user.Username})",
-                embed: DiscordMessageMaker.MakeUserSubscribed(user, roleIds, Colors.Warning)
+                embed: DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded, Colors.Warning)
             );
             Logger.LogWarning(
                 "Activation link failed to generate for user {UserId} (@{UserName})",
@@ -53,8 +71,9 @@ public static class GuildMemberUpdatedEventHandler {
                 embeds: DiscordMessageMaker.MakeActivationNote()
             );
         }
+
         await client.SendMessageInAdminAlertChannel(
-            embed: DiscordMessageMaker.MakeUserSubscribed(user, roleIds)
+            embed: DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded)
         );
     }
 
@@ -91,7 +110,8 @@ public static class GuildMemberUpdatedEventHandler {
             return;
         }
 
-        var taggedRoleIds = ActivationPresetController.GetTaggedRoleIds();
+        var taggedRoles = ActivationPresetController
+            .GetTaggedRoles();
 
         var rolesAdded = updated.Roles
             .ExceptBy(original.Value.Roles.Select(x => x.Id), role => role.Id)
@@ -102,12 +122,16 @@ public static class GuildMemberUpdatedEventHandler {
             .Select(x => x.Id)
             .ToArray();
 
-        if (rolesAdded.Any(taggedRoleIds.Contains)) {
-            await HandleRolesAdded(client, environment, rolesAdded, updated);
+        var taggedRolesAdded = taggedRoles
+            .Where(x => rolesAdded.Contains(x.RoleId))
+            .ToHashSet();
+
+        if (taggedRolesAdded.Count > 0) {
+            await HandleRolesAdded(client, environment, taggedRolesAdded, updated);
             return;
         }
 
-        if (rolesRemoved.Any(taggedRoleIds.Contains)) {
+        if (rolesRemoved.Any(taggedRoles.Select(x => x.RoleId).Contains)) {
             await HandleRolesRemoved(client, rolesRemoved, updated);
         }
     }

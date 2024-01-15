@@ -5,7 +5,7 @@ public static class HttpRequestHelper {
 
     public static async Task<string> GenerateDiscordActivationLink(
         string discordId,
-        ulong[] roleIds
+        IEnumerable<ulong> roleIds
     ) {
         var response = await Client.PostAsync(
             ConfigHelper.GetInternalApiGenerateActivation(),

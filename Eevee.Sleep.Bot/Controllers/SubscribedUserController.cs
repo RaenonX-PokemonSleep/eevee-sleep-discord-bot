@@ -14,7 +14,9 @@ public class SubscribedUserController(
 ) : ControllerBase {
     [HttpGet(Name = "GetSubscribedUsers")]
     public IEnumerable<SubscribedUserModel> Get() {
-        var taggedRoleIds = ActivationPresetController.GetTaggedRoleIds();
+        var taggedRoleIds = ActivationPresetController.GetTaggedRoles()
+            .Select(x => x.RoleId)
+            .ToHashSet();
 
         logger.LogInformation(
             "Getting users with role ID ({taggedRoleCount}): {taggedRoleIds}",
