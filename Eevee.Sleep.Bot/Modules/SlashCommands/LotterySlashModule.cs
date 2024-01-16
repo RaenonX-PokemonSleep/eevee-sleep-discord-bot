@@ -10,6 +10,7 @@ namespace Eevee.Sleep.Bot.Modules.SlashCommands;
 [Group("lottery", "Commands for doing lottery.")]
 public class LotterySlashModule : InteractionModuleBase<SocketInteractionContext> {
     [SlashCommand("role", "Do a role-based member lottery.")]
+    [DefaultMemberPermissions(GuildPermission.Administrator)]
     [UsedImplicitly]
     public Task RoleBasedLotteryAsync(
         [Summary(name: "role", description: "Lottery target role.")] SocketRole role,
