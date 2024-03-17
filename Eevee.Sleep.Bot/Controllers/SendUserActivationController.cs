@@ -22,7 +22,8 @@ public class SendUserActivationController(
         );
 
         Task.WhenAll(activationMessages.Select(async x => {
-            var user = await client.GetUserAsync(Convert.ToUInt64(x.UserId));
+            var userId = Convert.ToUInt64(x.UserId);
+            var user = await client.GetUserAsync(userId);
 
             if (user is null) {
                 logger.LogInformation(
@@ -30,7 +31,7 @@ public class SendUserActivationController(
                     x.UserId
                 );
                 await client.SendMessageInAdminAlertChannel(
-                    $"Failed to send activation message to <@{x.UserId}> - User not found"
+                    $"Failed to send activation message to {MentionUtils.MentionUser(userId)} - User not found"
                 );
                 return;
             }
@@ -49,7 +50,7 @@ public class SendUserActivationController(
             }
 
             await client.SendMessageInAdminAlertChannel(
-                $"Activation message sent to <@{x.UserId}> with [link]({x.Link}) - requested via API"
+                $"Activation message sent to {MentionUtils.MentionUser(userId)} with [link]({x.Link}) - requested via API"
             );
         }));
 

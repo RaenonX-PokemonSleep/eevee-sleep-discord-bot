@@ -30,7 +30,7 @@ public static class GuildMemberUpdatedEventHandler {
 
         if (activeRoles.Count <= 0) {
             await client.SendMessageInAdminAlertChannel(
-                $"All roles to add to <@{user.Id}> (@{user.Username}) are suspended",
+                $"All roles to add to {MentionUtils.MentionUser(user.Id)} (@{user.Username}) are suspended",
                 embed: DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded, Colors.Info)
             );
             Logger.LogInformation(
@@ -47,7 +47,7 @@ public static class GuildMemberUpdatedEventHandler {
         );
         if (string.IsNullOrEmpty(activationLink)) {
             await client.SendMessageInAdminAlertChannel(
-                $"Activation link failed to generate for user <@{user.Id}> (@{user.Username})",
+                $"Activation link failed to generate for user {MentionUtils.MentionUser(user.Id)} (@{user.Username})",
                 embed: DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded, Colors.Warning)
             );
             Logger.LogWarning(
