@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Net;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Models;
@@ -21,6 +22,15 @@ public static class DiscordMessageMaker {
             .WithColor(Colors.Warning)
             .WithTitle($"{message.Source}: {message.Message}")
             .WithDescription($"```{message.Exception}```")
+            .WithCurrentTimestamp()
+            .Build();
+    }
+    
+    public static Embed MakeDiscordHttpException(HttpException e) {
+        return new EmbedBuilder()
+            .WithColor(Colors.Warning)
+            .WithTitle($"{e.Source}: {e.Message} ({e.DiscordCode})")
+            .WithDescription($"```{e.StackTrace}```")
             .WithCurrentTimestamp()
             .Build();
     }

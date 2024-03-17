@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.Net;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
@@ -66,10 +67,18 @@ public static class GuildMemberUpdatedEventHandler {
         );
         // Prevent accidentally sending messages to the users
         if (environment.IsProduction()) {
-            await user.SendMessageAsync(
-                activationLink,
-                embeds: DiscordMessageMaker.MakeActivationNote()
-            );
+            try {
+                await user.SendMessageAsync(
+                    activationLink,
+                    embeds: DiscordMessageMaker.MakeActivationNote()
+                );
+            } catch (HttpException e) {
+                await client.SendMessageInAdminAlertChannel(
+                    $"Error occurred during activation link delivery to {MentionUtils.MentionUser(user.Id)}\n" +
+                    $"> {activationLink}",
+                    embed: DiscordMessageMaker.MakeDiscordHttpException(e)
+                );
+            }
         }
 
         await client.SendMessageInAdminAlertChannel(
