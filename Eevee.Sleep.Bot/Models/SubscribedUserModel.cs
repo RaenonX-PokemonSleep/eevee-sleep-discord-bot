@@ -14,4 +14,4 @@ public record SubscribedUserModel {
     
     [UsedImplicitly]
     public required string Username { get; init; }
-};
+}

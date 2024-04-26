@@ -8,4 +8,4 @@ public record DiscordActivationMessageModel {
 
     [UsedImplicitly]
     public required string Link { get; init; }
-};
+}

@@ -21,7 +21,7 @@ public partial class MessageAppModule : InteractionModuleBase<SocketInteractionC
 
         var content = userMessage.Content;
 
-        if (!content.StartsWith("<") || !content.EndsWith(">")) {
+        if (!content.StartsWith('<') || !content.EndsWith('>')) {
             await RespondAsync(text: "Single emoji message is required!");
             return;
         }

@@ -10,7 +10,7 @@ namespace Eevee.Sleep.Bot.Controllers;
 [Route("/subscribed-users")]
 public class SubscribedUserController(
     ILogger<SubscribedUserController> logger,
-    DiscordSocketClient client
+    BaseSocketClient client
 ) : ControllerBase {
     [HttpGet(Name = "GetSubscribedUsers")]
     public IEnumerable<SubscribedUserModel> Get() {
