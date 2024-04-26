@@ -49,8 +49,11 @@ public class SendUserActivationController(
                 );
             }
 
-            await client.SendMessageInAdminAlertChannel(
-                $"Activation message sent to {MentionUtils.MentionUser(userId)} with [link]({x.Link}) - requested via API"
+            await Task.WhenAll(
+                DiscordSubscriberMarker.MarkUserSubscribed(user),
+                client.SendMessageInAdminAlertChannel(
+                    $"Activation message sent to {MentionUtils.MentionUser(userId)} with [link]({x.Link}) - requested via API"
+                )
             );
         }));
 

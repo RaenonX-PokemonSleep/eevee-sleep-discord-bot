@@ -103,11 +103,13 @@ public static class DiscordMessageMaker {
             .Build();
     }
 
-    public static Embed MakeUserSubscribed(IUser user, HashSet<ActivationPresetRole> roles) {
+    public static Task<Embed> MakeUserSubscribed(IUser user, HashSet<ActivationPresetRole> roles) {
         return MakeUserSubscribed(user, roles, Colors.Success);
     }
 
-    public static Embed MakeUserSubscribed(IUser user, HashSet<ActivationPresetRole> roles, Color color) {
+    public static async Task<Embed> MakeUserSubscribed(IUser user, HashSet<ActivationPresetRole> roles, Color color) {
+        await DiscordSubscriberMarker.MarkUserSubscribed(user);
+        
         var builder = new EmbedBuilder()
             .WithColor(color)
             .WithAuthor(user)
@@ -129,7 +131,9 @@ public static class DiscordMessageMaker {
         return builder.Build();
     }
 
-    public static Embed MakeUserUnsubscribed(IUser user, IEnumerable<ulong>? roleIds = null) {
+    public static async Task<Embed> MakeUserUnsubscribed(IUser user, IEnumerable<ulong>? roleIds = null) {
+        await DiscordSubscriberMarker.MarkUserUnsubscribed(user);
+        
         var builder = new EmbedBuilder()
             .WithColor(Colors.Danger)
             .WithAuthor(user)

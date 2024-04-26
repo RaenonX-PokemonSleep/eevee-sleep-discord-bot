@@ -19,7 +19,7 @@ public static class GuildMemberLeftEventHandler {
 
         if (results.Any(x => x.DeletedCount > 0)) {
             await client.SendMessageInAdminAlertChannel(
-                embed: DiscordMessageMaker.MakeUserUnsubscribed(user)
+                embed: await DiscordMessageMaker.MakeUserUnsubscribed(user)
             );
         }
     }

@@ -31,6 +31,14 @@ public static class ConfigHelper {
         return GetDiscordChannelSection().GetRequiredValue<ulong>("AdminAlert");
     }
 
+    private static IConfigurationSection GetDiscordRolesSection() {
+        return GetDiscordSection().GetRequiredSection("Roles");
+    }
+
+    public static ulong GetDiscordSubscriberRoleId() {
+        return GetDiscordRolesSection().GetRequiredValue<ulong>("Subscriber");
+    }
+
     private static IConfigurationSection GetApiSection() {
         return Config.GetRequiredSection("Api");
     }

@@ -32,7 +32,7 @@ public static class GuildMemberUpdatedEventHandler {
         if (activeRoles.Count <= 0) {
             await client.SendMessageInAdminAlertChannel(
                 $"All roles to add to {MentionUtils.MentionUser(user.Id)} (@{user.Username}) are suspended",
-                embed: DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded, Colors.Info)
+                embed: await DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded, Colors.Info)
             );
             Logger.LogInformation(
                 "Skipped generating activation link due to role suspension for user {UserId} (@{UserName})",
@@ -49,7 +49,7 @@ public static class GuildMemberUpdatedEventHandler {
         if (string.IsNullOrEmpty(activationLink)) {
             await client.SendMessageInAdminAlertChannel(
                 $"Activation link failed to generate for user {MentionUtils.MentionUser(user.Id)} (@{user.Username})",
-                embed: DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded, Colors.Warning)
+                embed: await DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded, Colors.Warning)
             );
             Logger.LogWarning(
                 "Activation link failed to generate for user {UserId} (@{UserName})",
@@ -82,23 +82,23 @@ public static class GuildMemberUpdatedEventHandler {
         }
 
         await client.SendMessageInAdminAlertChannel(
-            embed: DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded)
+            embed: await DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded)
         );
     }
 
     private static async Task HandleRolesRemoved(
         IDiscordClient client,
-        ulong[] roleIds,
+        IReadOnlyCollection<ulong> roleIds,
         IUser user
     ) {
         await client.SendMessageInAdminAlertChannel(
-            embed: DiscordMessageMaker.MakeUserUnsubscribed(user, roleIds)
+            embed: await DiscordMessageMaker.MakeUserUnsubscribed(user, roleIds)
         );
         Logger.LogInformation(
             "User {UserId} (@{Username}) activation expired ({RoleCount} roles dropped: {RoleIds}), removing associated activation",
             user.Id,
             user.Username,
-            roleIds.Length,
+            roleIds.Count,
             string.Join(" / ", roleIds)
         );
 
