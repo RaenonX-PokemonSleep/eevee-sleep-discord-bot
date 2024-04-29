@@ -25,7 +25,7 @@ public static class DiscordMessageMaker {
             .WithCurrentTimestamp()
             .Build();
     }
-    
+
     public static Embed MakeDiscordHttpException(HttpException e) {
         return new EmbedBuilder()
             .WithColor(Colors.Warning)
@@ -109,7 +109,7 @@ public static class DiscordMessageMaker {
 
     public static async Task<Embed> MakeUserSubscribed(IUser user, HashSet<ActivationPresetRole> roles, Color color) {
         await DiscordSubscriberMarker.MarkUserSubscribed(user);
-        
+
         var builder = new EmbedBuilder()
             .WithColor(color)
             .WithAuthor(user)
@@ -132,8 +132,6 @@ public static class DiscordMessageMaker {
     }
 
     public static async Task<Embed> MakeUserUnsubscribed(IUser user, IEnumerable<ulong>? roleIds = null) {
-        await DiscordSubscriberMarker.MarkUserUnsubscribed(user);
-        
         var builder = new EmbedBuilder()
             .WithColor(Colors.Danger)
             .WithAuthor(user)
@@ -142,9 +140,15 @@ public static class DiscordMessageMaker {
             .WithFooter($"ID: {user.Id}")
             .WithCurrentTimestamp();
 
-        if (roleIds is not null) {
-            builder = builder.AddField("Role", string.Join(" / ", roleIds.Select(MentionUtils.MentionRole)));
+        if (roleIds is null) {
+            return builder.Build();
         }
+
+        // If `roleIds` is not null, it means that the user is still in the server.
+        // Therefore, mark the user unsubscribed, which removes the role
+        await DiscordSubscriberMarker.MarkUserUnsubscribed(user);
+
+        builder = builder.AddField("Role", string.Join(" / ", roleIds.Select(MentionUtils.MentionRole)));
 
         return builder.Build();
     }
