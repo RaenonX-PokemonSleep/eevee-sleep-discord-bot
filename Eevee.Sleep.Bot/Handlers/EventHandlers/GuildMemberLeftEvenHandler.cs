@@ -15,11 +15,11 @@ public static class GuildMemberLeftEventHandler {
             user.Id,
             user.Username
         );
-        var results = await ActivationController.RemoveDiscordActivationData(user.Id.ToString());
+        var subscriptionDuration = await ActivationController.RemoveDiscordActivationAndGetSubscriptionDuration(user.Id.ToString());
 
-        if (results.Any(x => x.DeletedCount > 0)) {
+        if (subscriptionDuration is not null) {
             await client.SendMessageInAdminAlertChannel(
-                embed: await DiscordMessageMaker.MakeUserUnsubscribed(user)
+                embed: await DiscordMessageMaker.MakeUserUnsubscribed(user, subscriptionDuration)
             );
         }
     }

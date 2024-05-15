@@ -131,12 +131,20 @@ public static class DiscordMessageMaker {
         return builder.Build();
     }
 
-    public static async Task<Embed> MakeUserUnsubscribed(IUser user, IEnumerable<ulong>? roleIds = null) {
+    public static async Task<Embed> MakeUserUnsubscribed(
+        IUser user,
+        TimeSpan? subscriptionDuration,
+        IEnumerable<ulong>? roleIds = null
+    ) {
         var builder = new EmbedBuilder()
             .WithColor(Colors.Danger)
             .WithAuthor(user)
             .WithTitle("Member Unsubscribed")
             .AddField("User", user.Mention)
+            .AddField(
+                "Subscription Duration",
+                subscriptionDuration.HasValue ? subscriptionDuration.Value.ToString("c") : "(N/A)"
+            )
             .WithFooter($"ID: {user.Id}")
             .WithCurrentTimestamp();
 

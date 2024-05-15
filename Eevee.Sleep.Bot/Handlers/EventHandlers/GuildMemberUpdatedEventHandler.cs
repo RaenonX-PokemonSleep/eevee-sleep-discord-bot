@@ -91,8 +91,10 @@ public static class GuildMemberUpdatedEventHandler {
         IReadOnlyCollection<ulong> roleIds,
         IUser user
     ) {
+        var subscriptionDuration = await ActivationController.RemoveDiscordActivationAndGetSubscriptionDuration(user.Id.ToString());
+        
         await client.SendMessageInAdminAlertChannel(
-            embed: await DiscordMessageMaker.MakeUserUnsubscribed(user, roleIds)
+            embed: await DiscordMessageMaker.MakeUserUnsubscribed(user, subscriptionDuration, roleIds)
         );
         Logger.LogInformation(
             "User {UserId} (@{Username}) activation expired ({RoleCount} roles dropped: {RoleIds}), removing associated activation",
@@ -101,8 +103,6 @@ public static class GuildMemberUpdatedEventHandler {
             roleIds.Count,
             string.Join(" / ", roleIds)
         );
-
-        await ActivationController.RemoveDiscordActivationData(user.Id.ToString());
     }
 
     public static async Task OnEvent(
