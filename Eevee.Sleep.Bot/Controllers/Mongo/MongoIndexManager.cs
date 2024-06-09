@@ -10,7 +10,9 @@ public static class MongoIndexManager {
             ActivationDataSourceIndex(),
             ActivationPresetSourceIndex(),
             ActivationPresetTagIndex(),
-            ActivationPresetUuidIndex()
+            ActivationPresetUuidIndex(),
+            DiscordRoleRecordUserIdIndex(),
+            DiscordTrackedRoleRoleIdIndex()
         };
     }
 
@@ -60,5 +62,21 @@ public static class MongoIndexManager {
         var indexModel = new CreateIndexModel<ActivationPresetModel>(indexKeys, indexOptions);
 
         await MongoConst.AuthActivationPresetCollection.Indexes.CreateOneAsync(indexModel);
+    }
+
+    private static Task DiscordRoleRecordUserIdIndex() {
+        var indexKeys = Builders<RoleRecordModel>.IndexKeys
+            .Ascending(data => data.UserId);
+        var indexModel = new CreateIndexModel<RoleRecordModel>(indexKeys);
+
+        return MongoConst.DiscordRoleRecordCollection.Indexes.CreateOneAsync(indexModel);
+    }
+
+    private static Task DiscordTrackedRoleRoleIdIndex() {
+        var indexKeys = Builders<TrackedRoleModel>.IndexKeys
+            .Ascending(data => data.Id);
+        var indexModel = new CreateIndexModel<TrackedRoleModel>(indexKeys);
+
+        return MongoConst.DiscordTrackedRoleCollection.Indexes.CreateOneAsync(indexModel);
     }
 }

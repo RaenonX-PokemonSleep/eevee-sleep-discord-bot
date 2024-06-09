@@ -20,4 +20,12 @@ public static class MongoConst {
 
     public static readonly IMongoCollection<ActivationPresetModel> AuthActivationPresetCollection =
         AuthDatabase.GetCollection<ActivationPresetModel>("activationPreset");
+
+    private static readonly IMongoDatabase DiscordDatabase = Client.GetDatabase("discord");
+
+    public static readonly IMongoCollection<RoleRecordModel> DiscordRoleRecordCollection =
+        DiscordDatabase.GetCollection<RoleRecordModel>("role/record");
+
+    public static readonly IMongoCollection<TrackedRoleModel> DiscordTrackedRoleCollection =
+        DiscordDatabase.GetCollection<TrackedRoleModel>("role/tracked");
 }

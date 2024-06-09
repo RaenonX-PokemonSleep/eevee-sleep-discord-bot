@@ -171,4 +171,58 @@ public static class DiscordMessageMaker {
             .WithCurrentTimestamp()
             .Build();
     }
+
+    public static MessageComponent MakeRoleSelectButton(
+        TrackedRoleModel[] roles,
+        ButtonId buttonId
+    ) {
+        var builder = new ComponentBuilder();
+
+        foreach (var role in roles) {
+            builder.WithButton(
+                label: role.Name,
+                customId: ButtonInteractionInfoSerializer.Serialize(
+                    new ButtonInteractionInfo() {
+                        ButtonId = buttonId,
+                        CustomId = role.Id
+                    }
+                )
+            );
+        }
+
+        return builder.Build();
+    }
+
+    public static Embed MakeDeleteRoleResult(IUser user, ulong roleId) {
+        return new EmbedBuilder()
+            .WithColor(Colors.Success)
+            .WithAuthor(user)
+            .WithTitle("Role deleted from database")
+            .AddField("User", user.Mention)
+            .AddField("Role", MentionUtils.MentionRole(roleId))
+            .WithCurrentTimestamp()
+            .WithFooter($"ID: {user.Id}")
+            .Build();
+    }
+
+    public static Embed MakeTrackRoleResult(
+        ulong roleId,
+        ulong[] trackedRoles,
+        int roleOwnedUsercount,
+        string message,
+        Color color
+    ) {
+        var trackedRolesMessage = trackedRoles.Length == 0 ?
+            "(N/A)" :
+            string.Join(" / ", trackedRoles.Select(x => MentionUtils.MentionRole(x)));
+
+        return new EmbedBuilder()
+            .WithColor(color)
+            .WithTitle(message)
+            .AddField("Role", MentionUtils.MentionRole(roleId))
+            .AddField("Role owner count", roleOwnedUsercount)
+            .AddField("Tracked roles", trackedRolesMessage)
+            .WithCurrentTimestamp()
+            .Build();
+    }
 }

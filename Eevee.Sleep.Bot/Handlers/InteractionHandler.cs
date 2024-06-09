@@ -23,6 +23,7 @@ public class InteractionHandler(
         await handler.AddModulesAsync(Assembly.GetEntryAssembly(), services);
 
         client.InteractionCreated += OnInteractionCreated;
+        client.ButtonExecuted += OnButtonClicked;
         client.ModalSubmitted += OnModalSubmitted;
         client.GuildMemberUpdated += (cached, updated) =>
             GuildMemberUpdatedEventHandler.OnEvent(client, env, cached, updated);
@@ -114,6 +115,33 @@ public class InteractionHandler(
                 return;
             default:
                 throw new ArgumentException($"Unhandled modal ID: {modalId}");
+        }
+    }
+
+    private static async Task OnButtonClicked(SocketMessageComponent component) {
+        var info = ButtonInteractionInfoSerializer.Deserialize(component.Data.CustomId);
+        var buttonId = info?.ButtonId;
+        var user = component.User is SocketGuildUser matchedUser ? matchedUser : null;
+
+        if (info is null || user is null) {
+            throw new ArgumentException("Button interaction info or user is null!");
+        }
+
+        switch (buttonId) {
+            case ButtonId.RoleChanger:
+                await component.RespondAsync("Your request has been accepted!", ephemeral: true);
+                await ButtonClickedHandler.DisplayRoleButtonClicked(info, user);
+                break;
+            case ButtonId.RoleAdder:
+                await component.RespondAsync("Your request has been accepted!", ephemeral: true);
+                await ButtonClickedHandler.AddRoleButtonClicked(info, user);
+                break;
+            case ButtonId.RoleRemover:
+                await component.RespondAsync("Your request has been accepted!", ephemeral: true);
+                await ButtonClickedHandler.RemoveRoleButtonClicked(info, user);
+                break;
+            default:
+                throw new ArgumentException($"Unhandled button ID: {buttonId}.");
         }
     }
 }

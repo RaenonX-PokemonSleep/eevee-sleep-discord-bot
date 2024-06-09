@@ -12,7 +12,7 @@ namespace Eevee.Sleep.Bot.Handlers.EventHandlers;
 public static class GuildMemberUpdatedEventHandler {
     private static readonly ILogger Logger = LogHelper.CreateLogger(typeof(GuildMemberUpdatedEventHandler));
 
-    private static async Task HandleRolesAdded(
+    private static async Task HandleTaggedRolesAdded(
         IDiscordClient client,
         IHostEnvironment environment,
         HashSet<ActivationPresetRole> rolesAdded,
@@ -86,6 +86,16 @@ public static class GuildMemberUpdatedEventHandler {
         );
     }
 
+    private static async Task HandleRolesAdded(ulong userId, ulong[] addedRoles) {
+        await DiscordRoleRecordContoller.AddRoles(
+            userId: userId,
+            roles: DiscordTrackedRoleContoller
+                .FindAllTrackedRoleIdsByRoleIds(addedRoles)
+                .Select(x => x.Id)
+                .ToArray()
+        );
+    }
+
     private static async Task HandleRolesRemoved(
         IDiscordClient client,
         IReadOnlyCollection<ulong> roleIds,
@@ -135,8 +145,12 @@ public static class GuildMemberUpdatedEventHandler {
             .Where(x => rolesAdded.Contains(x.RoleId))
             .ToHashSet();
 
+        if (rolesAdded.Length > 0) {
+            await HandleRolesAdded(original.Id, rolesAdded);
+        }
+
         if (taggedRolesAdded.Count > 0) {
-            await HandleRolesAdded(client, environment, taggedRolesAdded, updated);
+            await HandleTaggedRolesAdded(client, environment, taggedRolesAdded, updated);
             return;
         }
 
