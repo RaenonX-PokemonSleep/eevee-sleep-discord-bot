@@ -183,7 +183,7 @@ public static class DiscordMessageMaker {
             builder.WithButton(
                 label: role.Name,
                 customId: ButtonInteractionInfoSerializer.Serialize(
-                    new ButtonInteractionInfo() {
+                    new ButtonInteractionInfo {
                         ButtonId = buttonId,
                         CustomId = role.Id
                     }

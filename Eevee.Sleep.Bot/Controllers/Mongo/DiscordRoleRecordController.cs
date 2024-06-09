@@ -4,14 +4,6 @@ using MongoDB.Driver;
 namespace Eevee.Sleep.Bot.Controllers.Mongo;
 
 public static class DiscordRoleRecordController {
-    public static Task SaveRoles(ulong userId, ulong[] roles) {
-        return MongoConst.DiscordRoleRecordCollection.UpdateOneAsync(
-            Builders<RoleRecordModel>.Filter.Where(x => x.UserId == userId),
-            Builders<RoleRecordModel>.Update.Set(x => x.Roles, roles),
-            new UpdateOptions { IsUpsert = true }
-        );
-    }
-
     public static Task RemoveRoles(ulong userId, ulong[] roles) {
         return MongoConst.DiscordRoleRecordCollection.UpdateOneAsync(
             Builders<RoleRecordModel>.Filter.Where(x => x.UserId == userId),
@@ -57,6 +49,6 @@ public static class DiscordRoleRecordController {
             Builders<RoleRecordModel>.Filter.Where(x => x.UserId == userId)
         ).FirstOrDefault();
 
-        return result?.Roles ?? Array.Empty<ulong>();
+        return result?.Roles ?? [];
     }
 }

@@ -1,10 +1,10 @@
 using Discord;
 using Discord.Interactions;
-using JetBrains.Annotations;
-using Eevee.Sleep.Bot.Controllers.Mongo;
-using Eevee.Sleep.Bot.Utils;
-using Eevee.Sleep.Bot.Enums;
 using Discord.WebSocket;
+using Eevee.Sleep.Bot.Controllers.Mongo;
+using Eevee.Sleep.Bot.Enums;
+using Eevee.Sleep.Bot.Utils;
+using JetBrains.Annotations;
 
 namespace Eevee.Sleep.Bot.Modules.SlashCommands;
 
@@ -12,11 +12,11 @@ namespace Eevee.Sleep.Bot.Modules.SlashCommands;
 public class RoleManagementSlashModule : InteractionModuleBase<SocketInteractionContext> {
     private async Task SendEphemeralMessageToBeDeletedAsync(string text, MessageComponent components) {
         await Context.Interaction.RespondAsync(
-            text: text, 
-            components: components, 
+            text: text,
+            components: components,
             ephemeral: true
         );
-        
+
         // Ephemeral messages cannot be deleted by the button handler, so the message containing the button should be deleted after 30 seconds.
         await Task.Delay(TimeSpan.FromSeconds(30));
         await Context.Interaction.DeleteOriginalResponseAsync();
@@ -45,8 +45,8 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
     [SlashCommand("add", "Add the role ownership of a user.")]
     [UsedImplicitly]
     public Task AddRoleAsync() {
-        var user = Context.User is SocketGuildUser matchedUser ?
-            matchedUser : 
+        var user =
+            Context.User as SocketGuildUser ??
             throw new InvalidOperationException("User is not SocketGuildUser.");
 
         return SendEphemeralMessageToBeDeletedAsync(
@@ -67,8 +67,8 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
     [SlashCommand("remove", "Remove the role ownership of a user.")]
     [UsedImplicitly]
     public Task RemoveRoleAsync() {
-        var user = Context.User is SocketGuildUser matchedUser ?
-            matchedUser : 
+        var user =
+            Context.User as SocketGuildUser ??
             throw new InvalidOperationException("User is not SocketGuildUser.");
 
         return SendEphemeralMessageToBeDeletedAsync(

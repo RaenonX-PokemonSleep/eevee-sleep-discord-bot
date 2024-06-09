@@ -121,9 +121,8 @@ public class InteractionHandler(
     private static async Task OnButtonClicked(SocketMessageComponent component) {
         var info = ButtonInteractionInfoSerializer.Deserialize(component.Data.CustomId);
         var buttonId = info?.ButtonId;
-        var user = component.User is SocketGuildUser matchedUser ? matchedUser : null;
 
-        if (info is null || user is null) {
+        if (info is null || component.User is not SocketGuildUser user) {
             throw new ArgumentException("Button interaction info or user is null!");
         }
 

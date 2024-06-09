@@ -16,32 +16,32 @@ public static class MongoIndexManager {
         };
     }
 
-    private static async Task ActivationKeySourceIndex() {
+    private static Task<string> ActivationKeySourceIndex() {
         var indexKeys = Builders<ActivationKeyModel>.IndexKeys
             .Ascending(data => data.Source);
 
         var indexModel = new CreateIndexModel<ActivationKeyModel>(indexKeys);
 
-        await MongoConst.AuthActivationKeyCollection.Indexes.CreateOneAsync(indexModel);
+        return MongoConst.AuthActivationKeyCollection.Indexes.CreateOneAsync(indexModel);
     }
 
-    private static async Task ActivationDataSourceIndex() {
+    private static Task<string> ActivationDataSourceIndex() {
         var indexKeys = Builders<ActivationDataModel>.IndexKeys
             .Ascending(data => data.Source);
         var indexModel = new CreateIndexModel<ActivationDataModel>(indexKeys);
 
-        await MongoConst.AuthActivationDataCollection.Indexes.CreateOneAsync(indexModel);
+        return MongoConst.AuthActivationDataCollection.Indexes.CreateOneAsync(indexModel);
     }
 
-    private static async Task ActivationPresetSourceIndex() {
+    private static Task<string> ActivationPresetSourceIndex() {
         var indexKeys = Builders<ActivationPresetModel>.IndexKeys
             .Ascending(data => data.Source);
         var indexModel = new CreateIndexModel<ActivationPresetModel>(indexKeys);
 
-        await MongoConst.AuthActivationPresetCollection.Indexes.CreateOneAsync(indexModel);
+        return MongoConst.AuthActivationPresetCollection.Indexes.CreateOneAsync(indexModel);
     }
 
-    private static async Task ActivationPresetTagIndex() {
+    private static Task<string> ActivationPresetTagIndex() {
         var indexOptions = new CreateIndexOptions {
             Unique = true
         };
@@ -50,10 +50,10 @@ public static class MongoIndexManager {
             .Ascending(data => data.Tag);
         var indexModel = new CreateIndexModel<ActivationPresetModel>(indexKeys, indexOptions);
 
-        await MongoConst.AuthActivationPresetCollection.Indexes.CreateOneAsync(indexModel);
+        return MongoConst.AuthActivationPresetCollection.Indexes.CreateOneAsync(indexModel);
     }
 
-    private static async Task ActivationPresetUuidIndex() {
+    private static Task<string> ActivationPresetUuidIndex() {
         var indexOptions = new CreateIndexOptions {
             Unique = true
         };
@@ -61,10 +61,10 @@ public static class MongoIndexManager {
             .Ascending(data => data.Uuid);
         var indexModel = new CreateIndexModel<ActivationPresetModel>(indexKeys, indexOptions);
 
-        await MongoConst.AuthActivationPresetCollection.Indexes.CreateOneAsync(indexModel);
+        return MongoConst.AuthActivationPresetCollection.Indexes.CreateOneAsync(indexModel);
     }
 
-    private static Task DiscordRoleRecordUserIdIndex() {
+    private static Task<string> DiscordRoleRecordUserIdIndex() {
         var indexKeys = Builders<RoleRecordModel>.IndexKeys
             .Ascending(data => data.UserId);
         var indexModel = new CreateIndexModel<RoleRecordModel>(indexKeys);
@@ -72,7 +72,7 @@ public static class MongoIndexManager {
         return MongoConst.DiscordRoleRecordCollection.Indexes.CreateOneAsync(indexModel);
     }
 
-    private static Task DiscordTrackedRoleRoleIdIndex() {
+    private static Task<string> DiscordTrackedRoleRoleIdIndex() {
         var indexKeys = Builders<TrackedRoleModel>.IndexKeys
             .Ascending(data => data.Id);
         var indexModel = new CreateIndexModel<TrackedRoleModel>(indexKeys);
