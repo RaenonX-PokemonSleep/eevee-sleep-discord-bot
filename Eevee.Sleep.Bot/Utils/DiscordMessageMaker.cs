@@ -185,7 +185,7 @@ public static class DiscordMessageMaker {
                 customId: ButtonInteractionInfoSerializer.Serialize(
                     new ButtonInteractionInfo {
                         ButtonId = buttonId,
-                        CustomId = role.Id
+                        CustomId = role.RoleId
                     }
                 )
             );
@@ -213,7 +213,7 @@ public static class DiscordMessageMaker {
         Color color
     ) {
         var trackedRoles = DiscordTrackedRoleController.FindAllTrackedRoles()
-            .Select(x => MentionUtils.MentionRole(x.Id))
+            .Select(x => MentionUtils.MentionRole(x.RoleId))
             .ToArray();
         
         return new EmbedBuilder()

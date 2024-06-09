@@ -74,7 +74,7 @@ public static class MongoIndexManager {
 
     private static Task<string> DiscordTrackedRoleRoleIdIndex() {
         var indexKeys = Builders<TrackedRoleModel>.IndexKeys
-            .Ascending(data => data.Id);
+            .Ascending(data => data.RoleId);
         var indexModel = new CreateIndexModel<TrackedRoleModel>(indexKeys);
 
         return MongoConst.DiscordTrackedRoleCollection.Indexes.CreateOneAsync(indexModel);

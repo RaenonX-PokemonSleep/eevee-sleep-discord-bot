@@ -91,7 +91,7 @@ public static class GuildMemberUpdatedEventHandler {
             userId: userId,
             roles: DiscordTrackedRoleController
                 .FindAllTrackedRoleIdsByRoleIds(addedRoles)
-                .Select(x => x.Id)
+                .Select(x => x.RoleId)
                 .ToArray()
         );
     }

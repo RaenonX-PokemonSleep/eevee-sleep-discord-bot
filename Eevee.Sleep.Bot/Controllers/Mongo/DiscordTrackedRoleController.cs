@@ -8,7 +8,7 @@ public static class DiscordTrackedRoleController {
     public static Task SaveTrackedRole(IRole role) {
         return MongoConst.DiscordTrackedRoleCollection
             .UpdateOneAsync(
-                Builders<TrackedRoleModel>.Filter.Where(x => x.Id == role.Id),
+                Builders<TrackedRoleModel>.Filter.Where(x => x.RoleId == role.Id),
                 Builders<TrackedRoleModel>.Update.Set(x => x.Name, role.Name),
                 new UpdateOptions { IsUpsert = true }
             );
@@ -17,7 +17,7 @@ public static class DiscordTrackedRoleController {
     public static Task RemoveTrackedRole(ulong roleId) {
         return MongoConst.DiscordTrackedRoleCollection
             .DeleteOneAsync(
-                Builders<TrackedRoleModel>.Filter.Where(x => x.Id == roleId)
+                Builders<TrackedRoleModel>.Filter.Where(x => x.RoleId == roleId)
             );
     }
 
@@ -30,7 +30,7 @@ public static class DiscordTrackedRoleController {
 
     public static TrackedRoleModel[] FindAllTrackedRoleIdsByRoleIds(ulong[] roleIds) {
         return MongoConst.DiscordTrackedRoleCollection
-            .Find(Builders<TrackedRoleModel>.Filter.In(x => x.Id, roleIds))
+            .Find(Builders<TrackedRoleModel>.Filter.In(x => x.RoleId, roleIds))
             .ToEnumerable()
             .ToArray();
     }
