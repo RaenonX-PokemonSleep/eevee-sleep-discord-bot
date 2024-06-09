@@ -45,10 +45,10 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         }
 
         string[] messages = [
+            "Select the role to display.",
+            "",
             "All tracked roles will be removed from after selecting the role to display.",
             "Role ownership won't get affected by the removal, only the role assignment on Discord is affected.",
-            "",
-            "Select your role to display.",
             "",
             ..DiscordMessageMaker.MakeRoleSelectCorrespondenceList(roles)
         ];
