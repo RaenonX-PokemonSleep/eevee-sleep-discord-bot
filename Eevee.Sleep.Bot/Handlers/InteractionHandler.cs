@@ -128,16 +128,35 @@ public class InteractionHandler(
 
         switch (buttonId) {
             case ButtonId.RoleChanger:
-                await component.RespondAsync("Your request has been accepted!", ephemeral: true);
                 await ButtonClickedHandler.DisplayRoleButtonClicked(info, user);
+
+                await component.RespondAsync(
+                    string.Join("\n", [
+                        $"{MentionUtils.MentionRole(info.CustomId)} has been selected to display.",
+                        "Ownership of the other tracked roles on Discord are removed. " +
+                        "You can add them back using `/role add` or `/role display`."
+                    ]),
+                    ephemeral: true
+                );
                 break;
             case ButtonId.RoleAdder:
-                await component.RespondAsync("Your request has been accepted!", ephemeral: true);
                 await ButtonClickedHandler.AddRoleButtonClicked(info, user);
+                await component.RespondAsync(
+                    $"{MentionUtils.MentionRole(info.CustomId)} has been added.",
+                    ephemeral: true
+                );
                 break;
             case ButtonId.RoleRemover:
-                await component.RespondAsync("Your request has been accepted!", ephemeral: true);
                 await ButtonClickedHandler.RemoveRoleButtonClicked(info, user);
+
+                await component.RespondAsync(
+                    string.Join("\n", [
+                        $"{MentionUtils.MentionRole(info.CustomId)} has been removed.",
+                        "The actual ownership of the role is unaffected. " +
+                        "You can add them back using `/role add` or `/role display`."
+                    ]),
+                    ephemeral: true
+                );
                 break;
             default:
                 throw new ArgumentException($"Unhandled button ID: {buttonId}.");
