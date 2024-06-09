@@ -9,7 +9,7 @@ public static class DiscordTrackedRoleController {
         return MongoConst.DiscordTrackedRoleCollection
             .UpdateOneAsync(
                 Builders<TrackedRoleModel>.Filter.Where(x => x.RoleId == role.Id),
-                Builders<TrackedRoleModel>.Update.Set(x => x.Name, role.Name),
+                Builders<TrackedRoleModel>.Update.Set(x => x.RoleId, role.Id),
                 new UpdateOptions { IsUpsert = true }
             );
     }

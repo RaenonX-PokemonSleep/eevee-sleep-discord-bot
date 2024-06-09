@@ -173,15 +173,23 @@ public static class DiscordMessageMaker {
             .Build();
     }
 
+    public static IEnumerable<string> MakeRoleSelectCorrespondenceList(
+        TrackedRoleModel[] roles
+    ) {
+        return roles.Select((role, idx) => $"`{idx + 1}` - {MentionUtils.MentionRole(role.RoleId)}");
+    }
+
     public static MessageComponent MakeRoleSelectButton(
         TrackedRoleModel[] roles,
         ButtonId buttonId
     ) {
         var builder = new ComponentBuilder();
-
-        foreach (var role in roles) {
+        
+        for (var idx = 0; idx < roles.Length; idx++) {
+            var role = roles[idx];
+            
             builder.WithButton(
-                label: role.Name,
+                label: (idx + 1).ToString(),
                 customId: ButtonInteractionInfoSerializer.Serialize(
                     new ButtonInteractionInfo {
                         ButtonId = buttonId,

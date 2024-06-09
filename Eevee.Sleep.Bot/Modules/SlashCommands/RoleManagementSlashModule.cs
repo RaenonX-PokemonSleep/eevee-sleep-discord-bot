@@ -10,6 +10,17 @@ namespace Eevee.Sleep.Bot.Modules.SlashCommands;
 
 [Group("role", "Commands for managing the roles of a user.")]
 public class RoleManagementSlashModule : InteractionModuleBase<SocketInteractionContext> {
+    private async Task SendEphemeralMessageToBeDeletedAsync(string text) {
+        await Context.Interaction.RespondAsync(
+            text: text,
+            ephemeral: true
+        );
+
+        // Ephemeral messages cannot be deleted by the button handler, so the message containing the button should be deleted after 30 seconds.
+        await Task.Delay(TimeSpan.FromSeconds(30));
+        await Context.Interaction.DeleteOriginalResponseAsync();
+    }
+    
     private async Task SendEphemeralMessageToBeDeletedAsync(string text, MessageComponent components) {
         await Context.Interaction.RespondAsync(
             text: text,
@@ -25,18 +36,27 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
     [SlashCommand("display", "Select the role to display.")]
     [UsedImplicitly]
     public Task DisplayRoleAsync() {
+        var roles = DiscordTrackedRoleController.FindAllTrackedRoleIdsByRoleIds(
+            DiscordRoleRecordController.FindRoleIdsByUserId(Context.User.Id)
+        );
+
+        if (roles.Length == 0) {
+            return SendEphemeralMessageToBeDeletedAsync("No roles available for selection.");
+        }
+
         string[] messages = [
             "All tracked roles will be removed from after selecting the role to display.",
             "Role ownership won't get affected by the removal, only the role assignment on Discord is affected.",
             "",
-            "Select your role to display."
+            "Select your role to display.",
+            "",
+            ..DiscordMessageMaker.MakeRoleSelectCorrespondenceList(roles)
         ];
+
         return SendEphemeralMessageToBeDeletedAsync(
             string.Join("\n", messages),
             components: DiscordMessageMaker.MakeRoleSelectButton(
-                roles: DiscordTrackedRoleController.FindAllTrackedRoleIdsByRoleIds(
-                    DiscordRoleRecordController.FindRoleIdsByUserId(Context.User.Id)
-                ),
+                roles: roles,
                 buttonId: ButtonId.RoleChanger
             )
         );
@@ -49,16 +69,29 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             Context.User as SocketGuildUser ??
             throw new InvalidOperationException("User is not SocketGuildUser.");
 
+        var roles = DiscordTrackedRoleController.FindAllTrackedRoleIdsByRoleIds(
+            // Find the role ids that the user does not have
+            DiscordRoleRecordController
+                .FindRoleIdsByUserId(Context.User.Id)
+                .Except(user.Roles.Select(x => x.Id))
+                .ToArray()
+        );
+
+        if (roles.Length == 0) {
+            return SendEphemeralMessageToBeDeletedAsync("No roles available for addition.");
+        }
+
+        string[] messages = [
+            "Select a role to obtain the ownership on Discord.",
+            "This does not guarantee that the selected role will show. To ensure the selected role shows up, use `/role display` instead.",
+            "",
+            ..DiscordMessageMaker.MakeRoleSelectCorrespondenceList(roles)
+        ];
+
         return SendEphemeralMessageToBeDeletedAsync(
-            "You already have all the roles.",
+            string.Join("\n", messages),
             components: DiscordMessageMaker.MakeRoleSelectButton(
-                roles: DiscordTrackedRoleController.FindAllTrackedRoleIdsByRoleIds(
-                    // Find the role ids that the user does not have
-                    DiscordRoleRecordController
-                        .FindRoleIdsByUserId(Context.User.Id)
-                        .Except(user.Roles.Select(x => x.Id))
-                        .ToArray()
-                ),
+                roles: roles,
                 buttonId: ButtonId.RoleAdder
             )
         );
@@ -71,13 +104,25 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             Context.User as SocketGuildUser ??
             throw new InvalidOperationException("User is not SocketGuildUser.");
 
+        var roles = DiscordTrackedRoleController.FindAllTrackedRoleIdsByRoleIds(
+            user.Roles.Select(x => x.Id).ToArray()
+        );
+
+        if (roles.Length == 0) {
+            return SendEphemeralMessageToBeDeletedAsync("No roles available for removal.");
+        }
+        
+        string[] messages = [
+            "Select a role to remove the ownership on Discord.",
+            "This does not remove the actual ownership of the role. You can get them back using either `/role add` or `/role display` at any time.",
+            "",
+            ..DiscordMessageMaker.MakeRoleSelectCorrespondenceList(roles)
+        ];
+        
         return SendEphemeralMessageToBeDeletedAsync(
-            "You don't have any roles to remove.",
+            string.Join("\n", messages),
             components: DiscordMessageMaker.MakeRoleSelectButton(
-                // Find the role ids that the user has
-                roles: DiscordTrackedRoleController.FindAllTrackedRoleIdsByRoleIds(
-                    user.Roles.Select(x => x.Id).ToArray()
-                ),
+                roles: roles,
                 buttonId: ButtonId.RoleRemover
             )
         );
@@ -117,7 +162,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         );
     }
 
-    [SlashCommand("untrack", "Untracks the specified role.")]
+    [SlashCommand("untrack", "Untrack the specified role.")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [UsedImplicitly]
     public async Task UntrackRoleAsync(IRole role) {

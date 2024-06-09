@@ -7,7 +7,4 @@ namespace Eevee.Sleep.Bot.Models;
 public record TrackedRoleModel {
     [UsedImplicitly]
     public required ulong RoleId { get; init; }
-
-    [UsedImplicitly]
-    public required string Name { get; init; }
 }
