@@ -34,7 +34,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         return SendEphemeralMessageToBeDeletedAsync(
             string.Join("\n", messages),
             components: DiscordMessageMaker.MakeRoleSelectButton(
-                roles: DiscordTrackedRoleContoller.FindAllTrackedRoleIdsByRoleIds(
+                roles: DiscordTrackedRoleController.FindAllTrackedRoleIdsByRoleIds(
                     DiscordRoleRecordController.FindRoleIdsByUserId(Context.User.Id)
                 ),
                 buttonId: ButtonId.RoleChanger
@@ -52,7 +52,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         return SendEphemeralMessageToBeDeletedAsync(
             "You already have all the roles.",
             components: DiscordMessageMaker.MakeRoleSelectButton(
-                roles: DiscordTrackedRoleContoller.FindAllTrackedRoleIdsByRoleIds(
+                roles: DiscordTrackedRoleController.FindAllTrackedRoleIdsByRoleIds(
                     // Find the role ids that the user does not have
                     DiscordRoleRecordController
                         .FindRoleIdsByUserId(Context.User.Id)
@@ -75,7 +75,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             "You don't have any roles to remove.",
             components: DiscordMessageMaker.MakeRoleSelectButton(
                 // Find the role ids that the user has
-                roles: DiscordTrackedRoleContoller.FindAllTrackedRoleIdsByRoleIds(
+                roles: DiscordTrackedRoleController.FindAllTrackedRoleIdsByRoleIds(
                     user.Roles.Select(x => x.Id).ToArray()
                 ),
                 buttonId: ButtonId.RoleRemover
@@ -98,7 +98,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
     [RequireUserPermission(GuildPermission.Administrator)]
     [UsedImplicitly]
     public async Task TrackRoleAsync(IRole role) {
-        await DiscordTrackedRoleContoller.SaveTrackedRole(role);
+        await DiscordTrackedRoleController.SaveTrackedRole(role);
 
         var roleOwnedUsers = Context.Guild.Users
             .Where(x => x.Roles.Contains(role))
@@ -121,7 +121,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
     [RequireUserPermission(GuildPermission.Administrator)]
     [UsedImplicitly]
     public async Task UntrackRoleAsync(IRole role) {
-        await DiscordTrackedRoleContoller.RemoveTrackedRole(role.Id);
+        await DiscordTrackedRoleController.RemoveTrackedRole(role.Id);
 
         var roleOwnedUsers = Context.Guild.Users
             .Where(x => x.Roles.Contains(role))

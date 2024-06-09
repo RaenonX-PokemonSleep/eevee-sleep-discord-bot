@@ -212,7 +212,7 @@ public static class DiscordMessageMaker {
         string message,
         Color color
     ) {
-        var trackedRoles = DiscordTrackedRoleContoller.FindAllTrackedRoles()
+        var trackedRoles = DiscordTrackedRoleController.FindAllTrackedRoles()
             .Select(x => MentionUtils.MentionRole(x.Id))
             .ToArray();
         

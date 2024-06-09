@@ -4,7 +4,7 @@ using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Controllers.Mongo;
 
-public static class DiscordTrackedRoleContoller {
+public static class DiscordTrackedRoleController {
     public static Task SaveTrackedRole(IRole role) {
         return MongoConst.DiscordTrackedRoleCollection
             .UpdateOneAsync(
