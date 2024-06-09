@@ -3,11 +3,11 @@ using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Controllers.Mongo;
 
-public static class DiscordRoleRecordContoller {
+public static class DiscordRoleRecordController {
     public static Task SaveRoles(ulong userId, ulong[] roles) {
         return MongoConst.DiscordRoleRecordCollection.UpdateOneAsync(
             Builders<RoleRecordModel>.Filter.Where(x => x.UserId == userId),
-            Builders<RoleRecordModel>.Update.Set(x => x.Roles, roles), 
+            Builders<RoleRecordModel>.Update.Set(x => x.Roles, roles),
             new UpdateOptions { IsUpsert = true }
         );
     }
@@ -35,17 +35,21 @@ public static class DiscordRoleRecordContoller {
     }
 
     public static Task BulkAddRoles(ulong[] userIds, ulong[] roles) {
-        var bulkOps = new List<WriteModel<RoleRecordModel>>();
-        foreach (var userId in userIds) {
-            bulkOps.Add(
-                new UpdateOneModel<RoleRecordModel>(
-                    Builders<RoleRecordModel>.Filter.Where(r => r.UserId == userId),
-                    Builders<RoleRecordModel>.Update.AddToSetEach(r => r.Roles, roles)
-                ) { IsUpsert = true }
-            );
+        if (userIds.Length == 0) {
+            // Nothing to do if `userIds` is empty
+            return Task.CompletedTask;
         }
 
-        return MongoConst.DiscordRoleRecordCollection.BulkWriteAsync(bulkOps);
+        return MongoConst.DiscordRoleRecordCollection.BulkWriteAsync(
+            userIds
+                .Select(userId => new UpdateOneModel<RoleRecordModel>(
+                    Builders<RoleRecordModel>.Filter.Where(r => r.UserId == userId),
+                    Builders<RoleRecordModel>.Update.AddToSetEach(r => r.Roles, roles)
+                ) {
+                    IsUpsert = true
+                })
+                .ToList()
+        );
     }
 
     public static ulong[] FindRoleIdsByUserId(ulong userId) {

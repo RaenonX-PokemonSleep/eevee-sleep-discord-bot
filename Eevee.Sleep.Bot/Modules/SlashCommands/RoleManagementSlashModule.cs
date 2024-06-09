@@ -35,7 +35,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             string.Join("\n", messages),
             components: DiscordMessageMaker.MakeRoleSelectButton(
                 roles: DiscordTrackedRoleContoller.FindAllTrackedRoleIdsByRoleIds(
-                    DiscordRoleRecordContoller.FindRoleIdsByUserId(Context.User.Id)
+                    DiscordRoleRecordController.FindRoleIdsByUserId(Context.User.Id)
                 ),
                 buttonId: ButtonId.RoleChanger
             )
@@ -54,7 +54,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             components: DiscordMessageMaker.MakeRoleSelectButton(
                 roles: DiscordTrackedRoleContoller.FindAllTrackedRoleIdsByRoleIds(
                     // Find the role ids that the user does not have
-                    DiscordRoleRecordContoller
+                    DiscordRoleRecordController
                         .FindRoleIdsByUserId(Context.User.Id)
                         .Except(user.Roles.Select(x => x.Id))
                         .ToArray()
@@ -87,7 +87,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
     [RequireUserPermission(GuildPermission.Administrator)]
     [UsedImplicitly]
     public async Task DeleteRoleRecordAsync(IUser user, IRole role) {
-        await DiscordRoleRecordContoller.RemoveRoles(user.Id, [role.Id]);
+        await DiscordRoleRecordController.RemoveRoles(user.Id, [role.Id]);
 
         await Context.Interaction.RespondAsync(
             embed: DiscordMessageMaker.MakeDeleteRoleResult(user, role.Id)
@@ -105,7 +105,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             .Select(x => x.Id)
             .ToArray();
 
-        await DiscordRoleRecordContoller.BulkAddRoles(roleOwnedUsers, [role.Id]);
+        await DiscordRoleRecordController.BulkAddRoles(roleOwnedUsers, [role.Id]);
 
         await Context.Interaction.RespondAsync(
             embed: DiscordMessageMaker.MakeTrackRoleResult(
@@ -127,7 +127,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             .Where(x => x.Roles.Contains(role))
             .Select(x => x.Id)
             .ToArray();
-        await DiscordRoleRecordContoller.BulkRemoveRoles(roleOwnedUsers, [role.Id]);
+        await DiscordRoleRecordController.BulkRemoveRoles(roleOwnedUsers, [role.Id]);
 
         await Context.Interaction.RespondAsync(
             embed: DiscordMessageMaker.MakeTrackRoleResult(

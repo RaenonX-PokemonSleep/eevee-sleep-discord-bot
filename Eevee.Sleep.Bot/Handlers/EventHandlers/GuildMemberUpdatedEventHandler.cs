@@ -87,7 +87,7 @@ public static class GuildMemberUpdatedEventHandler {
     }
 
     private static async Task HandleRolesAdded(ulong userId, ulong[] addedRoles) {
-        await DiscordRoleRecordContoller.AddRoles(
+        await DiscordRoleRecordController.AddRoles(
             userId: userId,
             roles: DiscordTrackedRoleContoller
                 .FindAllTrackedRoleIdsByRoleIds(addedRoles)
