@@ -20,7 +20,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         await Task.Delay(TimeSpan.FromSeconds(30));
         await Context.Interaction.DeleteOriginalResponseAsync();
     }
-    
+
     private async Task SendEphemeralMessageToBeDeletedAsync(string text, MessageComponent components) {
         await Context.Interaction.RespondAsync(
             text: text,
@@ -111,14 +111,14 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         if (roles.Length == 0) {
             return SendEphemeralMessageToBeDeletedAsync("No roles available for removal.");
         }
-        
+
         string[] messages = [
             "Select a role to remove the ownership on Discord.",
             "This does not remove the actual ownership of the role. You can get them back using either `/role add` or `/role display` at any time.",
             "",
             ..DiscordMessageMaker.MakeRoleSelectCorrespondenceList(roles)
         ];
-        
+
         return SendEphemeralMessageToBeDeletedAsync(
             string.Join("\n", messages),
             components: DiscordMessageMaker.MakeRoleSelectButton(
@@ -182,5 +182,21 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
                 color: Colors.Danger
             )
         );
+    }
+
+    [SlashCommand("show-tracked", "Show all tracked roles.")]
+    [RequireUserPermission(GuildPermission.Administrator)]
+    [UsedImplicitly]
+    public async Task ShowTrackedRolesAsync() {
+        var trackedRoles = DiscordTrackedRoleController.FindAllTrackedRoles()
+            .Select(x => $"- {MentionUtils.MentionRole(x.RoleId)}")
+            .ToArray();
+
+        string[] messages = [
+            $"Currently tracked roles ({trackedRoles.Length}):",
+            ..trackedRoles
+        ];
+
+        await Context.Interaction.RespondAsync(string.Join("\n", messages));
     }
 }
