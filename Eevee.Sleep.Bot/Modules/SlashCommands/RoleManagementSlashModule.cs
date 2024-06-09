@@ -110,8 +110,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         await Context.Interaction.RespondAsync(
             embed: DiscordMessageMaker.MakeTrackRoleResult(
                 roleId: role.Id,
-                trackedRoles: DiscordTrackedRoleContoller.FindAllTrackedRoles().Select(x => x.Id).ToArray(),
-                roleOwnedUsercount: roleOwnedUsers.Length,
+                roleOwnedUserCount: roleOwnedUsers.Length,
                 message: "Role tracked.",
                 color: Colors.Success
             )
@@ -133,8 +132,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         await Context.Interaction.RespondAsync(
             embed: DiscordMessageMaker.MakeTrackRoleResult(
                 roleId: role.Id,
-                trackedRoles: DiscordTrackedRoleContoller.FindAllTrackedRoles().Select(x => x.Id).ToArray(),
-                roleOwnedUsercount: roleOwnedUsers.Length,
+                roleOwnedUserCount: roleOwnedUsers.Length,
                 message: "Role untracked.",
                 color: Colors.Danger
             )

@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Net;
 using Discord.WebSocket;
+using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Models;
 using IResult = Discord.Interactions.IResult;
@@ -207,21 +208,22 @@ public static class DiscordMessageMaker {
 
     public static Embed MakeTrackRoleResult(
         ulong roleId,
-        ulong[] trackedRoles,
-        int roleOwnedUsercount,
+        int roleOwnedUserCount,
         string message,
         Color color
     ) {
-        var trackedRolesMessage = trackedRoles.Length == 0 ?
-            "(N/A)" :
-            string.Join(" / ", trackedRoles.Select(x => MentionUtils.MentionRole(x)));
-
+        var trackedRoles = DiscordTrackedRoleContoller.FindAllTrackedRoles()
+            .Select(x => MentionUtils.MentionRole(x.Id))
+            .ToArray();
+        
         return new EmbedBuilder()
             .WithColor(color)
             .WithTitle(message)
-            .AddField("Role", MentionUtils.MentionRole(roleId))
-            .AddField("Role owner count", roleOwnedUsercount)
-            .AddField("Tracked roles", trackedRolesMessage)
+            .AddField("Role", MentionUtils.MentionRole(roleId), inline: true)
+            .AddField("Role owner count", roleOwnedUserCount, inline: true)
+            .AddField("Currently tracked roles", trackedRoles.Length == 0 ?
+                "(N/A)" :
+                string.Join(" / ", trackedRoles))
             .WithCurrentTimestamp()
             .Build();
     }
