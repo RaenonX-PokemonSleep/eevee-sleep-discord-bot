@@ -83,8 +83,8 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         );
     }
 
-    [SlashCommand("delete-record", "Delete role owned by a specific user from the database.")]
-    [RequireOwner]
+    [SlashCommand("delete-record", "Delete a role owned by a specific user from the database.")]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [UsedImplicitly]
     public async Task DeleteRoleRecordAsync(IUser user, IRole role) {
         await DiscordRoleRecordContoller.RemoveRoles(user.Id, [role.Id]);
@@ -95,7 +95,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
     }
 
     [SlashCommand("track", "Track the specific role.")]
-    [RequireOwner]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [UsedImplicitly]
     public async Task TrackRoleAsync(IRole role) {
         await DiscordTrackedRoleContoller.SaveTrackedRole(role);
@@ -119,7 +119,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
     }
 
     [SlashCommand("untrack", "Untrack the specified role.")]
-    [RequireOwner]
+    [RequireUserPermission(GuildPermission.Administrator)]
     [UsedImplicitly]
     public async Task UntrackRoleAsync(IRole role) {
         await DiscordTrackedRoleContoller.RemoveTrackedRole(role.Id);
