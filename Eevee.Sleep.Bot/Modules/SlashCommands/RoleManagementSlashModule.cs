@@ -42,7 +42,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         );
     }
 
-    [SlashCommand("add", "Add the role ownership of a user.")]
+    [SlashCommand("add", "Adds the selected role to the user on Discord.")]
     [UsedImplicitly]
     public Task AddRoleAsync() {
         var user =
@@ -64,7 +64,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         );
     }
 
-    [SlashCommand("remove", "Remove the role ownership of a user.")]
+    [SlashCommand("remove", "Removes the selected role from a user on Discord.")]
     [UsedImplicitly]
     public Task RemoveRoleAsync() {
         var user =
@@ -83,7 +83,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         );
     }
 
-    [SlashCommand("delete-record", "Delete a role owned by a specific user from the database.")]
+    [SlashCommand("delete-record", "Deletes the role record of a specific user from the database.")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [UsedImplicitly]
     public async Task DeleteRoleRecordAsync(IUser user, IRole role) {
@@ -94,7 +94,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         );
     }
 
-    [SlashCommand("track", "Track the specific role.")]
+    [SlashCommand("track", "Tracks the specified role.")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [UsedImplicitly]
     public async Task TrackRoleAsync(IRole role) {
@@ -117,7 +117,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         );
     }
 
-    [SlashCommand("untrack", "Untrack the specified role.")]
+    [SlashCommand("untrack", "Untracks the specified role.")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [UsedImplicitly]
     public async Task UntrackRoleAsync(IRole role) {
