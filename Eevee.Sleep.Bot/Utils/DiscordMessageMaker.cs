@@ -202,6 +202,48 @@ public static class DiscordMessageMaker {
         return builder.Build();
     }
 
+    public static Embed MakeChangeRoleResult(
+        IUser user,
+        ulong[] previousRoleIds,
+        ulong[] currentRoleIds,
+        Color color
+    ) {
+        return new EmbedBuilder()
+            .WithColor(color)
+            .WithAuthor(user)
+            .WithTitle("Your owned roles")
+            .AddField(
+                name: "Roles before change",
+                value: previousRoleIds.Length == 0 ?
+                    "(N/A)" :
+                    string.Join(" / ", previousRoleIds.Select(x => MentionUtils.MentionRole(x)))
+            )
+            .AddField(
+                name: "Roles after change",
+                value: currentRoleIds.Length == 0 ?
+                    "(N/A)" :
+                    string.Join(" / ", currentRoleIds.Select(x => MentionUtils.MentionRole(x)))
+            )
+            .WithCurrentTimestamp()
+            .Build();
+    }
+
+    public static Embed MakeShowRoleResult(IUser user, ulong[] roleIds) {
+        return new EmbedBuilder()
+            .WithColor(Colors.Success)
+            .WithAuthor(user)
+            .WithTitle("Your owned roles")
+            .AddField(
+                name: "Roles",
+                value: roleIds.Length == 0 ?
+                    "(N/A)" :
+                    string.Join(" / ", roleIds.Select(x => MentionUtils.MentionRole(x))),
+                inline: true
+            )
+            .WithCurrentTimestamp()
+            .Build();
+    }
+
     public static Embed MakeDeleteRoleResult(IUser user, ulong roleId) {
         return new EmbedBuilder()
             .WithColor(Colors.Success)

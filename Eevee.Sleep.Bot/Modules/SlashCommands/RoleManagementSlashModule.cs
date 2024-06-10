@@ -128,6 +128,72 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         );
     }
 
+    [SlashCommand("add-all", "Add all owned tracked roles.")]
+    [UsedImplicitly]
+    public async Task AddAllRoleAsync() {
+        var user =
+            Context.User as SocketGuildUser ??
+            throw new InvalidOperationException("User is not SocketGuildUser.");
+
+        var previousRoleIds = DiscordTrackedRoleController
+            .FindAllTrackedRoleIdsByRoleIds(user.Roles.Select(x => x.Id).ToArray())
+            .Select(x => x.RoleId)
+            .ToArray();
+
+        await user.AddRolesAsync(DiscordRoleRecordController.FindRoleIdsByUserId(user.Id));
+
+        await Context.Interaction.RespondAsync(
+            embed: DiscordMessageMaker.MakeChangeRoleResult(
+                user: user,
+                previousRoleIds: previousRoleIds,
+                currentRoleIds: DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
+                color: Colors.Success
+            ),
+            ephemeral: true
+        );
+    }
+
+    [SlashCommand("remove-all", "Remove all tracked roles.")]
+    [UsedImplicitly]
+    public async Task RemoveAllRoleAsync() {
+        var user =
+            Context.User as SocketGuildUser ??
+            throw new InvalidOperationException("User is not SocketGuildUser.");
+
+        var previousRoleIds = DiscordTrackedRoleController
+            .FindAllTrackedRoleIdsByRoleIds(user.Roles.Select(x => x.Id).ToArray())
+            .Select(x => x.RoleId)
+            .ToArray();
+
+        await user.RemoveRolesAsync(DiscordRoleRecordController.FindRoleIdsByUserId(user.Id));
+
+        await Context.Interaction.RespondAsync(
+            embed: DiscordMessageMaker.MakeChangeRoleResult(
+                user: user,
+                previousRoleIds: previousRoleIds,
+                currentRoleIds: [],
+                color: Colors.Danger
+            ),
+            ephemeral: true
+        );
+    }
+
+    [SlashCommand("show", "Shows all the owned tracked roles.")]
+    [UsedImplicitly]
+    public Task ShowRoleAsync() {
+        var user =
+            Context.User as SocketGuildUser ??
+            throw new InvalidOperationException("User is not SocketGuildUser.");
+
+        return Context.Interaction.RespondAsync(
+            embed: DiscordMessageMaker.MakeShowRoleResult(
+                user: user,
+                roleIds: DiscordRoleRecordController.FindRoleIdsByUserId(user.Id)
+            ),
+            ephemeral: true
+        );
+    }
+
     [SlashCommand("delete-record", "Deletes the role record of a specific user from the database.")]
     [RequireUserPermission(GuildPermission.Administrator)]
     [UsedImplicitly]
