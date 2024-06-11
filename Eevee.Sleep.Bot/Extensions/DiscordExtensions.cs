@@ -32,4 +32,9 @@ public static class DiscordExtensions {
             "(N/A)" :
             roles.Select(role => MentionUtils.MentionRole(role)).MergeLines();
     }
+
+    public static SocketGuildUser AsGuildUser(this IUser user) {
+        return user as SocketGuildUser ??
+            throw new InvalidOperationException("User is not SocketGuildUser.");
+    }
 }
