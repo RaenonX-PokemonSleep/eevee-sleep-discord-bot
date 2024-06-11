@@ -166,9 +166,9 @@ public static class DiscordMessageMaker {
     public static Embed MakeLotteryResult(ulong roleId, int count, IEnumerable<SocketGuildUser> members) {
         return new EmbedBuilder()
             .WithColor(Colors.Info)
-            .WithDescription(string.Join("\n", [
+            .WithDescription(StringHelper.MergeLines([
                 $"# {MentionUtils.MentionRole(roleId)} x {count}",
-                string.Join("\n", members.Select(x => $"- {MentionUtils.MentionUser(x.Id)}"))
+                members.Select(x => $"- {MentionUtils.MentionUser(x.Id)}").MergeLines()
             ]))
             .WithCurrentTimestamp()
             .Build();

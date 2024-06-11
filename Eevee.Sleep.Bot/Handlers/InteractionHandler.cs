@@ -131,7 +131,7 @@ public class InteractionHandler(
                 await ButtonClickedHandler.DisplayRoleButtonClicked(info, user);
 
                 await component.RespondAsync(
-                    string.Join("\n", [
+                    StringHelper.MergeLines([
                         $"{MentionUtils.MentionRole(info.CustomId)} has been selected to display.",
                         "Ownership of the other tracked roles on Discord are removed. " +
                         "You can add them back using `/role add` or `/role display`."
@@ -150,7 +150,7 @@ public class InteractionHandler(
                 await ButtonClickedHandler.RemoveRoleButtonClicked(info, user);
 
                 await component.RespondAsync(
-                    string.Join("\n", [
+                    StringHelper.MergeLines([
                         $"{MentionUtils.MentionRole(info.CustomId)} has been removed.",
                         "The actual ownership of the role is unaffected. " +
                         "You can add them back using `/role add` or `/role display`."

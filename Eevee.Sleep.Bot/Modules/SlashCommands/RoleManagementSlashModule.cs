@@ -54,7 +54,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         ];
 
         return SendEphemeralMessageToBeDeletedAsync(
-            string.Join("\n", messages),
+            messages.MergeLines(),
             components: DiscordMessageMaker.MakeRoleSelectButton(
                 roles: roles,
                 buttonId: ButtonId.RoleChanger
@@ -87,7 +87,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         ];
 
         return SendEphemeralMessageToBeDeletedAsync(
-            string.Join("\n", messages),
+            messages.MergeLines(),
             components: DiscordMessageMaker.MakeRoleSelectButton(
                 roles: roles,
                 buttonId: ButtonId.RoleAdder
@@ -116,7 +116,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         ];
 
         return SendEphemeralMessageToBeDeletedAsync(
-            string.Join("\n", messages),
+            messages.MergeLines(),
             components: DiscordMessageMaker.MakeRoleSelectButton(
                 roles: roles,
                 buttonId: ButtonId.RoleRemover
@@ -253,6 +253,6 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             ..trackedRoles
         ];
 
-        await Context.Interaction.RespondAsync(string.Join("\n", messages));
+        await Context.Interaction.RespondAsync(messages.MergeLines());
     }
 }
