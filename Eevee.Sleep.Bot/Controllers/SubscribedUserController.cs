@@ -21,7 +21,7 @@ public class SubscribedUserController(
 
         logger.LogInformation(
             "Getting users with role ID ({taggedRoleCount}): {taggedRoleIds}",
-            taggedRoleIds.MergeLines(),
+            taggedRoleIds.MergeToSameLine(),
             taggedRoleIds.Count
         );
 

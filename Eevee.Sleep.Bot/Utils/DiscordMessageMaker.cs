@@ -158,7 +158,7 @@ public static class DiscordMessageMaker {
         // Therefore, mark the user unsubscribed, which removes the role
         await DiscordSubscriberMarker.MarkUserUnsubscribed(user);
 
-        builder = builder.AddField("Role", roleIds.Select(MentionUtils.MentionRole).MergeLines());
+        builder = builder.AddField("Role", roleIds.Select(MentionUtils.MentionRole).MergeToSameLine());
 
         return builder.Build();
     }

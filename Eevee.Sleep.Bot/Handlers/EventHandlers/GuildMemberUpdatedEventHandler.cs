@@ -20,7 +20,7 @@ public static class GuildMemberUpdatedEventHandler {
     ) {
         Logger.LogInformation(
             "Handing subscriber role addition of {RoleIds} for user {UserId} (@{UserName})",
-            rolesAdded.Select(x => x.RoleId).MergeLines(),
+            rolesAdded.Select(x => x.RoleId).MergeToSameLine(),
             user.Id,
             user.Username
         );
@@ -111,7 +111,7 @@ public static class GuildMemberUpdatedEventHandler {
             user.Id,
             user.Username,
             roleIds.Count,
-            roleIds.MergeLines()
+            roleIds.MergeToSameLine()
         );
     }
 

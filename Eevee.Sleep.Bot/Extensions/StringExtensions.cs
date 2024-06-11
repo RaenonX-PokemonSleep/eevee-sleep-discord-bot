@@ -21,11 +21,11 @@ public static class StringExtensions {
         return EnumToString<ModalFieldId>(value);
     }
 
-    public static string MergeLines(this IEnumerable<string> lines) {
+    public static string MergeToSameLine(this IEnumerable<string> lines) {
         return string.Join(" / ", lines);
     }
 
-    public static string MergeLines(this IEnumerable<ulong> lines) {
+    public static string MergeToSameLine(this IEnumerable<ulong> lines) {
         return string.Join(" / ", lines);
     }
 }
