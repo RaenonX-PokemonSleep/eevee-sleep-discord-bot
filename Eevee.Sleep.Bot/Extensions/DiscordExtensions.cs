@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using Eevee.Sleep.Bot.Utils;
 
 namespace Eevee.Sleep.Bot.Extensions;
@@ -24,5 +25,11 @@ public static class DiscordExtensions {
     ) {
         return await (await client.GetAdminAlertChannelAsync())
             .SendMessageAsync(message, embed: embed, embeds: embeds);
+    }
+
+    public static string MentionAllRoles(this IEnumerable<ulong> roles) {
+        return roles.Count() == 0 ?
+            "(N/A)" :
+            roles.Select(role => MentionUtils.MentionRole(role)).MergeLines();
     }
 }

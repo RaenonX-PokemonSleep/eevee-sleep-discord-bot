@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
+using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Utils;
 using JetBrains.Annotations;
 

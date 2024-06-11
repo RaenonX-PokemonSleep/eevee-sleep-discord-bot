@@ -20,4 +20,12 @@ public static class StringExtensions {
     public static ModalFieldId? ToModalFieldId(this string value) {
         return EnumToString<ModalFieldId>(value);
     }
+
+    public static string MergeLines(this IEnumerable<string> lines) {
+        return string.Join(" / ", lines);
+    }
+
+    public static string MergeLines(this IEnumerable<ulong> lines) {
+        return string.Join(" / ", lines);
+    }
 }

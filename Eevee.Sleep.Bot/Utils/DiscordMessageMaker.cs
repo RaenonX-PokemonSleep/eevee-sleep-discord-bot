@@ -3,6 +3,7 @@ using Discord.Net;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
+using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
 using IResult = Discord.Interactions.IResult;
 
@@ -157,7 +158,7 @@ public static class DiscordMessageMaker {
         // Therefore, mark the user unsubscribed, which removes the role
         await DiscordSubscriberMarker.MarkUserUnsubscribed(user);
 
-        builder = builder.AddField("Role", string.Join(" / ", roleIds.Select(MentionUtils.MentionRole)));
+        builder = builder.AddField("Role", roleIds.Select(MentionUtils.MentionRole).MergeLines());
 
         return builder.Build();
     }
@@ -214,15 +215,11 @@ public static class DiscordMessageMaker {
             .WithTitle("Your owned roles")
             .AddField(
                 name: "Roles before change",
-                value: previousRoleIds.Length == 0 ?
-                    "(N/A)" :
-                    string.Join(" / ", previousRoleIds.Select(x => MentionUtils.MentionRole(x)))
+                value: previousRoleIds.MentionAllRoles()
             )
             .AddField(
                 name: "Roles after change",
-                value: currentRoleIds.Length == 0 ?
-                    "(N/A)" :
-                    string.Join(" / ", currentRoleIds.Select(x => MentionUtils.MentionRole(x)))
+                value: currentRoleIds.MentionAllRoles()
             )
             .WithCurrentTimestamp()
             .Build();
@@ -235,9 +232,7 @@ public static class DiscordMessageMaker {
             .WithTitle("Your owned roles")
             .AddField(
                 name: "Roles",
-                value: roleIds.Length == 0 ?
-                    "(N/A)" :
-                    string.Join(" / ", roleIds.Select(x => MentionUtils.MentionRole(x))),
+                value: roleIds.MentionAllRoles(),
                 inline: true
             )
             .WithCurrentTimestamp()
@@ -262,18 +257,16 @@ public static class DiscordMessageMaker {
         string message,
         Color color
     ) {
-        var trackedRoles = DiscordTrackedRoleController.FindAllTrackedRoles()
-            .Select(x => MentionUtils.MentionRole(x.RoleId))
-            .ToArray();
-        
         return new EmbedBuilder()
             .WithColor(color)
             .WithTitle(message)
             .AddField("Role", MentionUtils.MentionRole(roleId), inline: true)
             .AddField("Role owner count", roleOwnedUserCount, inline: true)
-            .AddField("Currently tracked roles", trackedRoles.Length == 0 ?
-                "(N/A)" :
-                string.Join(" / ", trackedRoles))
+            .AddField("Currently tracked roles", DiscordTrackedRoleController
+                .FindAllTrackedRoles()
+                .Select(x => x.RoleId)
+                .MentionAllRoles()
+            )
             .WithCurrentTimestamp()
             .Build();
     }
