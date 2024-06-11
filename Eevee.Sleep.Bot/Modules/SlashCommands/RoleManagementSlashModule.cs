@@ -1,8 +1,8 @@
 using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
+using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Utils;
 using JetBrains.Annotations;
 
@@ -54,7 +54,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         ];
 
         return SendEphemeralMessageToBeDeletedAsync(
-            string.Join("\n", messages),
+            messages.MergeLines(),
             components: DiscordMessageMaker.MakeRoleSelectButton(
                 roles: roles,
                 buttonId: ButtonId.RoleChanger
@@ -65,14 +65,12 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
     [SlashCommand("add", "Adds the selected role to the user on Discord.")]
     [UsedImplicitly]
     public Task AddRoleAsync() {
-        var user =
-            Context.User as SocketGuildUser ??
-            throw new InvalidOperationException("User is not SocketGuildUser.");
+        var user = Context.User.AsGuildUser();
 
         var roles = DiscordTrackedRoleController.FindAllTrackedRoleIdsByRoleIds(
             // Find the role ids that the user does not have
             DiscordRoleRecordController
-                .FindRoleIdsByUserId(Context.User.Id)
+                .FindRoleIdsByUserId(user.Id)
                 .Except(user.Roles.Select(x => x.Id))
                 .ToArray()
         );
@@ -89,7 +87,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         ];
 
         return SendEphemeralMessageToBeDeletedAsync(
-            string.Join("\n", messages),
+            messages.MergeLines(),
             components: DiscordMessageMaker.MakeRoleSelectButton(
                 roles: roles,
                 buttonId: ButtonId.RoleAdder
@@ -100,9 +98,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
     [SlashCommand("remove", "Removes the selected role from a user on Discord.")]
     [UsedImplicitly]
     public Task RemoveRoleAsync() {
-        var user =
-            Context.User as SocketGuildUser ??
-            throw new InvalidOperationException("User is not SocketGuildUser.");
+        var user = Context.User.AsGuildUser();
 
         var roles = DiscordTrackedRoleController.FindAllTrackedRoleIdsByRoleIds(
             user.Roles.Select(x => x.Id).ToArray()
@@ -120,11 +116,71 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         ];
 
         return SendEphemeralMessageToBeDeletedAsync(
-            string.Join("\n", messages),
+            messages.MergeLines(),
             components: DiscordMessageMaker.MakeRoleSelectButton(
                 roles: roles,
                 buttonId: ButtonId.RoleRemover
             )
+        );
+    }
+
+    [SlashCommand("add-all", "Add all owned tracked roles.")]
+    [UsedImplicitly]
+    public async Task AddAllRoleAsync() {
+        var user = Context.User.AsGuildUser();
+
+        var previousRoleIds = DiscordTrackedRoleController
+            .FindAllTrackedRoleIdsByRoleIds(user.Roles.Select(x => x.Id).ToArray())
+            .Select(x => x.RoleId)
+            .ToArray();
+
+        await user.AddRolesAsync(DiscordRoleRecordController.FindRoleIdsByUserId(user.Id));
+
+        await Context.Interaction.RespondAsync(
+            embed: DiscordMessageMaker.MakeChangeRoleResult(
+                user: user,
+                previousRoleIds: previousRoleIds,
+                currentRoleIds: DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
+                color: Colors.Success
+            ),
+            ephemeral: true
+        );
+    }
+
+    [SlashCommand("remove-all", "Remove all tracked roles.")]
+    [UsedImplicitly]
+    public async Task RemoveAllRoleAsync() {
+        var user = Context.User.AsGuildUser();
+
+        var previousRoleIds = DiscordTrackedRoleController
+            .FindAllTrackedRoleIdsByRoleIds(user.Roles.Select(x => x.Id).ToArray())
+            .Select(x => x.RoleId)
+            .ToArray();
+
+        await user.RemoveRolesAsync(DiscordRoleRecordController.FindRoleIdsByUserId(user.Id));
+
+        await Context.Interaction.RespondAsync(
+            embed: DiscordMessageMaker.MakeChangeRoleResult(
+                user: user,
+                previousRoleIds: previousRoleIds,
+                currentRoleIds: [],
+                color: Colors.Danger
+            ),
+            ephemeral: true
+        );
+    }
+
+    [SlashCommand("show", "Shows all the owned tracked roles.")]
+    [UsedImplicitly]
+    public Task ShowRoleAsync() {
+        var user = Context.User.AsGuildUser();
+
+        return Context.Interaction.RespondAsync(
+            embed: DiscordMessageMaker.MakeShowRoleResult(
+                user: user,
+                roleIds: DiscordRoleRecordController.FindRoleIdsByUserId(user.Id)
+            ),
+            ephemeral: true
         );
     }
 
@@ -197,6 +253,6 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             ..trackedRoles
         ];
 
-        await Context.Interaction.RespondAsync(string.Join("\n", messages));
+        await Context.Interaction.RespondAsync(messages.MergeLines());
     }
 }

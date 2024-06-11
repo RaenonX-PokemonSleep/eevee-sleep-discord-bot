@@ -3,6 +3,7 @@ using Discord.Net;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
+using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
 using IResult = Discord.Interactions.IResult;
 
@@ -157,7 +158,7 @@ public static class DiscordMessageMaker {
         // Therefore, mark the user unsubscribed, which removes the role
         await DiscordSubscriberMarker.MarkUserUnsubscribed(user);
 
-        builder = builder.AddField("Role", string.Join(" / ", roleIds.Select(MentionUtils.MentionRole)));
+        builder = builder.AddField("Role", roleIds.Select(MentionUtils.MentionRole).MergeToSameLine());
 
         return builder.Build();
     }
@@ -165,9 +166,9 @@ public static class DiscordMessageMaker {
     public static Embed MakeLotteryResult(ulong roleId, int count, IEnumerable<SocketGuildUser> members) {
         return new EmbedBuilder()
             .WithColor(Colors.Info)
-            .WithDescription(string.Join("\n", [
+            .WithDescription(StringHelper.MergeLines([
                 $"# {MentionUtils.MentionRole(roleId)} x {count}",
-                string.Join("\n", members.Select(x => $"- {MentionUtils.MentionUser(x.Id)}"))
+                members.Select(x => $"- {MentionUtils.MentionUser(x.Id)}").MergeLines()
             ]))
             .WithCurrentTimestamp()
             .Build();
@@ -202,6 +203,42 @@ public static class DiscordMessageMaker {
         return builder.Build();
     }
 
+    public static Embed MakeChangeRoleResult(
+        IUser user,
+        ulong[] previousRoleIds,
+        ulong[] currentRoleIds,
+        Color color
+    ) {
+        return new EmbedBuilder()
+            .WithColor(color)
+            .WithAuthor(user)
+            .WithTitle("Your owned roles")
+            .AddField(
+                name: "Roles before change",
+                value: previousRoleIds.MentionAllRoles()
+            )
+            .AddField(
+                name: "Roles after change",
+                value: currentRoleIds.MentionAllRoles()
+            )
+            .WithCurrentTimestamp()
+            .Build();
+    }
+
+    public static Embed MakeShowRoleResult(IUser user, ulong[] roleIds) {
+        return new EmbedBuilder()
+            .WithColor(Colors.Success)
+            .WithAuthor(user)
+            .WithTitle("Your owned roles")
+            .AddField(
+                name: "Roles",
+                value: roleIds.MentionAllRoles(),
+                inline: true
+            )
+            .WithCurrentTimestamp()
+            .Build();
+    }
+
     public static Embed MakeDeleteRoleResult(IUser user, ulong roleId) {
         return new EmbedBuilder()
             .WithColor(Colors.Success)
@@ -220,18 +257,17 @@ public static class DiscordMessageMaker {
         string message,
         Color color
     ) {
-        var trackedRoles = DiscordTrackedRoleController.FindAllTrackedRoles()
-            .Select(x => MentionUtils.MentionRole(x.RoleId))
-            .ToArray();
-        
         return new EmbedBuilder()
             .WithColor(color)
             .WithTitle(message)
             .AddField("Role", MentionUtils.MentionRole(roleId), inline: true)
             .AddField("Role owner count", roleOwnedUserCount, inline: true)
-            .AddField("Currently tracked roles", trackedRoles.Length == 0 ?
-                "(N/A)" :
-                string.Join(" / ", trackedRoles))
+            .AddField("Currently tracked roles", DiscordTrackedRoleController
+                .FindAllTrackedRoles()
+                .Select(x => x.RoleId)
+                .ToArray()
+                .MentionAllRoles()
+            )
             .WithCurrentTimestamp()
             .Build();
     }

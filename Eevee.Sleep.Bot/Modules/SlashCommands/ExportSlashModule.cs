@@ -2,6 +2,7 @@
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
+using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Utils;
 using JetBrains.Annotations;
 
@@ -29,7 +30,7 @@ public class ExportSlashModule : InteractionModuleBase<SocketInteractionContext>
                     string.Join(
                         "\n",
                         string.Join(",", "ID", "Username", "Display Name"),
-                        string.Join("\n", result.Select(x => string.Join(",", x.Id, x.Username, x.DisplayName)))
+                        result.Select(x => string.Join(",", x.Id, x.Username, x.DisplayName)).MergeLines()
                     )
                 )),
                 fileName: $"{targetRoleId}.csv",

@@ -1,4 +1,5 @@
 ﻿using Eevee.Sleep.Bot.Enums;
+using Eevee.Sleep.Bot.Utils;
 
 namespace Eevee.Sleep.Bot.Extensions;
 
@@ -19,5 +20,17 @@ public static class StringExtensions {
 
     public static ModalFieldId? ToModalFieldId(this string value) {
         return EnumToString<ModalFieldId>(value);
+    }
+
+    public static string MergeToSameLine(this IEnumerable<string> lines) {
+        return string.Join(" / ", lines);
+    }
+
+    public static string MergeToSameLine(this IEnumerable<ulong> lines) {
+        return string.Join(" / ", lines);
+    }
+
+    public static string MergeLines(this IEnumerable<string> lines) {
+        return StringHelper.MergeLines(lines);
     }
 }

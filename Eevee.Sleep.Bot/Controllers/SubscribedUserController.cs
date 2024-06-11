@@ -1,5 +1,6 @@
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
+using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
 using Eevee.Sleep.Bot.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,7 @@ public class SubscribedUserController(
 
         logger.LogInformation(
             "Getting users with role ID ({taggedRoleCount}): {taggedRoleIds}",
-            string.Join(" / ", taggedRoleIds),
+            taggedRoleIds.MergeToSameLine(),
             taggedRoleIds.Count
         );
 

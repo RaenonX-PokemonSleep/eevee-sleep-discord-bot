@@ -1,4 +1,5 @@
 ﻿using Discord;
+using Discord.WebSocket;
 using Eevee.Sleep.Bot.Utils;
 
 namespace Eevee.Sleep.Bot.Extensions;
@@ -24,5 +25,16 @@ public static class DiscordExtensions {
     ) {
         return await (await client.GetAdminAlertChannelAsync())
             .SendMessageAsync(message, embed: embed, embeds: embeds);
+    }
+
+    public static string MentionAllRoles(this ulong[] roles) {
+        return roles.Length == 0 ?
+            "(N/A)" :
+            roles.Select(MentionUtils.MentionRole).MergeToSameLine();
+    }
+
+    public static SocketGuildUser AsGuildUser(this IUser user) {
+        return user as SocketGuildUser ??
+            throw new InvalidOperationException("User is not SocketGuildUser.");
     }
 }
