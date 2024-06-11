@@ -265,6 +265,7 @@ public static class DiscordMessageMaker {
             .AddField("Currently tracked roles", DiscordTrackedRoleController
                 .FindAllTrackedRoles()
                 .Select(x => x.RoleId)
+                .ToArray()
                 .MentionAllRoles()
             )
             .WithCurrentTimestamp()

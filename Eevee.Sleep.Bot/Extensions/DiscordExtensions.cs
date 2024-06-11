@@ -27,10 +27,10 @@ public static class DiscordExtensions {
             .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 
-    public static string MentionAllRoles(this IEnumerable<ulong> roles) {
-        return roles.Count() == 0 ?
+    public static string MentionAllRoles(this ulong[] roles) {
+        return roles.Length == 0 ?
             "(N/A)" :
-            roles.Select(role => MentionUtils.MentionRole(role)).MergeLines();
+            roles.Select(MentionUtils.MentionRole).MergeLines();
     }
 
     public static SocketGuildUser AsGuildUser(this IUser user) {
