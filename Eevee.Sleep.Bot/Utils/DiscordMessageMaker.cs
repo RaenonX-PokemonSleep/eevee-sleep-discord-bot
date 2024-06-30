@@ -283,4 +283,20 @@ public static class DiscordMessageMaker {
             .WithCurrentTimestamp()
             .Build();
     }
+
+    public static Embed MakeInGameAnnouncementUpdateMessage(InGameAnnouncementDetailModel detail) {
+        string truncatedContent = detail.Content.Length > 1024 ? detail.Content[..1021] + "..." : detail.Content;
+
+        return new EmbedBuilder()
+            .WithColor(Colors.Info)
+            .WithTitle("In-game Announcement Updated!")
+            .AddField("Title", detail.Title)
+            .AddField("Announcement ID", detail.AnnouncementId)
+            .AddField("Url", detail.Url)
+            .AddField("Updated", detail.Updated)
+            .AddField("Record Created", detail.RecordCreated)
+            .AddField("Content", truncatedContent)
+            .WithCurrentTimestamp()
+            .Build();
+    }
 }
