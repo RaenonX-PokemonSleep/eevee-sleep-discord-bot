@@ -1,4 +1,6 @@
-﻿using Eevee.Sleep.Bot.Enums;
+﻿using System.Security.Cryptography;
+using System.Text;
+using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Utils;
 
 namespace Eevee.Sleep.Bot.Extensions;
@@ -32,5 +34,16 @@ public static class StringExtensions {
 
     public static string MergeLines(this IEnumerable<string> lines) {
         return StringHelper.MergeLines(lines);
+    }
+
+    public static string ToSha256Hash(this string value) {
+        byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(value));
+        var builder = new StringBuilder();
+
+        foreach (byte b in hashBytes) {
+            builder.Append(b.ToString("x2"));
+        }
+
+        return builder.ToString();
     }
 }

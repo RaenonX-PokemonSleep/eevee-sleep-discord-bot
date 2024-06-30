@@ -12,7 +12,10 @@ public static class MongoIndexManager {
             ActivationPresetTagIndex(),
             ActivationPresetUuidIndex(),
             DiscordRoleRecordUserIdIndex(),
-            DiscordTrackedRoleRoleIdIndex()
+            DiscordTrackedRoleRoleIdIndex(),
+            InGameAnnouncementIndexAnnounceIdIndex(),
+            InGameAnnouncementDetailAnnounceIdIndex(),
+            InGameAnnouncementHistoryAnnounceIdIndex()
         };
     }
 
@@ -78,5 +81,30 @@ public static class MongoIndexManager {
         var indexModel = new CreateIndexModel<TrackedRoleModel>(indexKeys);
 
         return MongoConst.DiscordTrackedRoleCollection.Indexes.CreateOneAsync(indexModel);
+    }
+    
+    private static Task<string> InGameAnnouncementIndexAnnounceIdIndex() {
+        var indexKeys = Builders<InGameAnnouncementIndexModel>.IndexKeys
+            .Ascending(data => data.AnnouncementId);
+        var indexModel = new CreateIndexModel<InGameAnnouncementIndexModel>(indexKeys);
+
+        return MongoConst.InGameAnnouncementIndexCollection.Indexes.CreateOneAsync(indexModel);
+    }
+
+    private static Task<string> InGameAnnouncementDetailAnnounceIdIndex() {
+        var indexKeys = Builders<InGameAnnouncementDetailModel>.IndexKeys
+            .Ascending(data => data.AnnouncementId);
+        var indexModel = new CreateIndexModel<InGameAnnouncementDetailModel>(indexKeys);
+
+        return MongoConst.InGameAnnouncementDetailCollection.Indexes.CreateOneAsync(indexModel);
+    }
+
+    private static Task<string> InGameAnnouncementHistoryAnnounceIdIndex() {
+        var indexKeys = Builders<InGameAnnouncementDetailModel>.IndexKeys
+            .Ascending(data => data.AnnouncementId)
+            .Ascending(data => data.RecordCreated);
+        var indexModel = new CreateIndexModel<InGameAnnouncementDetailModel>(indexKeys);
+
+        return MongoConst.InGameAnnouncementHistoryCollection.Indexes.CreateOneAsync(indexModel);
     }
 }

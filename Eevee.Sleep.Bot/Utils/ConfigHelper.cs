@@ -31,6 +31,18 @@ public static class ConfigHelper {
         return GetDiscordChannelSection().GetRequiredValue<ulong>("AdminAlert");
     }
 
+    public static ulong GetJPInGameAnnouncementNoticeChannelId() {
+        return GetDiscordChannelSection().GetRequiredValue<ulong>("JPInGameAnnouncementNotice");
+    }
+
+    public static ulong GetENInGameAnnouncementNoticeChannelId() {
+        return GetDiscordChannelSection().GetRequiredValue<ulong>("ENInGameAnnouncementNotice");
+    }
+
+    public static ulong GetZHInGameAnnouncementNoticeChannelId() {
+        return GetDiscordChannelSection().GetRequiredValue<ulong>("ZHInGameAnnouncementNotice");
+    }
+
     private static IConfigurationSection GetDiscordRolesSection() {
         return GetDiscordSection().GetRequiredSection("Roles");
     }

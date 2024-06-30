@@ -23,6 +23,7 @@ builder.Services.AddSingleton(socketConfig)
     .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
     .AddSingleton<InteractionHandler>()
     .AddHostedService<DiscordClientWorker>()
+    .AddHostedService<InGameAnnouncementCrawlingWorker>()
     .AddControllers();
 
 var app = builder

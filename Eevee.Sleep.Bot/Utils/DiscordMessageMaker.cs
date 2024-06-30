@@ -3,6 +3,7 @@ using Discord.Net;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
+using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
 using IResult = Discord.Interactions.IResult;
@@ -268,6 +269,17 @@ public static class DiscordMessageMaker {
                 .ToArray()
                 .MentionAllRoles()
             )
+            .WithCurrentTimestamp()
+            .Build();
+    }
+
+    public static Embed MakeContentStructureChangedMessage(ContentStructureChangedException exception) {
+        return new EmbedBuilder()
+            .WithColor(Colors.Danger)
+            .WithTitle("Failed to retrieve in-game announcement")
+            .WithDescription("Web page structure may have changed.")
+            .AddField("Message", exception.Message)
+            .AddField("Context", exception.Context.GetString())
             .WithCurrentTimestamp()
             .Build();
     }

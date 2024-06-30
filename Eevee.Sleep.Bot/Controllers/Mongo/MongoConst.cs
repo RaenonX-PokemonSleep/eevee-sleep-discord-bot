@@ -28,4 +28,15 @@ public static class MongoConst {
 
     public static readonly IMongoCollection<TrackedRoleModel> DiscordTrackedRoleCollection =
         DiscordDatabase.GetCollection<TrackedRoleModel>("role/tracked");
+
+    public static readonly IMongoDatabase GameDatabase = Client.GetDatabase("game");
+
+    public static readonly IMongoCollection<InGameAnnouncementIndexModel> InGameAnnouncementIndexCollection =
+        GameDatabase.GetCollection<InGameAnnouncementIndexModel>("announcement/index");
+
+    public static readonly IMongoCollection<InGameAnnouncementDetailModel> InGameAnnouncementDetailCollection =
+        GameDatabase.GetCollection<InGameAnnouncementDetailModel>("announcement/details");
+
+    public static readonly IMongoCollection<InGameAnnouncementDetailModel> InGameAnnouncementHistoryCollection =
+        GameDatabase.GetCollection<InGameAnnouncementDetailModel>("announcement/history");
 }
