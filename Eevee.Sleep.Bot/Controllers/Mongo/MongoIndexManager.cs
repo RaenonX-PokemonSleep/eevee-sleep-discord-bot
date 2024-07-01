@@ -103,7 +103,7 @@ public static class MongoIndexManager {
     private static Task<string> InGameAnnouncementHistoryAnnounceIdIndex() {
         var indexKeys = Builders<InGameAnnouncementDetailModel>.IndexKeys
             .Ascending(data => data.AnnouncementId)
-            .Ascending(data => data.RecordCreated);
+            .Ascending(data => data.RecordCreatedUtc);
         var indexModel = new CreateIndexModel<InGameAnnouncementDetailModel>(indexKeys);
 
         return MongoConst.InGameAnnouncementHistoryCollection.Indexes.CreateOneAsync(indexModel);

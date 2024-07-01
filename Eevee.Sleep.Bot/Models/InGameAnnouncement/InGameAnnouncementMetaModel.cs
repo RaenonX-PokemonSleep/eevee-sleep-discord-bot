@@ -19,4 +19,7 @@ public record InGameAnnouncementMetaModel {
 
     [UsedImplicitly]
     public required string Url { get; init; }
+
+    [UsedImplicitly]
+    public required DateTime RecordCreatedUtc { get; init; }
 }

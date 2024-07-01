@@ -17,7 +17,7 @@ public static class InGameAnnouncememntHistoryController {
             {
                 var oldestRecord = await MongoConst.InGameAnnouncementHistoryCollection
                     .Find(Builders<InGameAnnouncementDetailModel>.Filter.Where(x => x.AnnouncementId == model.AnnouncementId))
-                    .Sort(Builders<InGameAnnouncementDetailModel>.Sort.Ascending(x => x.RecordCreated))
+                    .Sort(Builders<InGameAnnouncementDetailModel>.Sort.Ascending(x => x.RecordCreatedUtc))
                     .Limit(1)
                     .FirstOrDefaultAsync();
 

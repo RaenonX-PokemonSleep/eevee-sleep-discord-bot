@@ -27,6 +27,7 @@ public static class DetailScraper {
             );
         }
 
+        await Task.Delay(500);
         return new InGameAnnouncementDetailModel() {
             AnnouncementId = index.AnnouncementId,
             Title = index.Title,
@@ -35,7 +36,7 @@ public static class DetailScraper {
             Content = content,
             ContentHash = content.ToSha256Hash(),
             Updated = date,
-            RecordCreated = DateTime.UtcNow
+            RecordCreatedUtc = DateTime.UtcNow
         };
     }
 }

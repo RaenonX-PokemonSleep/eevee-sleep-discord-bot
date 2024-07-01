@@ -295,7 +295,7 @@ public static class DiscordMessageMaker {
             .AddField("Announcement ID", detail.AnnouncementId)
             .AddField("Url", detail.Url)
             .AddField("Updated", detail.Updated)
-            .AddField("Record Created", detail.RecordCreated)
+            .AddField("Record Created", detail.RecordCreatedUtc)
             .AddField("Content", truncatedContent)
             .WithCurrentTimestamp()
             .Build();

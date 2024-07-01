@@ -46,4 +46,8 @@ public static class StringExtensions {
 
         return builder.ToString();
     }
+
+    public static int ToInt(this string str, int defaultValue = 0) {
+        return int.TryParse(str, out int val) ? val : defaultValue;
+    }
 }

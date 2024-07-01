@@ -20,14 +20,13 @@ public class InGameAnnouncementCrawlingWorker(
     private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(60);
 
     private static async Task<IEnumerable<InGameAnnouncementIndexModel>> GetIndexes() {
-        Dictionary<string, InGameAnnoucementLanguage> urls = new(){
-            { "https://www.pokemonsleep.net/news/", InGameAnnoucementLanguage.JP },
-            { "https://www.pokemonsleep.net/news/page/2", InGameAnnoucementLanguage.JP },
-            { "https://www.pokemonsleep.net/en/news/", InGameAnnoucementLanguage.EN },
-            { "https://www.pokemonsleep.net/zh/news/", InGameAnnoucementLanguage.ZH },
+        Dictionary<string, InGameAnnoucementLanguage> BaseUrls = new(){
+            { "https://www.pokemonsleep.net/news", InGameAnnoucementLanguage.JP },
+            { "https://www.pokemonsleep.net/en/news", InGameAnnoucementLanguage.EN },
+            { "https://www.pokemonsleep.net/zh/news", InGameAnnoucementLanguage.ZH },
         };
 
-        var tasks = urls.Select(dict => IndexScraper.GetAsync(dict.Key, dict.Value)).ToArray();
+        var tasks = BaseUrls.Select(dict => IndexScraper.GetAllPagesAsync(dict.Key, dict.Value)).ToArray();
         var results = await Task.WhenAll(tasks);
 
         return results.SelectMany(x => x);

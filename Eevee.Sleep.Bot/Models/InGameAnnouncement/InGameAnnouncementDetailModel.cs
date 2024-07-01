@@ -13,7 +13,4 @@ public record InGameAnnouncementDetailModel: InGameAnnouncementMetaModel {
 
     [UsedImplicitly]
     public required string Updated { get; init; }
-
-    [UsedImplicitly]
-    public required DateTime RecordCreated { get; init; }
 }

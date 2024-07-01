@@ -1,6 +1,8 @@
 using AngleSharp;
+using AngleSharp.Text;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
+using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models.InGameAnnouncement;
 using MongoDB.Driver.Linq;
 
@@ -47,9 +49,35 @@ public static class IndexScraper {
                 Language = language,
                 AnnouncementId = id,
                 Url = $"https://www.pokemonsleep.net/news/{id}/",
+                RecordCreatedUtc = DateTime.UtcNow
             });
         }
 
+        await Task.Delay(500);
         return IndexModels;
+    }
+
+    public static async Task<IEnumerable<InGameAnnouncementIndexModel>> GetAllPagesAsync(string baseUrl, InGameAnnoucementLanguage language) {
+        var config = Configuration.Default.WithDefaultLoader();
+        var context = BrowsingContext.New(config);
+        var document = await context.OpenAsync(baseUrl);
+
+        // format: "1/23" to "23"
+        var pageCount = (document.QuerySelector("div.pagination_1 > div > p")?.TextContent?.Trim()?.Split("/").Last())
+            ?? throw new ContentStructureChangedException(
+                message: "Page count is empty. Failed to get index.",
+                context: new Dictionary<string, string?> {
+                    { "url", baseUrl },
+                    { "language", language.ToString() },
+                }
+            );
+
+        var tasks = Enumerable
+            .Range(1, pageCount.ToInt(defaultValue: 1))
+            .AsParallel()
+            .WithDegreeOfParallelism(5)
+            .Select(n => GetAsync($"{baseUrl}/page/{n}", language));
+
+        return (await Task.WhenAll(tasks)).SelectMany(page => page);
     }
 }
