@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Utils;
+using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 
 namespace Eevee.Sleep.Bot.Handlers;
 
@@ -17,7 +18,7 @@ public static class OnLogHandler {
             message.Exception.Message != "Cannot respond to an interaction after 3 seconds!" &&
             message.Exception.Message != "WebSocket connection was closed"
         ) {
-            await client.SendMessageInAdminAlertChannel(embed: DiscordMessageMaker.MakeErrorFromLog(message));
+            await client.SendMessageInAdminAlertChannel(embed: DiscordMessageMakerForError.MakeErrorFromLog(message));
         }
 
         Logger.Log(

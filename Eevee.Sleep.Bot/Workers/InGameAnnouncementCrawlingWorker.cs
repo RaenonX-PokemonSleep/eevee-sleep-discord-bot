@@ -5,7 +5,7 @@ using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models.InGameAnnouncement;
-using Eevee.Sleep.Bot.Utils;
+using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement;
 
 namespace Eevee.Sleep.Bot.Workers;
@@ -73,7 +73,7 @@ public class InGameAnnouncementCrawlingWorker(
             } catch (ContentStructureChangedException e) {
                 _logger.LogError("Failed to get indexes. Web page structure may have changed.");
                 await _client.SendMessageInAdminAlertChannel(
-                    embed: DiscordMessageMaker.MakeContentStructureChangedMessage(e)
+                    embed: DiscordMessageMakerForInGameAnnouncement.MakeContentStructureChangedMessage(e)
                 );
                 _cancellationTokenSource.Cancel();
                 break;

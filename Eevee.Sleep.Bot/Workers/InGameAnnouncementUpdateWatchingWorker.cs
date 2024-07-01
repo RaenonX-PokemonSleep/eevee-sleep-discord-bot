@@ -2,7 +2,7 @@ using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models.InGameAnnouncement;
-using Eevee.Sleep.Bot.Utils;
+using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Workers;
@@ -38,7 +38,7 @@ public class InGameAnnouncementUpdateWatchingWorker(
 
             await _client.SendMessageInInGameAnnouncementNoticeChannelAsync(
                 language: detail.Language,
-                embed: DiscordMessageMaker.MakeInGameAnnouncementUpdateMessage(detail)
+                embed: DiscordMessageMakerForInGameAnnouncement.MakeInGameAnnouncementUpdateMessage(detail)
             );
         }, cancellationToken);
     }
