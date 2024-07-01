@@ -1,7 +1,7 @@
 using JetBrains.Annotations;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Eevee.Sleep.Bot.Models;
+namespace Eevee.Sleep.Bot.Models.InGameAnnouncement;
 
 [BsonIgnoreExtraElements]
 public record InGameAnnouncementDetailModel: InGameAnnouncementMetaModel {
@@ -15,5 +15,5 @@ public record InGameAnnouncementDetailModel: InGameAnnouncementMetaModel {
     public required string Updated { get; init; }
 
     [UsedImplicitly]
-    public required string RecordCreated { get; init; }
+    public required DateTime RecordCreated { get; init; }
 }

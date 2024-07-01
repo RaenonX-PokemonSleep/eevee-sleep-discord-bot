@@ -1,7 +1,7 @@
-using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement;
 using MongoDB.Driver;
 
-namespace Eevee.Sleep.Bot.Controllers.Mongo;
+namespace Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement;
 
 public static class InGameAnnouncementDetailController {
     public static Task BulkUpsert(InGameAnnouncementDetailModel[] model) {

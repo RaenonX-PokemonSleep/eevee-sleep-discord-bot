@@ -6,6 +6,7 @@ using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement;
 using IResult = Discord.Interactions.IResult;
 
 namespace Eevee.Sleep.Bot.Utils;

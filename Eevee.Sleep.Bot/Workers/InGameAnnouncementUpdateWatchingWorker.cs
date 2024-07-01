@@ -1,7 +1,7 @@
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Extensions;
-using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement;
 using Eevee.Sleep.Bot.Utils;
 using MongoDB.Driver;
 

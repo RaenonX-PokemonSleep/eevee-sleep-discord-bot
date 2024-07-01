@@ -1,10 +1,10 @@
 using AngleSharp.Common;
 using Discord.WebSocket;
-using Eevee.Sleep.Bot.Controllers.Mongo;
+using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
-using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement;
 using Eevee.Sleep.Bot.Utils;
 using Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement;
 
@@ -43,13 +43,13 @@ public class InGameAnnouncementCrawlingWorker(
     }
 
     private static async Task SaveDetailsAndHistories(IEnumerable<InGameAnnouncementDetailModel> details) {
-        var detailModels = InGameAnnouncementDetailController.FindAllByIds(details.Select(x => x.AnnouncementId));
-        var detailModelsById = detailModels.ToDictionary(x => x.AnnouncementId);
+        var existedDetails = InGameAnnouncementDetailController.FindAllByIds(details.Select(x => x.AnnouncementId));
+        var existedDetailsById = existedDetails.ToDictionary(x => x.AnnouncementId);
     
         var shouldSaveDetail = new List<InGameAnnouncementDetailModel>();
     
         foreach (var detail in details) {
-            var detailModel = detailModelsById.GetOrDefault(detail.AnnouncementId, null);
+            var detailModel = existedDetailsById.GetOrDefault(detail.AnnouncementId, null);
             if (detailModel?.ContentHash != detail.ContentHash) {
                 shouldSaveDetail.Add(detail!);
             }

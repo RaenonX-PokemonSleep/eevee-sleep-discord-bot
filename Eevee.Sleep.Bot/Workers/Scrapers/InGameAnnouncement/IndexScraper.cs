@@ -1,7 +1,7 @@
 using AngleSharp;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
-using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement;
 using MongoDB.Driver.Linq;
 
 namespace Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement;

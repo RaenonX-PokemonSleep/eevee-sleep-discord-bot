@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Eevee.Sleep.Bot.Models;
+namespace Eevee.Sleep.Bot.Models.InGameAnnouncement;
 
 [BsonIgnoreExtraElements]
 public record InGameAnnouncementMetaModel {

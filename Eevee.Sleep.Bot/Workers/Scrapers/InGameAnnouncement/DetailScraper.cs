@@ -1,7 +1,7 @@
 using AngleSharp;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
-using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement;
 
 namespace Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement;
 
@@ -35,7 +35,7 @@ public static class DetailScraper {
             Content = content,
             ContentHash = content.ToSha256Hash(),
             Updated = date,
-            RecordCreated = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ")
+            RecordCreated = DateTime.UtcNow
         };
     }
 }
