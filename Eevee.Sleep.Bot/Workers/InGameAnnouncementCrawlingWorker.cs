@@ -10,40 +10,14 @@ using Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement;
 
 namespace Eevee.Sleep.Bot.Workers;
 public class InGameAnnouncementCrawlingWorker(
-        DiscordSocketClient client,
-        ILogger<InGameAnnouncementCrawlingWorker> logger
-    ) : BackgroundService {
+    DiscordSocketClient client,
+    ILogger<InGameAnnouncementCrawlingWorker> logger
+) : BackgroundService {
     private readonly DiscordSocketClient _client = client;
     private readonly ILogger<InGameAnnouncementCrawlingWorker> _logger = logger;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(60);
-
-    protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
-        _logger.LogInformation("InGameAnnouncementUpdateCheckWorker is starting.");
-        cancellationToken.Register(() => _logger.LogInformation("InGameAnnouncementUpdateCheckWorker background task is stopping."));
-
-        while (!cancellationToken.IsCancellationRequested) {
-            _logger.LogInformation("InGameAnnouncementUpdateCheckWorker task doing background work.");
-
-            try {
-                var indexes = await GetIndexes();
-                await InGameAnnouncememntIndexController.BulkUpsert([.. indexes]);
-                
-                var details = await GetDetails(indexes);
-                await SaveDetailsAndHistories(details);
-            } catch (ContentStructureChangedException e) {
-                _logger.LogError("Failed to get indexes. Web page structure may have changed.");
-                await _client.SendMessageInAdminAlertChannel(
-                    embed: DiscordMessageMaker.MakeContentStructureChangedMessage(e)
-                );
-                _cancellationTokenSource.Cancel();
-                break;
-            }
-
-            await Task.Delay(CheckInterval, cancellationToken);
-        }
-    }
 
     private static async Task<IEnumerable<InGameAnnouncementIndexModel>> GetIndexes() {
         Dictionary<string, InGameAnnoucementLanguage> urls = new(){
@@ -72,7 +46,7 @@ public class InGameAnnouncementCrawlingWorker(
         var detailModels = InGameAnnouncementDetailController.FindAllByIds(details.Select(x => x.AnnouncementId));
         var detailModelsById = detailModels.ToDictionary(x => x.AnnouncementId);
     
-        List<InGameAnnouncementDetailModel> shouldSaveDetail = [];
+        var shouldSaveDetail = new List<InGameAnnouncementDetailModel>();
     
         foreach (var detail in details) {
             var detailModel = detailModelsById.GetOrDefault(detail.AnnouncementId, null);
@@ -80,7 +54,33 @@ public class InGameAnnouncementCrawlingWorker(
                 shouldSaveDetail.Add(detail!);
             }
         }
-        await InGameAnnouncementDetailController.BulkUpsert([.. shouldSaveDetail]);
-        await InGameAnnouncememntHistoryController.BulkUpsert([.. shouldSaveDetail]);
+        await InGameAnnouncementDetailController.BulkUpsert([..shouldSaveDetail]);
+        await InGameAnnouncememntHistoryController.BulkUpsert([..shouldSaveDetail]);
+    }
+
+    protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
+        _logger.LogInformation("Starting in-game announcement update watcher.");
+        cancellationToken.Register(() => _logger.LogInformation("Stopping in-game announcement update watcher: cancellation token received."));
+
+        while (!cancellationToken.IsCancellationRequested) {
+            _logger.LogInformation("Checking in-game announcement updates.");
+
+            try {
+                var indexes = await GetIndexes();
+                await InGameAnnouncememntIndexController.BulkUpsert([..indexes]);
+                
+                var details = await GetDetails(indexes);
+                await SaveDetailsAndHistories(details);
+            } catch (ContentStructureChangedException e) {
+                _logger.LogError("Failed to get indexes. Web page structure may have changed.");
+                await _client.SendMessageInAdminAlertChannel(
+                    embed: DiscordMessageMaker.MakeContentStructureChangedMessage(e)
+                );
+                _cancellationTokenSource.Cancel();
+                break;
+            }
+
+            await Task.Delay(CheckInterval, cancellationToken);
+        }
     }
 }

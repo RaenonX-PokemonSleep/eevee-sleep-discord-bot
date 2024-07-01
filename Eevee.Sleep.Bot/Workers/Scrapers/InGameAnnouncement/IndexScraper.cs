@@ -27,7 +27,7 @@ public static class IndexScraper {
             };
             
             var title = content.QuerySelector("p.banner_2__title")?.TextContent?.Trim();
-            // url formt: https://www.pokemonsleep.net/news/313438343932333036303239323135373435/
+            // url format: https://www.pokemonsleep.net/news/313438343932333036303239323135373435/
             var id = content.GetAttribute("href")?.Split("/").SkipLast(1).Last();
 
             if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(id)) {

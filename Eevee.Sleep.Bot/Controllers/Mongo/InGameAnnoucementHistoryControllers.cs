@@ -7,7 +7,7 @@ public static class InGameAnnouncememntHistoryController {
     public static async Task Upsert(InGameAnnouncementDetailModel model) {
         await MongoConst.InGameAnnouncementHistoryCollection.InsertOneAsync(model);
 
-        long count = await MongoConst.InGameAnnouncementHistoryCollection
+        var count = await MongoConst.InGameAnnouncementHistoryCollection
             .CountDocumentsAsync(Builders<InGameAnnouncementDetailModel>.Filter.Where(x => x.AnnouncementId == model.AnnouncementId));
 
         if (count > 3) {

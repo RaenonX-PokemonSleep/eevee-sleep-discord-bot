@@ -37,10 +37,10 @@ public static class StringExtensions {
     }
 
     public static string ToSha256Hash(this string value) {
-        byte[] hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(value));
+        var hashBytes = SHA256.HashData(Encoding.UTF8.GetBytes(value));
         var builder = new StringBuilder();
 
-        foreach (byte b in hashBytes) {
+        foreach (var b in hashBytes) {
             builder.Append(b.ToString("x2"));
         }
 

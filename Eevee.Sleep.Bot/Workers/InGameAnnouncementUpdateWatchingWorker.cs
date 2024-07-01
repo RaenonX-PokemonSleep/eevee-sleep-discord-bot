@@ -7,12 +7,12 @@ using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Workers;
 
-public class InGameAnnouncementUpdateCheckWorker(
+public class InGameAnnouncementUpdateWatchingWorker(
     DiscordSocketClient client,
-    ILogger<InGameAnnouncementUpdateCheckWorker> logger
+    ILogger<InGameAnnouncementUpdateWatchingWorker> logger
 ) : BackgroundService {
     private readonly DiscordSocketClient _client = client;
-    private readonly ILogger<InGameAnnouncementUpdateCheckWorker> _logger = logger;
+    private readonly ILogger<InGameAnnouncementUpdateWatchingWorker> _logger = logger;
 
      protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
         var options = new ChangeStreamOptions { FullDocument = ChangeStreamFullDocumentOption.UpdateLookup };
@@ -30,9 +30,10 @@ public class InGameAnnouncementUpdateCheckWorker(
             var detail = change.FullDocument;
 
             _logger.LogInformation(
-                "Received Detail Update {title}, {id}",
+                "Received in-game announcement detail update in {Language} ({Title} / #{Id})",
+                detail.Language,
                 detail.Title,
-                detail.Url
+                detail.AnnouncementId
             );
 
             await _client.SendMessageInInGameAnnouncementNoticeChannelAsync(

@@ -279,13 +279,13 @@ public static class DiscordMessageMaker {
             .WithTitle("Failed to retrieve in-game announcement")
             .WithDescription("Web page structure may have changed.")
             .AddField("Message", exception.Message)
-            .AddField("Context", exception.Context.GetString())
+            .AddField("Context", exception.Context.ToJsonString())
             .WithCurrentTimestamp()
             .Build();
     }
 
     public static Embed MakeInGameAnnouncementUpdateMessage(InGameAnnouncementDetailModel detail) {
-        string truncatedContent = detail.Content.Length > 1024 ? detail.Content[..1021] + "..." : detail.Content;
+        var truncatedContent = detail.Content.Length > 1024 ? detail.Content[..1021] + "..." : detail.Content;
 
         return new EmbedBuilder()
             .WithColor(Colors.Info)
