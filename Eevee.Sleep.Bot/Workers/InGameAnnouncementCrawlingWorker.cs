@@ -46,11 +46,11 @@ public class InGameAnnouncementCrawlingWorker(
     }
 
     private static async Task<IEnumerable<InGameAnnouncementIndexModel>> GetIndexes() {
-        Dictionary<string, InGameAnnoucementLanguages> urls = new(){
-            { "https://www.pokemonsleep.net/news/", InGameAnnoucementLanguages.JP },
-            { "https://www.pokemonsleep.net/news/page/2", InGameAnnoucementLanguages.JP },
-            { "https://www.pokemonsleep.net/en/news/", InGameAnnoucementLanguages.EN },
-            { "https://www.pokemonsleep.net/zh/news/", InGameAnnoucementLanguages.ZH },
+        Dictionary<string, InGameAnnoucementLanguage> urls = new(){
+            { "https://www.pokemonsleep.net/news/", InGameAnnoucementLanguage.JP },
+            { "https://www.pokemonsleep.net/news/page/2", InGameAnnoucementLanguage.JP },
+            { "https://www.pokemonsleep.net/en/news/", InGameAnnoucementLanguage.EN },
+            { "https://www.pokemonsleep.net/zh/news/", InGameAnnoucementLanguage.ZH },
         };
 
         var tasks = urls.Select(dict => IndexScraper.GetAsync(dict.Key, dict.Value)).ToArray();

@@ -15,7 +15,7 @@ public record InGameAnnouncementMetaModel {
 
     [UsedImplicitly]
     [BsonRepresentation(BsonType.String)]
-    public required InGameAnnoucementLanguages Language { get; init; }
+    public required InGameAnnoucementLanguage Language { get; init; }
 
     [UsedImplicitly]
     public required string Url { get; init; }

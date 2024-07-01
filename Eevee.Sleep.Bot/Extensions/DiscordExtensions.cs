@@ -28,18 +28,13 @@ public static class DiscordExtensions {
             .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 
-    private static Task<IMessageChannel> GetInGameAnnouncementNoticeChannelsAsync(this IDiscordClient client, InGameAnnoucementLanguages language) {
-        return language switch {
-            InGameAnnoucementLanguages.JP => client.GetMessageChannel(ConfigHelper.GetJPInGameAnnouncementNoticeChannelId()),
-            InGameAnnoucementLanguages.EN => client.GetMessageChannel(ConfigHelper.GetENInGameAnnouncementNoticeChannelId()),
-            InGameAnnoucementLanguages.ZH => client.GetMessageChannel(ConfigHelper.GetZHInGameAnnouncementNoticeChannelId()),
-            _ => throw new ArgumentException($"Unknown language: {language}")
-        };
+    private static Task<IMessageChannel> GetInGameAnnouncementNoticeChannelsAsync(this IDiscordClient client, InGameAnnoucementLanguage language) {
+        return client.GetMessageChannel(ConfigHelper.GetJPInGameAnnouncementNotificationChannelId(language));
     }
 
     public static async Task<IUserMessage> SendMessageInInGameAnnouncementNoticeChannelAsync(
         this IDiscordClient client,
-        InGameAnnoucementLanguages language,
+        InGameAnnoucementLanguage language,
         string? message = null,
         Embed? embed = null,
         Embed[]? embeds = null

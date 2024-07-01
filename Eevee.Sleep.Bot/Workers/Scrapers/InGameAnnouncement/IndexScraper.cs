@@ -7,7 +7,7 @@ using MongoDB.Driver.Linq;
 namespace Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement;
 
 public static class IndexScraper {
-    public static async Task<List<InGameAnnouncementIndexModel>> GetAsync(string url, InGameAnnoucementLanguages language) {
+    public static async Task<List<InGameAnnouncementIndexModel>> GetAsync(string url, InGameAnnoucementLanguage language) {
         var config = Configuration.Default.WithDefaultLoader();
         var context = BrowsingContext.New(config);
         var document = await context.OpenAsync(url);
