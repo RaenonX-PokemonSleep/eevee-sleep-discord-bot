@@ -39,7 +39,8 @@ public static class IndexScraper {
                         { "title", title },
                         { "url", url },
                         { "language", language.ToString() },
-                        { "id", id }
+                        { "id", id },
+                        { "statusCode", document.StatusCode.ToString()}
                     }
                 );
             };

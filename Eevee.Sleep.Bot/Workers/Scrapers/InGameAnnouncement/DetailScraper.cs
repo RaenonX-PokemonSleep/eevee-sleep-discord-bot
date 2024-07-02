@@ -22,7 +22,10 @@ public static class DetailScraper {
                     { "title", index.Title },
                     { "url", index.Url },
                     { "language", index.Language.ToString() },
-                    { "id", index.AnnouncementId }
+                    { "date", date },
+                    { "content", content },
+                    { "id", index.AnnouncementId },
+                    { "statusCode", document.StatusCode.ToString()}
                 }
             );
         }
