@@ -6,6 +6,7 @@ using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
 using Eevee.Sleep.Bot.Utils;
+using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 
 namespace Eevee.Sleep.Bot.Handlers.EventHandlers;
 
@@ -32,7 +33,7 @@ public static class GuildMemberUpdatedEventHandler {
         if (activeRoles.Count <= 0) {
             await client.SendMessageInAdminAlertChannel(
                 $"All roles to add to {MentionUtils.MentionUser(user.Id)} (@{user.Username}) are suspended",
-                embed: await DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded, Colors.Info)
+                embed: await DiscordMessageMakerForActivation.MakeUserSubscribed(user, rolesAdded, Colors.Info)
             );
             Logger.LogInformation(
                 "Skipped generating activation link due to role suspension for user {UserId} (@{UserName})",
@@ -49,7 +50,7 @@ public static class GuildMemberUpdatedEventHandler {
         if (string.IsNullOrEmpty(activationLink)) {
             await client.SendMessageInAdminAlertChannel(
                 $"Activation link failed to generate for user {MentionUtils.MentionUser(user.Id)} (@{user.Username})",
-                embed: await DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded, Colors.Warning)
+                embed: await DiscordMessageMakerForActivation.MakeUserSubscribed(user, rolesAdded, Colors.Warning)
             );
             Logger.LogWarning(
                 "Activation link failed to generate for user {UserId} (@{UserName})",
@@ -70,19 +71,19 @@ public static class GuildMemberUpdatedEventHandler {
             try {
                 await user.SendMessageAsync(
                     activationLink,
-                    embeds: DiscordMessageMaker.MakeActivationNote()
+                    embeds: DiscordMessageMakerForActivation.MakeActivationNote()
                 );
             } catch (HttpException e) {
                 await client.SendMessageInAdminAlertChannel(
                     $"Error occurred during activation link delivery to {MentionUtils.MentionUser(user.Id)}\n" +
                     $"> {activationLink}",
-                    embed: DiscordMessageMaker.MakeDiscordHttpException(e)
+                    embed: DiscordMessageMakerForError.MakeDiscordHttpException(e)
                 );
             }
         }
 
         await client.SendMessageInAdminAlertChannel(
-            embed: await DiscordMessageMaker.MakeUserSubscribed(user, rolesAdded)
+            embed: await DiscordMessageMakerForActivation.MakeUserSubscribed(user, rolesAdded)
         );
     }
 
@@ -104,7 +105,7 @@ public static class GuildMemberUpdatedEventHandler {
         var subscriptionDuration = await ActivationController.RemoveDiscordActivationAndGetSubscriptionDuration(user.Id.ToString());
         
         await client.SendMessageInAdminAlertChannel(
-            embed: await DiscordMessageMaker.MakeUserUnsubscribed(user, subscriptionDuration, roleIds)
+            embed: await DiscordMessageMakerForActivation.MakeUserUnsubscribed(user, subscriptionDuration, roleIds)
         );
         Logger.LogInformation(
             "User {UserId} (@{Username}) activation expired ({RoleCount} roles dropped: {RoleIds}), removing associated activation",
@@ -124,7 +125,7 @@ public static class GuildMemberUpdatedEventHandler {
         if (!original.HasValue) {
             Logger.LogWarning("User data of {UserId} not cached", original.Id);
             await client.SendMessageInAdminAlertChannel(
-                embed: DiscordMessageMaker.MakeUserDataNotCached(original.Id, updated)
+                embed: DiscordMessageMakerForActivation.MakeUserDataNotCached(original.Id, updated)
             );
             return;
         }

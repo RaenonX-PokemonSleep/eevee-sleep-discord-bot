@@ -4,6 +4,7 @@ using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Utils;
+using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using JetBrains.Annotations;
 
 namespace Eevee.Sleep.Bot.Modules.SlashCommands;
@@ -50,12 +51,12 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             "All tracked roles will be removed from after selecting the role to display.",
             "Role ownership won't get affected by the removal, only the role assignment on Discord is affected.",
             "",
-            ..DiscordMessageMaker.MakeRoleSelectCorrespondenceList(roles)
+            ..DiscordMessageMakerForRoleChange.MakeRoleSelectCorrespondenceList(roles)
         ];
 
         return SendEphemeralMessageToBeDeletedAsync(
             messages.MergeLines(),
-            components: DiscordMessageMaker.MakeRoleSelectButton(
+            components: DiscordMessageMakerForRoleChange.MakeRoleSelectButton(
                 roles: roles,
                 buttonId: ButtonId.RoleChanger
             )
@@ -83,12 +84,12 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             "Select a role to obtain the ownership on Discord.",
             "This does not guarantee that the selected role will show. To ensure the selected role shows up, use `/role display` instead.",
             "",
-            ..DiscordMessageMaker.MakeRoleSelectCorrespondenceList(roles)
+            ..DiscordMessageMakerForRoleChange.MakeRoleSelectCorrespondenceList(roles)
         ];
 
         return SendEphemeralMessageToBeDeletedAsync(
             messages.MergeLines(),
-            components: DiscordMessageMaker.MakeRoleSelectButton(
+            components: DiscordMessageMakerForRoleChange.MakeRoleSelectButton(
                 roles: roles,
                 buttonId: ButtonId.RoleAdder
             )
@@ -112,12 +113,12 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             "Select a role to remove the ownership on Discord.",
             "This does not remove the actual ownership of the role. You can get them back using either `/role add` or `/role display` at any time.",
             "",
-            ..DiscordMessageMaker.MakeRoleSelectCorrespondenceList(roles)
+            ..DiscordMessageMakerForRoleChange.MakeRoleSelectCorrespondenceList(roles)
         ];
 
         return SendEphemeralMessageToBeDeletedAsync(
             messages.MergeLines(),
-            components: DiscordMessageMaker.MakeRoleSelectButton(
+            components: DiscordMessageMakerForRoleChange.MakeRoleSelectButton(
                 roles: roles,
                 buttonId: ButtonId.RoleRemover
             )
@@ -137,7 +138,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         await user.AddRolesAsync(DiscordRoleRecordController.FindRoleIdsByUserId(user.Id));
 
         await Context.Interaction.RespondAsync(
-            embed: DiscordMessageMaker.MakeChangeRoleResult(
+            embed: DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
                 user: user,
                 previousRoleIds: previousRoleIds,
                 currentRoleIds: DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
@@ -160,7 +161,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         await user.RemoveRolesAsync(DiscordRoleRecordController.FindRoleIdsByUserId(user.Id));
 
         await Context.Interaction.RespondAsync(
-            embed: DiscordMessageMaker.MakeChangeRoleResult(
+            embed: DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
                 user: user,
                 previousRoleIds: previousRoleIds,
                 currentRoleIds: [],
@@ -176,7 +177,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         var user = Context.User.AsGuildUser();
 
         return Context.Interaction.RespondAsync(
-            embed: DiscordMessageMaker.MakeShowRoleResult(
+            embed: DiscordMessageMakerForRoleChange.MakeShowRoleResult(
                 user: user,
                 roleIds: DiscordRoleRecordController.FindRoleIdsByUserId(user.Id)
             ),
@@ -191,7 +192,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         await DiscordRoleRecordController.RemoveRoles(user.Id, [role.Id]);
 
         await Context.Interaction.RespondAsync(
-            embed: DiscordMessageMaker.MakeDeleteRoleResult(user, role.Id)
+            embed: DiscordMessageMakerForRoleChange.MakeDeleteRoleResult(user, role.Id)
         );
     }
 
@@ -209,7 +210,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         await DiscordRoleRecordController.BulkAddRoles(roleOwnedUsers, [role.Id]);
 
         await Context.Interaction.RespondAsync(
-            embed: DiscordMessageMaker.MakeTrackRoleResult(
+            embed: DiscordMessageMakerForRoleChange.MakeTrackRoleResult(
                 roleId: role.Id,
                 roleOwnedUserCount: roleOwnedUsers.Length,
                 message: "Role tracked.",
@@ -231,7 +232,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         await DiscordRoleRecordController.BulkRemoveRoles(roleOwnedUsers, [role.Id]);
 
         await Context.Interaction.RespondAsync(
-            embed: DiscordMessageMaker.MakeTrackRoleResult(
+            embed: DiscordMessageMakerForRoleChange.MakeTrackRoleResult(
                 roleId: role.Id,
                 roleOwnedUserCount: roleOwnedUsers.Length,
                 message: "Role untracked.",

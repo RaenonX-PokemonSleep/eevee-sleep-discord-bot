@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Utils;
+using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 
 namespace Eevee.Sleep.Bot.Handlers.EventHandlers;
 
@@ -19,7 +20,7 @@ public static class GuildMemberLeftEventHandler {
 
         if (subscriptionDuration is not null) {
             await client.SendMessageInAdminAlertChannel(
-                embed: await DiscordMessageMaker.MakeUserUnsubscribed(user, subscriptionDuration)
+                embed: await DiscordMessageMakerForActivation.MakeUserUnsubscribed(user, subscriptionDuration)
             );
         }
     }

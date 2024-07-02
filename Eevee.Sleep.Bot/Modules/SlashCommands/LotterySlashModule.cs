@@ -3,6 +3,7 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Utils;
+using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using JetBrains.Annotations;
 
 namespace Eevee.Sleep.Bot.Modules.SlashCommands;
@@ -29,7 +30,7 @@ public class LotterySlashModule : InteractionModuleBase<SocketInteractionContext
 
             return RespondAsync(
                 text: string.Join(" ", result.Select(x => MentionUtils.MentionUser(x.Id))),
-                embed: DiscordMessageMaker.MakeLotteryResult(targetRoleId, count, result)
+                embed: DiscordMessageMakerForLottery.MakeLotteryResult(targetRoleId, count, result)
             );
         } catch (ArgumentException e) {
             return RespondAsync(e.Message, ephemeral: true);

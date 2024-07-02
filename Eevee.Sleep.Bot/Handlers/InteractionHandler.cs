@@ -6,6 +6,7 @@ using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Handlers.EventHandlers;
 using Eevee.Sleep.Bot.Utils;
+using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using IResult = Discord.Interactions.IResult;
 
 namespace Eevee.Sleep.Bot.Handlers;
@@ -45,7 +46,7 @@ public class InteractionHandler(
 
         return context.Interaction.RespondAsync(
             "Bot error occurred!",
-            embed: DiscordMessageMaker.MakeError(result),
+            embed: DiscordMessageMakerForError.MakeError(result),
             ephemeral: true
         );
     }

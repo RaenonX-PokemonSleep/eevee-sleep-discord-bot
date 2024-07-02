@@ -1,42 +1,11 @@
-﻿using Discord;
-using Discord.Net;
-using Discord.WebSocket;
-using Eevee.Sleep.Bot.Controllers.Mongo;
+using Discord;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
-using IResult = Discord.Interactions.IResult;
 
-namespace Eevee.Sleep.Bot.Utils;
+namespace Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 
-public static class DiscordMessageMaker {
-    public static Embed MakeError(IResult result) {
-        return new EmbedBuilder()
-            .WithColor(Colors.Danger)
-            .WithTitle($"Error - {result.Error}")
-            .WithDescription(result.ErrorReason)
-            .WithCurrentTimestamp()
-            .Build();
-    }
-
-    public static Embed MakeErrorFromLog(LogMessage message) {
-        return new EmbedBuilder()
-            .WithColor(Colors.Warning)
-            .WithTitle($"{message.Source}: {message.Message}")
-            .WithDescription($"```{message.Exception}```")
-            .WithCurrentTimestamp()
-            .Build();
-    }
-
-    public static Embed MakeDiscordHttpException(HttpException e) {
-        return new EmbedBuilder()
-            .WithColor(Colors.Warning)
-            .WithTitle($"{e.Source}: {e.Message} ({e.DiscordCode})")
-            .WithDescription($"```{e.StackTrace}```")
-            .WithCurrentTimestamp()
-            .Build();
-    }
-
+public static class DiscordMessageMakerForActivation {
     public static Embed[] MakeActivationNote() {
         return [
             new EmbedBuilder()
@@ -161,114 +130,5 @@ public static class DiscordMessageMaker {
         builder = builder.AddField("Role", roleIds.Select(MentionUtils.MentionRole).MergeToSameLine());
 
         return builder.Build();
-    }
-
-    public static Embed MakeLotteryResult(ulong roleId, int count, IEnumerable<SocketGuildUser> members) {
-        return new EmbedBuilder()
-            .WithColor(Colors.Info)
-            .WithDescription(StringHelper.MergeLines([
-                $"# {MentionUtils.MentionRole(roleId)} x {count}",
-                members.Select(x => $"- {MentionUtils.MentionUser(x.Id)}").MergeLines()
-            ]))
-            .WithCurrentTimestamp()
-            .Build();
-    }
-
-    public static IEnumerable<string> MakeRoleSelectCorrespondenceList(
-        TrackedRoleModel[] roles
-    ) {
-        return roles.Select((role, idx) => $"`{idx + 1}` - {MentionUtils.MentionRole(role.RoleId)}");
-    }
-
-    public static MessageComponent MakeRoleSelectButton(
-        TrackedRoleModel[] roles,
-        ButtonId buttonId
-    ) {
-        var builder = new ComponentBuilder();
-        
-        for (var idx = 0; idx < roles.Length; idx++) {
-            var role = roles[idx];
-            
-            builder.WithButton(
-                label: (idx + 1).ToString(),
-                customId: ButtonInteractionInfoSerializer.Serialize(
-                    new ButtonInteractionInfo {
-                        ButtonId = buttonId,
-                        CustomId = role.RoleId
-                    }
-                )
-            );
-        }
-
-        return builder.Build();
-    }
-
-    public static Embed MakeChangeRoleResult(
-        IUser user,
-        ulong[] previousRoleIds,
-        ulong[] currentRoleIds,
-        Color color
-    ) {
-        return new EmbedBuilder()
-            .WithColor(color)
-            .WithAuthor(user)
-            .WithTitle("Your owned roles")
-            .AddField(
-                name: "Roles before change",
-                value: previousRoleIds.MentionAllRoles()
-            )
-            .AddField(
-                name: "Roles after change",
-                value: currentRoleIds.MentionAllRoles()
-            )
-            .WithCurrentTimestamp()
-            .Build();
-    }
-
-    public static Embed MakeShowRoleResult(IUser user, ulong[] roleIds) {
-        return new EmbedBuilder()
-            .WithColor(Colors.Success)
-            .WithAuthor(user)
-            .WithTitle("Your owned roles")
-            .AddField(
-                name: "Roles",
-                value: roleIds.MentionAllRoles(),
-                inline: true
-            )
-            .WithCurrentTimestamp()
-            .Build();
-    }
-
-    public static Embed MakeDeleteRoleResult(IUser user, ulong roleId) {
-        return new EmbedBuilder()
-            .WithColor(Colors.Success)
-            .WithAuthor(user)
-            .WithTitle("Role deleted from database")
-            .AddField("User", user.Mention)
-            .AddField("Role", MentionUtils.MentionRole(roleId))
-            .WithCurrentTimestamp()
-            .WithFooter($"ID: {user.Id}")
-            .Build();
-    }
-
-    public static Embed MakeTrackRoleResult(
-        ulong roleId,
-        int roleOwnedUserCount,
-        string message,
-        Color color
-    ) {
-        return new EmbedBuilder()
-            .WithColor(color)
-            .WithTitle(message)
-            .AddField("Role", MentionUtils.MentionRole(roleId), inline: true)
-            .AddField("Role owner count", roleOwnedUserCount, inline: true)
-            .AddField("Currently tracked roles", DiscordTrackedRoleController
-                .FindAllTrackedRoles()
-                .Select(x => x.RoleId)
-                .ToArray()
-                .MentionAllRoles()
-            )
-            .WithCurrentTimestamp()
-            .Build();
     }
 }

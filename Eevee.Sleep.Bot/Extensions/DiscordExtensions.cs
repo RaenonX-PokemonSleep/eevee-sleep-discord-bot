@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.WebSocket;
+using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Utils;
 
 namespace Eevee.Sleep.Bot.Extensions;
@@ -24,6 +25,21 @@ public static class DiscordExtensions {
         Embed[]? embeds = null
     ) {
         return await (await client.GetAdminAlertChannelAsync())
+            .SendMessageAsync(message, embed: embed, embeds: embeds);
+    }
+
+    private static Task<IMessageChannel> GetInGameAnnouncementNoticeChannelsAsync(this IDiscordClient client, InGameAnnoucementLanguage language) {
+        return client.GetMessageChannel(ConfigHelper.GetJPInGameAnnouncementNotificationChannelId(language));
+    }
+
+    public static async Task<IUserMessage> SendMessageInInGameAnnouncementNoticeChannelAsync(
+        this IDiscordClient client,
+        InGameAnnoucementLanguage language,
+        string? message = null,
+        Embed? embed = null,
+        Embed[]? embeds = null
+    ) {
+        return await (await client.GetInGameAnnouncementNoticeChannelsAsync(language))
             .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 
