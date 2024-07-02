@@ -7,7 +7,6 @@ using Eevee.Sleep.Bot.Models.InGameAnnouncement;
 namespace Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 
 public static class DiscordMessageMakerForInGameAnnouncement {
-
     public static Embed MakeContentStructureChangedMessage(ContentStructureChangedException exception) {
         return new EmbedBuilder()
             .WithColor(Colors.Danger)

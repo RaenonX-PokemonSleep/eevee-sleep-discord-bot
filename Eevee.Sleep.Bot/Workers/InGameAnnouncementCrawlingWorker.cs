@@ -50,7 +50,7 @@ public class InGameAnnouncementCrawlingWorker(
         foreach (var detail in details) {
             var detailModel = existedDetailsById.GetOrDefault(detail.AnnouncementId, null);
             if (detailModel?.ContentHash != detail.ContentHash) {
-                shouldSaveDetail.Add(detail!);
+                shouldSaveDetail.Add(detail);
             }
         }
         await InGameAnnouncementDetailController.BulkUpsert([..shouldSaveDetail]);

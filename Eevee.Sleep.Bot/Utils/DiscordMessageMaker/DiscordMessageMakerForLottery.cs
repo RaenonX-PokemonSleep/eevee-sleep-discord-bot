@@ -6,7 +6,6 @@ using Eevee.Sleep.Bot.Extensions;
 namespace Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 
 public static class DiscordMessageMakerForLottery {
-
     public static Embed MakeLotteryResult(ulong roleId, int count, IEnumerable<SocketGuildUser> members) {
         return new EmbedBuilder()
             .WithColor(Colors.Info)

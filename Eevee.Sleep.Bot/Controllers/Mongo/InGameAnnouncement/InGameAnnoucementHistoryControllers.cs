@@ -4,17 +4,18 @@ using MongoDB.Driver;
 namespace Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement;
 
 public static class InGameAnnouncememntHistoryController {
+    private const int MaxHistoryCount = 3;
+
     public static async Task Upsert(InGameAnnouncementDetailModel model) {
         using var session = await MongoConst.Client.StartSessionAsync();
         session.StartTransaction();
 
-        try{
+        try {
             await MongoConst.InGameAnnouncementHistoryCollection.InsertOneAsync(model);
             var count = await MongoConst.InGameAnnouncementHistoryCollection
                 .CountDocumentsAsync(Builders<InGameAnnouncementDetailModel>.Filter.Where(x => x.AnnouncementId == model.AnnouncementId));
 
-            if (count > 3)
-            {
+            if (count > MaxHistoryCount) {
                 var oldestRecord = await MongoConst.InGameAnnouncementHistoryCollection
                     .Find(Builders<InGameAnnouncementDetailModel>.Filter.Where(x => x.AnnouncementId == model.AnnouncementId))
                     .Sort(Builders<InGameAnnouncementDetailModel>.Sort.Ascending(x => x.RecordCreatedUtc))
