@@ -12,7 +12,7 @@ public static class DetailScraper {
         var context = BrowsingContext.New(config);
         var document = await context.OpenAsync(index.Url);
 
-        var date = document.QuerySelector("p.header_4__date > time")?.TextContent;
+        var date = document.QuerySelector("p.header_4__date > time")?.TextContent.Trim();
         var content = document.QuerySelector("div.article_2__content")?.InnerHtml.Trim();
 
         if (string.IsNullOrWhiteSpace(date) || string.IsNullOrWhiteSpace(content)) {
@@ -38,7 +38,7 @@ public static class DetailScraper {
             Url = index.Url,
             Content = content,
             ContentHash = content.ToSha256Hash(),
-            Updated = date,
+            Updated = DateOnly.Parse(date),
             RecordCreatedUtc = DateTime.UtcNow
         };
     }

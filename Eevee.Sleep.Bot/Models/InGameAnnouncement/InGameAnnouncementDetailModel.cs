@@ -12,5 +12,5 @@ public record InGameAnnouncementDetailModel: InGameAnnouncementMetaModel {
     public required string ContentHash { get; init; }
 
     [UsedImplicitly]
-    public required string Updated { get; init; }
+    public required DateOnly Updated { get; init; }
 }
