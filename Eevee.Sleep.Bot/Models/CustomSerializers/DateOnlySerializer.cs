@@ -5,8 +5,11 @@ namespace Eevee.Sleep.Bot.Models.CustomSerializers;
 
 public class DateOnlySerializer : SerializerBase<DateOnly> {
     public override DateOnly Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args) {
-        var date = context.Reader.ReadDateTime();
-        return DateOnly.FromDateTime(new DateTime(date));
+        var millisecondsSinceEpoch = context.Reader.ReadDateTime();
+        // Convert milliseconds to ticks (1 tick = 100 nanoseconds)
+        var ticks = millisecondsSinceEpoch * 10000;
+        var date = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddTicks(ticks);
+        return DateOnly.FromDateTime(date);
     }
 
     public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, DateOnly value) {
