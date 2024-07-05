@@ -9,6 +9,7 @@ using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement;
 
 namespace Eevee.Sleep.Bot.Workers;
+
 public class InGameAnnouncementCrawlingWorker(
     DiscordSocketClient client,
     ILogger<InGameAnnouncementCrawlingWorker> logger
@@ -16,6 +17,8 @@ public class InGameAnnouncementCrawlingWorker(
     private readonly DiscordSocketClient _client = client;
     private readonly ILogger<InGameAnnouncementCrawlingWorker> _logger = logger;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private const int MAX_RETRY_COUNT = 3;
+    private int retryCount = 0;
 
     private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(60);
 
@@ -70,13 +73,20 @@ public class InGameAnnouncementCrawlingWorker(
                 
                 var details = await GetDetails(indexes);
                 await SaveDetailsAndHistories(details);
+
+                retryCount = 0;
             } catch (ContentStructureChangedException e) {
-                _logger.LogError("Failed to get indexes. Web page structure may have changed.");
-                await _client.SendMessageInAdminAlertChannel(
-                    embed: DiscordMessageMakerForInGameAnnouncement.MakeContentStructureChangedMessage(e)
-                );
-                _cancellationTokenSource.Cancel();
-                break;
+                retryCount++;
+                _logger.LogError("Failed to get indexes. Web page structure may have changed. retries: {RetryCount}", retryCount);
+                
+                if (retryCount >= MAX_RETRY_COUNT) {
+                    _logger.LogError("Failed to get indexes. Retry count exceeded.");
+                    await _client.SendMessageInAdminAlertChannel(
+                        embed: DiscordMessageMakerForInGameAnnouncement.MakeContentStructureChangedMessage(e)
+                    );
+                    _cancellationTokenSource.Cancel();
+                    break;
+                }
             }
 
             await Task.Delay(CheckInterval, cancellationToken);
