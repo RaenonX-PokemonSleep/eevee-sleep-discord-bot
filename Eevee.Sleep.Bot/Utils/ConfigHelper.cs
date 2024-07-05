@@ -1,4 +1,5 @@
-﻿using Eevee.Sleep.Bot.Extensions;
+﻿using Eevee.Sleep.Bot.Enums;
+using Eevee.Sleep.Bot.Extensions;
 
 namespace Eevee.Sleep.Bot.Utils;
 
@@ -29,6 +30,14 @@ public static class ConfigHelper {
 
     public static ulong GetDiscordAdminAlertChannelId() {
         return GetDiscordChannelSection().GetRequiredValue<ulong>("AdminAlert");
+    }
+
+    public static IConfigurationSection GetInGameAnnouncementNotificationChannelSection() {
+        return GetDiscordChannelSection().GetRequiredSection("InGameAnnouncementNotification");
+    }
+
+    public static ulong GetJPInGameAnnouncementNotificationChannelId(InGameAnnoucementLanguage language) {
+        return GetInGameAnnouncementNotificationChannelSection().GetRequiredValue<ulong>(language.ToString());
     }
 
     private static IConfigurationSection GetDiscordRolesSection() {

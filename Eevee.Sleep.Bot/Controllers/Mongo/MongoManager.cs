@@ -1,4 +1,6 @@
-﻿using Eevee.Sleep.Bot.Utils;
+﻿using Eevee.Sleep.Bot.Models.CustomSerializers;
+using Eevee.Sleep.Bot.Utils;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Controllers.Mongo;
@@ -8,6 +10,8 @@ public static class MongoManager {
 
     public static async Task Initialize() {
         MongoConst.Client.Ping();
+
+        BsonSerializer.RegisterSerializer(new DateOnlySerializer());
 
         await Task.WhenAll(MongoIndexManager.Initialize());
     }

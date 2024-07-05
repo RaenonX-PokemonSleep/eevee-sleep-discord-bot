@@ -3,6 +3,7 @@ using Discord.WebSocket;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
 using Eevee.Sleep.Bot.Utils;
+using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Eevee.Sleep.Bot.Controllers;
@@ -45,7 +46,7 @@ public class SendUserActivationController(
             if (env.IsProduction()) {
                 await user.SendMessageAsync(
                     x.Link,
-                    embeds: DiscordMessageMaker.MakeActivationNote()
+                    embeds: DiscordMessageMakerForActivation.MakeActivationNote()
                 );
             }
 
