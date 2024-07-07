@@ -7,12 +7,11 @@ using Eevee.Sleep.Bot.Models.InGameAnnouncement;
 namespace Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 
 public static class DiscordMessageMakerForInGameAnnouncement {
-    public static Embed MakeContentStructureChangedMessage(ContentStructureChangedException exception) {
+    public static Embed MakeDocumentProcessingErrorMessage(DocumentProcessingException exception) {
         return new EmbedBuilder()
             .WithColor(Colors.Danger)
             .WithTitle("Failed to retrieve in-game announcement")
-            .WithDescription("Web page structure may have changed.")
-            .AddField("Message", exception.Message)
+            .WithDescription(exception.Message)
             .AddField("Context", exception.Context.ToJsonString())
             .WithCurrentTimestamp()
             .Build();

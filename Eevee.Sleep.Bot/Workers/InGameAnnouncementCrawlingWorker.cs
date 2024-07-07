@@ -75,14 +75,14 @@ public class InGameAnnouncementCrawlingWorker(
                 await SaveDetailsAndHistories(details);
 
                 retryCount = 0;
-            } catch (ContentStructureChangedException e) {
+            } catch (DocumentProcessingException e) {
                 retryCount++;
-                _logger.LogError("Failed to get indexes. Web page structure may have changed. retries: {RetryCount}", retryCount);
-                
+                _logger.LogError("{Message} Retries: {RetryCount}", e.Message, retryCount);
+
                 if (retryCount >= MAX_RETRY_COUNT) {
                     _logger.LogError("Failed to get indexes. Retry count exceeded.");
                     await _client.SendMessageInAdminAlertChannel(
-                        embed: DiscordMessageMakerForInGameAnnouncement.MakeContentStructureChangedMessage(e)
+                        embed: DiscordMessageMakerForInGameAnnouncement.MakeDocumentProcessingErrorMessage(e)
                     );
                     _cancellationTokenSource.Cancel();
                     break;
