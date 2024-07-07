@@ -1,5 +1,3 @@
-using AngleSharp;
-using AngleSharp.Text;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
@@ -10,10 +8,7 @@ namespace Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement;
 
 public static class IndexScraper {
     public static async Task<List<InGameAnnouncementIndexModel>> GetAsync(string url, InGameAnnoucementLanguage language) {
-        var config = Configuration.Default.WithDefaultLoader();
-        var context = BrowsingContext.New(config);
-        var document = await context.OpenAsync(url);
-
+        var document = await DocumentLoader.FetchDocumentAsync(url);
         var contents = document.QuerySelectorAll("ul.items > li > a.banner_2");
 
         List<InGameAnnouncementIndexModel> IndexModels = [];
@@ -59,9 +54,7 @@ public static class IndexScraper {
     }
 
     public static async Task<IEnumerable<InGameAnnouncementIndexModel>> GetAllPagesAsync(string baseUrl, InGameAnnoucementLanguage language) {
-        var config = Configuration.Default.WithDefaultLoader();
-        var context = BrowsingContext.New(config);
-        var document = await context.OpenAsync(baseUrl);
+        var document = await DocumentLoader.FetchDocumentAsync(baseUrl);
 
         // format: "1/23" to "23"
         var pageCount = (document.QuerySelector("div.pagination_1 > div > p")?.TextContent?.Trim()?.Split("/").Last())
