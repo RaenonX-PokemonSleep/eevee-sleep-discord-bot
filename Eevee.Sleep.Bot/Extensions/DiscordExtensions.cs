@@ -28,29 +28,30 @@ public static class DiscordExtensions {
             .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 
-    private static Task<IMessageChannel> GetInGameAnnouncementNoticeChannelsAsync(this IDiscordClient client, InGameAnnoucementLanguage language) {
-        return client.GetMessageChannel(ConfigHelper.GetJPInGameAnnouncementNotificationChannelId(language));
+    private static Task<IMessageChannel> GetInGameAnnouncementNoticeChannelsAsync(
+        this IDiscordClient client,
+        InGameAnnoucementLanguage language
+    ) {
+        return client.GetMessageChannel(ConfigHelper.GetInGameAnnouncementNotificationChannelId(language));
     }
 
-    public static async Task<IUserMessage> SendMessageInInGameAnnouncementNoticeChannelAsync(
+    public static async Task SendMessageInInGameAnnouncementNoticeChannelAsync(
         this IDiscordClient client,
         InGameAnnoucementLanguage language,
         string? message = null,
         Embed? embed = null,
         Embed[]? embeds = null
     ) {
-        return await (await client.GetInGameAnnouncementNoticeChannelsAsync(language))
+        await (await client.GetInGameAnnouncementNoticeChannelsAsync(language))
             .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 
     public static string MentionAllRoles(this ulong[] roles) {
-        return roles.Length == 0 ?
-            "(N/A)" :
-            roles.Select(MentionUtils.MentionRole).MergeToSameLine();
+        return roles.Length == 0 ? "(N/A)" : roles.Select(MentionUtils.MentionRole).MergeToSameLine();
     }
 
     public static SocketGuildUser AsGuildUser(this IUser user) {
         return user as SocketGuildUser ??
-            throw new InvalidOperationException("User is not SocketGuildUser.");
+               throw new InvalidOperationException("User is not SocketGuildUser.");
     }
 }

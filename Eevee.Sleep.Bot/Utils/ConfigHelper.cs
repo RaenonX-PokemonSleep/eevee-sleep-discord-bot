@@ -19,7 +19,7 @@ public static class ConfigHelper {
     public static string GetDiscordToken() {
         return GetDiscordSection().GetRequiredValue<string>("Token");
     }
-    
+
     public static ulong GetDiscordWorkingGuild() {
         return GetDiscordSection().GetRequiredValue<ulong>("Guild");
     }
@@ -32,11 +32,11 @@ public static class ConfigHelper {
         return GetDiscordChannelSection().GetRequiredValue<ulong>("AdminAlert");
     }
 
-    public static IConfigurationSection GetInGameAnnouncementNotificationChannelSection() {
+    private static IConfigurationSection GetInGameAnnouncementNotificationChannelSection() {
         return GetDiscordChannelSection().GetRequiredSection("InGameAnnouncementNotification");
     }
 
-    public static ulong GetJPInGameAnnouncementNotificationChannelId(InGameAnnoucementLanguage language) {
+    public static ulong GetInGameAnnouncementNotificationChannelId(InGameAnnoucementLanguage language) {
         return GetInGameAnnouncementNotificationChannelSection().GetRequiredValue<ulong>(language.ToString());
     }
 
@@ -46,6 +46,14 @@ public static class ConfigHelper {
 
     public static ulong GetDiscordSubscriberRoleId() {
         return GetDiscordRolesSection().GetRequiredValue<ulong>("Subscriber");
+    }
+
+    private static IConfigurationSection GetInGameAnnouncementNotificationRoleSection() {
+        return GetDiscordRolesSection().GetRequiredSection("InGameAnnouncementNotification");
+    }
+
+    public static ulong? GetInGameAnnouncementNotificationRoleId(InGameAnnoucementLanguage language) {
+        return GetInGameAnnouncementNotificationRoleSection().GetValue<ulong>(language.ToString());
     }
 
     private static IConfigurationSection GetApiSection() {
@@ -63,7 +71,7 @@ public static class ConfigHelper {
     public static string GetInternalApiGenerateActivation() {
         return GetInternalApiEndpoints().GetRequiredValue<string>("GenerateActivation");
     }
-    
+
     private static IConfigurationSection GetInternalApiTokenSection() {
         return GetInternalApiSection().GetRequiredSection("Token");
     }
