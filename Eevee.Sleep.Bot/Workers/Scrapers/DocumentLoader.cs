@@ -8,7 +8,7 @@ namespace Eevee.Sleep.Bot.Workers.Scrapers;
 public static class DocumentLoader {
     private const int TIMEOUT_SECONDS = 120;
 
-    public static Task<IDocument> FetchDocumentAsync(string url) {
+    public static async Task<IDocument> FetchDocumentAsync(string url) {
         var requester = new DefaultHttpRequester {
             Timeout = TimeSpan.FromSeconds(TIMEOUT_SECONDS)
         };
@@ -16,7 +16,9 @@ public static class DocumentLoader {
         var context = BrowsingContext.New(config);
         
         try {
-            return context.OpenAsync(url);
+            // Connections establishment errors, etc., are to be detected here, so await.
+            // If not await, exception will occur on the caller side.
+            return await context.OpenAsync(url);
         } catch (Exception e) {
             throw new FetchDocumentFailedException(
                 message: "Failed to fetch document.",
