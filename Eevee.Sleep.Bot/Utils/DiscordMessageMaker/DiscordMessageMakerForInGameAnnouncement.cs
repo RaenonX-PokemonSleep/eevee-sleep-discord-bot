@@ -35,7 +35,7 @@ public static class DiscordMessageMakerForInGameAnnouncement {
             .AddField("Title", detail.Title)
             .AddField("Announcement ID", detail.AnnouncementId)
             .AddField("Url", detail.Url)
-            .AddField("Updated", detail.Updated)
+            .AddField("Updated", detail.OriginalUpdated)
             .AddField("Record Created", detail.RecordCreatedUtc)
             .WithCurrentTimestamp()
             .Build();

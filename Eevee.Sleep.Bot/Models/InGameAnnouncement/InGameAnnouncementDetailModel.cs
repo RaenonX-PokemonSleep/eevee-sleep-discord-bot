@@ -1,3 +1,4 @@
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.ApiResponses;
 using JetBrains.Annotations;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -12,5 +13,15 @@ public record InGameAnnouncementDetailModel: InGameAnnouncementMetaModel {
     public required string ContentHash { get; init; }
 
     [UsedImplicitly]
-    public required DateOnly Updated { get; init; }
+    public required DateOnly OriginalUpdated { get; init; }
+
+    public InGameAnnouncementDetailResponse ToApiResponse() => new() {
+        Title = Title,
+        OfficialLink = Url,
+        LastUpdated = new() {
+            Official = OriginalUpdated.ToDateTime(new TimeOnly(0), DateTimeKind.Utc),
+            Server = RecordUpdatedUtc
+        },
+        Content = Content
+    };
 }

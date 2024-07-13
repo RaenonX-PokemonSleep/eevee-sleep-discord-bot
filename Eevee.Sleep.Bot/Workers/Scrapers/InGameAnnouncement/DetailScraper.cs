@@ -33,8 +33,9 @@ public static class DetailScraper {
             Url = index.Url,
             Content = content,
             ContentHash = content.ToSha256Hash(),
-            Updated = DateOnly.Parse(date),
-            RecordCreatedUtc = DateTime.UtcNow
+            OriginalUpdated = DateOnly.Parse(date),
+            RecordCreatedUtc = DateTime.UtcNow,
+            RecordUpdatedUtc = DateTime.UtcNow
         };
     }
 }

@@ -16,6 +16,7 @@ public static class MongoIndexManager {
             DiscordTrackedRoleRoleIdIndex(),
             InGameAnnouncementIndexAnnounceIdIndex(),
             InGameAnnouncementDetailAnnounceIdIndex(),
+            InGameAnnouncementDetailLanguageAnnounceIdIndex(),
             InGameAnnouncementHistoryAnnounceIdIndex()
         };
     }
@@ -94,6 +95,15 @@ public static class MongoIndexManager {
 
     private static Task<string> InGameAnnouncementDetailAnnounceIdIndex() {
         var indexKeys = Builders<InGameAnnouncementDetailModel>.IndexKeys
+            .Ascending(data => data.AnnouncementId);
+        var indexModel = new CreateIndexModel<InGameAnnouncementDetailModel>(indexKeys);
+
+        return MongoConst.InGameAnnouncementDetailCollection.Indexes.CreateOneAsync(indexModel);
+    }
+
+    private static Task<string> InGameAnnouncementDetailLanguageAnnounceIdIndex() {
+        var indexKeys = Builders<InGameAnnouncementDetailModel>.IndexKeys
+            .Ascending(data => data.Language)
             .Ascending(data => data.AnnouncementId);
         var indexModel = new CreateIndexModel<InGameAnnouncementDetailModel>(indexKeys);
 

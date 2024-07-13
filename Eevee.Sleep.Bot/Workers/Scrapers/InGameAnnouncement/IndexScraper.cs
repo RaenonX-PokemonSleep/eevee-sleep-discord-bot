@@ -45,7 +45,8 @@ public static class IndexScraper {
                 Language = language,
                 AnnouncementId = id,
                 Url = $"https://www.pokemonsleep.net/news/{id}/",
-                RecordCreatedUtc = DateTime.UtcNow
+                RecordCreatedUtc = DateTime.UtcNow,
+                RecordUpdatedUtc = DateTime.UtcNow
             });
         }
 
