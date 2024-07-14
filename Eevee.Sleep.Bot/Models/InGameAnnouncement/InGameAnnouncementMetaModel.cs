@@ -22,4 +22,7 @@ public record InGameAnnouncementMetaModel {
 
     [UsedImplicitly]
     public required DateTime RecordCreatedUtc { get; init; }
+    
+    [UsedImplicitly]
+    public required DateTime RecordUpdatedUtc { get; init; }
 }
