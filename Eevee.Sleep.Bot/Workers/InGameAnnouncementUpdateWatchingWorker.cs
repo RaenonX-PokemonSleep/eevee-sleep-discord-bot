@@ -3,7 +3,7 @@ using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
 using Eevee.Sleep.Bot.Utils;
 using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using MongoDB.Driver;
@@ -11,7 +11,7 @@ using MongoDB.Driver;
 namespace Eevee.Sleep.Bot.Workers;
 
 public class InGameAnnouncementUpdateWatchingWorker(
-    InGameAnnouncementCrawler crawler,
+    OfficialSiteAnnouncementCrawler crawler,
     DiscordSocketClient client,
     ILogger<InGameAnnouncementUpdateWatchingWorker> logger
 ) : BackgroundService {
@@ -28,14 +28,14 @@ public class InGameAnnouncementUpdateWatchingWorker(
         }
 
         var options = new ChangeStreamOptions { FullDocument = ChangeStreamFullDocumentOption.UpdateLookup };
-        var pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<InGameAnnouncementDetailModel>>()
+        var pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<OfficialSiteAnnouncementDetailModel>>()
             .Match(x =>
                 x.OperationType == ChangeStreamOperationType.Update ||
                 x.OperationType == ChangeStreamOperationType.Modify ||
                 x.OperationType == ChangeStreamOperationType.Insert
             );
 
-        using var cursor = await MongoConst.InGameAnnouncementDetailCollection
+        using var cursor = await MongoConst.InGameAnnouncementOfficialSiteDetailCollection
             .WatchAsync(pipeline, options, cancellationToken);
 
         await cursor.ForEachAsync(async change => {

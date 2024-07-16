@@ -6,7 +6,7 @@ using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 namespace Eevee.Sleep.Bot.Workers;
 
 public class InGameAnnouncementCrawlingWorker(
-    InGameAnnouncementCrawler crawler,
+    OfficialSiteAnnouncementCrawler crawler,
     DiscordSocketClient client,
     ILogger<InGameAnnouncementCrawlingWorker> logger
 ) : BackgroundService {

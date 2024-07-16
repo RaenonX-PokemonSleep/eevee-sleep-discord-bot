@@ -1,11 +1,11 @@
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
 
-namespace Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement;
+namespace Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement.OfficialSite;
 
 public static class DetailScraper {
-    public static async Task<InGameAnnouncementDetailModel> GetAsync(InGameAnnouncementIndexModel index) {
+    public static async Task<OfficialSiteAnnouncementDetailModel> GetAsync(OfficialSiteAnnouncementIndexModel index) {
         var document = await DocumentLoader.FetchDocumentAsync(index.Url);
         var date = document.QuerySelector("p.header_4__date > time")?.TextContent.Trim();
         var content = document.QuerySelector("div.article_2__content")?.InnerHtml.Trim();
@@ -26,7 +26,7 @@ public static class DetailScraper {
         }
 
         await Task.Delay(500);
-        return new InGameAnnouncementDetailModel() {
+        return new OfficialSiteAnnouncementDetailModel() {
             AnnouncementId = index.AnnouncementId,
             Title = index.Title,
             Language = index.Language,

@@ -1,17 +1,17 @@
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
 using MongoDB.Driver.Linq;
 
-namespace Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement;
+namespace Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement.OfficialSite;
 
 public static class IndexScraper {
-    public static async Task<List<InGameAnnouncementIndexModel>> GetAsync(string url, InGameAnnoucementLanguage language) {
+    public static async Task<List<OfficialSiteAnnouncementIndexModel>> GetAsync(string url, InGameAnnoucementLanguage language) {
         var document = await DocumentLoader.FetchDocumentAsync(url);
         var contents = document.QuerySelectorAll("ul.items > li > a.banner_2");
 
-        List<InGameAnnouncementIndexModel> IndexModels = [];
+        List<OfficialSiteAnnouncementIndexModel> IndexModels = [];
         foreach (var content in contents) {
             if (content is null) {
                 throw new ContentStructureChangedException(
@@ -40,7 +40,7 @@ public static class IndexScraper {
                 );
             };
 
-            IndexModels.Add(new InGameAnnouncementIndexModel {
+            IndexModels.Add(new OfficialSiteAnnouncementIndexModel {
                 Title = title,
                 Language = language,
                 AnnouncementId = id,
@@ -54,7 +54,7 @@ public static class IndexScraper {
         return IndexModels;
     }
 
-    public static async Task<IEnumerable<InGameAnnouncementIndexModel>> GetAllPagesAsync(string baseUrl, InGameAnnoucementLanguage language) {
+    public static async Task<IEnumerable<OfficialSiteAnnouncementIndexModel>> GetAllPagesAsync(string baseUrl, InGameAnnoucementLanguage language) {
         var document = await DocumentLoader.FetchDocumentAsync(baseUrl);
 
         // format: "1/23" to "23"

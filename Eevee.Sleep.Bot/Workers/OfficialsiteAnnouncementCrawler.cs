@@ -1,21 +1,21 @@
 using AngleSharp.Common;
-using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement;
+using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement.OfficialSite;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement;
-using Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
+using Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement.OfficialSite;
 
 namespace Eevee.Sleep.Bot.Workers;
 
-public class InGameAnnouncementCrawler(
-    ILogger<InGameAnnouncementCrawler> logger
+public class OfficialSiteAnnouncementCrawler(
+    ILogger<OfficialSiteAnnouncementCrawler> logger
 ) {
     private const int MAX_RETRY_COUNT = 3;
     private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(10);
     // Used to run only one process when called by multiple workers at the same time.
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
-    private static async Task<IEnumerable<InGameAnnouncementIndexModel>> GetIndexes() {
+    private static async Task<IEnumerable<OfficialSiteAnnouncementIndexModel>> GetIndexes() {
         Dictionary<string, InGameAnnoucementLanguage> BaseUrls = new(){
             { "https://www.pokemonsleep.net/news", InGameAnnoucementLanguage.JP },
             { "https://www.pokemonsleep.net/en/news", InGameAnnoucementLanguage.EN },
@@ -28,7 +28,7 @@ public class InGameAnnouncementCrawler(
         return results.SelectMany(x => x);
     }
 
-    private static async Task<IEnumerable<InGameAnnouncementDetailModel>> GetDetails(IEnumerable<InGameAnnouncementIndexModel> indexes) {
+    private static async Task<IEnumerable<OfficialSiteAnnouncementDetailModel>> GetDetails(IEnumerable<OfficialSiteAnnouncementIndexModel> indexes) {
         var detailTasks = indexes
             .AsParallel()
             .WithDegreeOfParallelism(5)
@@ -37,11 +37,11 @@ public class InGameAnnouncementCrawler(
         return await Task.WhenAll(detailTasks);
     }
 
-    private static async Task SaveDetailsAndHistories(IEnumerable<InGameAnnouncementDetailModel> details) {
-        var existedDetails = InGameAnnouncementDetailController.FindAllByIds(details.Select(x => x.AnnouncementId));
+    private static async Task SaveDetailsAndHistories(IEnumerable<OfficialSiteAnnouncementDetailModel> details) {
+        var existedDetails = OfficialSiteAnnouncementDetailController.FindAllByIds(details.Select(x => x.AnnouncementId));
         var existedDetailsById = existedDetails.ToDictionary(x => x.AnnouncementId);
     
-        var shouldSaveDetail = new List<InGameAnnouncementDetailModel>();
+        var shouldSaveDetail = new List<OfficialSiteAnnouncementDetailModel>();
     
         foreach (var detail in details) {
             var detailModel = existedDetailsById.GetOrDefault(detail.AnnouncementId, null);
@@ -49,8 +49,8 @@ public class InGameAnnouncementCrawler(
                 shouldSaveDetail.Add(detail);
             }
         }
-        await InGameAnnouncementDetailController.BulkUpsert([..shouldSaveDetail]);
-        await InGameAnnouncememntHistoryController.BulkUpsert([..shouldSaveDetail]);
+        await OfficialSiteAnnouncementDetailController.BulkUpsert([..shouldSaveDetail]);
+        await OfficialSiteAnnouncememntHistoryController.BulkUpsert([..shouldSaveDetail]);
     }
 
     public async Task ExecuteAsync(int retryCount = 0) {
@@ -60,7 +60,7 @@ public class InGameAnnouncementCrawler(
 
         try {
             var indexes = await GetIndexes();
-            await InGameAnnouncememntIndexController.BulkUpsert([..indexes]);
+            await OfficialSiteAnnouncememntIndexController.BulkUpsert([..indexes]);
             
             var details = await GetDetails(indexes);
             await SaveDetailsAndHistories(details);

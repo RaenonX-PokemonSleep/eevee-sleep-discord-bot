@@ -1,4 +1,4 @@
-using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement;
+using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement.OfficialSite;
 using Eevee.Sleep.Bot.Enums;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,7 +14,7 @@ public class InGameAnnouncementController(
             return BadRequest();
         }
 
-        var announcement = InGameAnnouncememntIndexController.FindAllByLanguage(language);
+        var announcement = OfficialSiteAnnouncememntIndexController.FindAllByLanguage(language);
         return Ok(announcement.Select(x => x.ToApiResponse()));
     }
 
@@ -24,7 +24,7 @@ public class InGameAnnouncementController(
             return BadRequest();
         }
 
-        var announcement = InGameAnnouncementDetailController.FindById(language, AnnouncementId);
+        var announcement = OfficialSiteAnnouncementDetailController.FindById(language, AnnouncementId);
         if (announcement is null) {
             return NotFound();
         }

@@ -1,10 +1,10 @@
 using Eevee.Sleep.Bot.Models.InGameAnnouncement.ApiResponses;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Eevee.Sleep.Bot.Models.InGameAnnouncement;
+namespace Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
 
 [BsonIgnoreExtraElements]
-public record InGameAnnouncementIndexModel: InGameAnnouncementMetaModel {
+public record OfficialSiteAnnouncementIndexModel: OfficialSiteAnnouncementMetaModel {
     public InGameAnnouncementIndexResponse ToApiResponse() => new() {
         Title = Title,
         OfficialLink = Url,

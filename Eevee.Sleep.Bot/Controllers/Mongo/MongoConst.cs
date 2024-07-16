@@ -1,6 +1,6 @@
 ﻿using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
 using Eevee.Sleep.Bot.Utils;
 using MongoDB.Driver;
 
@@ -32,12 +32,12 @@ public static class MongoConst {
 
     public static readonly IMongoDatabase GameDatabase = Client.GetDatabase("game");
 
-    public static readonly IMongoCollection<InGameAnnouncementIndexModel> InGameAnnouncementIndexCollection =
-        GameDatabase.GetCollection<InGameAnnouncementIndexModel>("announcement/index");
+    public static readonly IMongoCollection<OfficialSiteAnnouncementIndexModel> InGameAnnouncementOfficialSiteIndexCollection =
+        GameDatabase.GetCollection<OfficialSiteAnnouncementIndexModel>("announcement/OfficialSite/index");
 
-    public static readonly IMongoCollection<InGameAnnouncementDetailModel> InGameAnnouncementDetailCollection =
-        GameDatabase.GetCollection<InGameAnnouncementDetailModel>("announcement/details");
+    public static readonly IMongoCollection<OfficialSiteAnnouncementDetailModel> InGameAnnouncementOfficialSiteDetailCollection =
+        GameDatabase.GetCollection<OfficialSiteAnnouncementDetailModel>("announcement/OfficialSite/details");
 
-    public static readonly IMongoCollection<InGameAnnouncementDetailModel> InGameAnnouncementHistoryCollection =
-        GameDatabase.GetCollection<InGameAnnouncementDetailModel>("announcement/history");
+    public static readonly IMongoCollection<OfficialSiteAnnouncementDetailModel> InGameAnnouncementOfficialSiteHistoryCollection =
+        GameDatabase.GetCollection<OfficialSiteAnnouncementDetailModel>("announcement/OfficialSite/history");
 }
