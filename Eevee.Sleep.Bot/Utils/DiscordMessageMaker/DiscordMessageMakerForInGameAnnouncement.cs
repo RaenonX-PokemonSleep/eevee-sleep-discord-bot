@@ -2,6 +2,7 @@ using Discord;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.InGame;
 using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
 
 namespace Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
@@ -28,7 +29,7 @@ public static class DiscordMessageMakerForInGameAnnouncement {
             .Build();
     }
 
-    public static Embed MakeInGameAnnouncementUpdateMessage(OfficialSiteAnnouncementDetailModel detail) {
+    public static Embed MakeOfficialSiteAnnouncementUpdateMessage(OfficialSiteAnnouncementDetailModel detail) {
         return new EmbedBuilder()
             .WithColor(Colors.Info)
             .WithTitle("In-game Announcement Updated!")
@@ -36,6 +37,25 @@ public static class DiscordMessageMakerForInGameAnnouncement {
             .AddField("Announcement ID", detail.AnnouncementId)
             .AddField("Url", detail.Url)
             .AddField("Updated", detail.OriginalUpdated)
+            .AddField("Record Created", detail.RecordCreatedUtc)
+            .WithCurrentTimestamp()
+            .Build();
+    }
+
+    public static Embed MakeInGameAnnouncementUpdateMessage(InGameAnnouncementDetailModel detail) {
+        var content = detail.Text;
+        if (content.Length > 1024) {
+            content = string.Concat(content.AsSpan(0, 1021), "...");
+        }
+
+        return new EmbedBuilder()
+            .WithColor(Colors.Info)
+            .WithTitle("In-game Announcement Updated!")
+            .AddField("Title", detail.Title)
+            .AddField("Announcement ID", detail.AnnouncementId)
+            .AddField("Url", detail.Url)
+            .AddField("Content", content)
+            .AddField("Updated", detail.OriginalUpdatedUtc)
             .AddField("Record Created", detail.RecordCreatedUtc)
             .WithCurrentTimestamp()
             .Build();

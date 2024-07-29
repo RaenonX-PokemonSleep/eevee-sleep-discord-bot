@@ -1,4 +1,5 @@
 ﻿using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.InGame;
 using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
 using MongoDB.Driver;
 
@@ -16,7 +17,6 @@ public static class MongoIndexManager {
             DiscordTrackedRoleRoleIdIndex(),
             InGameAnnouncementIndexAnnounceIdIndex(),
             InGameAnnouncementDetailAnnounceIdIndex(),
-            InGameAnnouncementDetailLanguageAnnounceIdIndex(),
             InGameAnnouncementHistoryAnnounceIdIndex()
         };
     }
@@ -86,36 +86,27 @@ public static class MongoIndexManager {
     }
     
     private static Task<string> InGameAnnouncementIndexAnnounceIdIndex() {
-        var indexKeys = Builders<OfficialSiteAnnouncementIndexModel>.IndexKeys
+        var indexKeys = Builders<InGameAnnouncementIndexModel>.IndexKeys
             .Ascending(data => data.AnnouncementId);
-        var indexModel = new CreateIndexModel<OfficialSiteAnnouncementIndexModel>(indexKeys);
+        var indexModel = new CreateIndexModel<InGameAnnouncementIndexModel>(indexKeys);
 
-        return MongoConst.InGameAnnouncementOfficialSiteIndexCollection.Indexes.CreateOneAsync(indexModel);
+        return MongoConst.InGameAnnouncementIndexCollection.Indexes.CreateOneAsync(indexModel);
     }
 
     private static Task<string> InGameAnnouncementDetailAnnounceIdIndex() {
-        var indexKeys = Builders<OfficialSiteAnnouncementDetailModel>.IndexKeys
+        var indexKeys = Builders<InGameAnnouncementDetailModel>.IndexKeys
             .Ascending(data => data.AnnouncementId);
-        var indexModel = new CreateIndexModel<OfficialSiteAnnouncementDetailModel>(indexKeys);
+        var indexModel = new CreateIndexModel<InGameAnnouncementDetailModel>(indexKeys);
 
-        return MongoConst.InGameAnnouncementOfficialSiteDetailCollection.Indexes.CreateOneAsync(indexModel);
-    }
-
-    private static Task<string> InGameAnnouncementDetailLanguageAnnounceIdIndex() {
-        var indexKeys = Builders<OfficialSiteAnnouncementDetailModel>.IndexKeys
-            .Ascending(data => data.Language)
-            .Ascending(data => data.AnnouncementId);
-        var indexModel = new CreateIndexModel<OfficialSiteAnnouncementDetailModel>(indexKeys);
-
-        return MongoConst.InGameAnnouncementOfficialSiteDetailCollection.Indexes.CreateOneAsync(indexModel);
+        return MongoConst.InGameAnnouncementDetailCollection.Indexes.CreateOneAsync(indexModel);
     }
 
     private static Task<string> InGameAnnouncementHistoryAnnounceIdIndex() {
-        var indexKeys = Builders<OfficialSiteAnnouncementDetailModel>.IndexKeys
+        var indexKeys = Builders<InGameAnnouncementDetailModel>.IndexKeys
             .Ascending(data => data.AnnouncementId)
             .Ascending(data => data.RecordCreatedUtc);
-        var indexModel = new CreateIndexModel<OfficialSiteAnnouncementDetailModel>(indexKeys);
+        var indexModel = new CreateIndexModel<InGameAnnouncementDetailModel>(indexKeys);
 
-        return MongoConst.InGameAnnouncementOfficialSiteHistoryCollection.Indexes.CreateOneAsync(indexModel);
+        return MongoConst.InGameAnnouncementHistoryCollection.Indexes.CreateOneAsync(indexModel);
     }
 }

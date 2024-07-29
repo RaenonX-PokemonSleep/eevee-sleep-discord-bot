@@ -2,13 +2,14 @@ using Discord.WebSocket;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
+using Eevee.Sleep.Bot.Workers.Crawlers;
 
 namespace Eevee.Sleep.Bot.Workers;
 
-public class InGameAnnouncementCrawlingWorker(
-    OfficialSiteAnnouncementCrawler crawler,
+public class AnnouncementCrawlingWorker (
+    IAnnoucementCrawler crawler,
     DiscordSocketClient client,
-    ILogger<InGameAnnouncementCrawlingWorker> logger
+    ILogger<AnnouncementCrawlingWorker> logger
 ) : BackgroundService {
     private readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(60);
     private readonly CancellationTokenSource CancellationTokenSource = new();

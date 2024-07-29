@@ -18,17 +18,17 @@ public static class OfficialSiteAnnouncementDetailController {
             IsUpsert = true
         }).ToList();
         
-        return MongoConst.InGameAnnouncementOfficialSiteDetailCollection.BulkWriteAsync(details);
+        return MongoConst.OfficialSiteAnnouncementDetailCollection.BulkWriteAsync(details);
     }
 
     public static IEnumerable<OfficialSiteAnnouncementDetailModel> FindAllByIds(IEnumerable<string> ids) {
-        return MongoConst.InGameAnnouncementOfficialSiteDetailCollection.Find(
+        return MongoConst.OfficialSiteAnnouncementDetailCollection.Find(
             Builders<OfficialSiteAnnouncementDetailModel>.Filter.In(x => x.AnnouncementId, ids)
         ).ToEnumerable();
     }
 
     public static OfficialSiteAnnouncementDetailModel? FindById(InGameAnnoucementLanguage language, string id) {
-        return MongoConst.InGameAnnouncementOfficialSiteDetailCollection.Find(
+        return MongoConst.OfficialSiteAnnouncementDetailCollection.Find(
             Builders<OfficialSiteAnnouncementDetailModel>.Filter.And(
                 Builders<OfficialSiteAnnouncementDetailModel>.Filter.Where(x => x.Language == language),
                 Builders<OfficialSiteAnnouncementDetailModel>.Filter.Where(x => x.AnnouncementId == id)

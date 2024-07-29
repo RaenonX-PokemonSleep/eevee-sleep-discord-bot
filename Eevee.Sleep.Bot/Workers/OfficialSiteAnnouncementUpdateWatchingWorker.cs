@@ -1,25 +1,23 @@
-using Discord;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement.InGame;
-using Eevee.Sleep.Bot.Utils;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
 using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using Eevee.Sleep.Bot.Workers.Crawlers;
 using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Workers;
 
-public class InGameAnnouncementUpdateWatchingWorker(
-    InGameAnnouncementCrawler crawler,
+public class OfficialSiteAnnouncementUpdateWatchingWorker(
+    OfficialSiteAnnouncementCrawler crawler,
     DiscordSocketClient client,
-    ILogger<InGameAnnouncementUpdateWatchingWorker> logger
+    ILogger<OfficialSiteAnnouncementUpdateWatchingWorker> logger
 ) : BackgroundService {
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
         // If UpdateWatchingWorker enters the waiting state before CrawlingWorker before initialization, 
         // it will be notified by the number of news, so check the news first and then enter the waiting state.
-        logger.LogInformation("Starting initialization process of the ingame announcement update worker.");
+        logger.LogInformation("Starting initialization process of the OfficialSite announcement update worker.");
         try {
             await crawler.ExecuteAsync();
         } catch (MaxAttemptExceededException e) {
@@ -29,14 +27,14 @@ public class InGameAnnouncementUpdateWatchingWorker(
         }
 
         var options = new ChangeStreamOptions { FullDocument = ChangeStreamFullDocumentOption.UpdateLookup };
-        var pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<InGameAnnouncementDetailModel>>()
+        var pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<OfficialSiteAnnouncementDetailModel>>()
             .Match(x =>
                 x.OperationType == ChangeStreamOperationType.Update ||
                 x.OperationType == ChangeStreamOperationType.Modify ||
                 x.OperationType == ChangeStreamOperationType.Insert
             );
 
-        using var cursor = await MongoConst.InGameAnnouncementDetailCollection
+        using var cursor = await MongoConst.OfficialSiteAnnouncementDetailCollection
             .WatchAsync(pipeline, options, cancellationToken);
 
         await cursor.ForEachAsync(async change => {
@@ -49,12 +47,8 @@ public class InGameAnnouncementUpdateWatchingWorker(
                 detail.AnnouncementId
             );
 
-            var notifyRole = ConfigHelper.GetInGameAnnouncementNotificationRoleId(detail.Language);
-
-            await client.SendMessageInInGameAnnouncementNoticeChannelAsync(
-                message: notifyRole is not null ? MentionUtils.MentionRole(notifyRole.Value) : null,
-                language: detail.Language,
-                embed: DiscordMessageMakerForInGameAnnouncement.MakeInGameAnnouncementUpdateMessage(detail)
+            await client.SendMessageInOfficialSiteAnnouncementNoticeChannelAsync(
+                embed: DiscordMessageMakerForInGameAnnouncement.MakeOfficialSiteAnnouncementUpdateMessage(detail)
             );
         }, cancellationToken);
     }

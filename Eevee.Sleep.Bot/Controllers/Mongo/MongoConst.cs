@@ -1,5 +1,6 @@
 ﻿using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.InGame;
 using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
 using Eevee.Sleep.Bot.Utils;
 using MongoDB.Driver;
@@ -32,12 +33,21 @@ public static class MongoConst {
 
     public static readonly IMongoDatabase GameDatabase = Client.GetDatabase("game");
 
-    public static readonly IMongoCollection<OfficialSiteAnnouncementIndexModel> InGameAnnouncementOfficialSiteIndexCollection =
+    public static readonly IMongoCollection<OfficialSiteAnnouncementIndexModel> OfficialSiteAnnouncementIndexCollection =
         GameDatabase.GetCollection<OfficialSiteAnnouncementIndexModel>("announcement/OfficialSite/index");
 
-    public static readonly IMongoCollection<OfficialSiteAnnouncementDetailModel> InGameAnnouncementOfficialSiteDetailCollection =
+    public static readonly IMongoCollection<OfficialSiteAnnouncementDetailModel> OfficialSiteAnnouncementDetailCollection =
         GameDatabase.GetCollection<OfficialSiteAnnouncementDetailModel>("announcement/OfficialSite/details");
 
-    public static readonly IMongoCollection<OfficialSiteAnnouncementDetailModel> InGameAnnouncementOfficialSiteHistoryCollection =
+    public static readonly IMongoCollection<OfficialSiteAnnouncementDetailModel> OfficialSiteAnnouncementHistoryCollection =
         GameDatabase.GetCollection<OfficialSiteAnnouncementDetailModel>("announcement/OfficialSite/history");
+        
+    public static readonly IMongoCollection<InGameAnnouncementIndexModel> InGameAnnouncementIndexCollection =
+        GameDatabase.GetCollection<InGameAnnouncementIndexModel>("announcement/InGame/index");
+
+    public static readonly IMongoCollection<InGameAnnouncementDetailModel> InGameAnnouncementDetailCollection =
+        GameDatabase.GetCollection<InGameAnnouncementDetailModel>("announcement/InGame/details");
+
+    public static readonly IMongoCollection<InGameAnnouncementDetailModel> InGameAnnouncementHistoryCollection =
+        GameDatabase.GetCollection<InGameAnnouncementDetailModel>("announcement/InGame/history");
 }

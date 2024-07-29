@@ -5,11 +5,11 @@ using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
 using Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement.OfficialSite;
 
-namespace Eevee.Sleep.Bot.Workers;
+namespace Eevee.Sleep.Bot.Workers.Crawlers;
 
 public class OfficialSiteAnnouncementCrawler(
     ILogger<OfficialSiteAnnouncementCrawler> logger
-) {
+) : IAnnoucementCrawler {
     private const int MAX_RETRY_COUNT = 3;
     private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(10);
     // Used to run only one process when called by multiple workers at the same time.

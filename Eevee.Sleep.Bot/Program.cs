@@ -4,6 +4,7 @@ using Discord.WebSocket;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Handlers;
 using Eevee.Sleep.Bot.Workers;
+using Eevee.Sleep.Bot.Workers.Crawlers;
 
 var socketConfig = new DiscordSocketConfig {
     GatewayIntents =
@@ -14,6 +15,7 @@ var socketConfig = new DiscordSocketConfig {
     AlwaysDownloadUsers = true
 };
 
+
 var builder = WebApplication.CreateBuilder(args)
     .BuildCommon();
 
@@ -23,9 +25,19 @@ builder.Services.AddSingleton(socketConfig)
     .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
     .AddSingleton<InteractionHandler>()
     .AddSingleton<OfficialSiteAnnouncementCrawler>()
+    .AddSingleton<InGameAnnouncementCrawler>()
     .AddHostedService<DiscordClientWorker>()
     .AddHostedService<InGameAnnouncementUpdateWatchingWorker>()
-    .AddHostedService<InGameAnnouncementCrawlingWorker>()
+    .AddHostedService(x => new AnnouncementCrawlingWorker(
+        x.GetRequiredService<InGameAnnouncementCrawler>(),
+        x.GetRequiredService<DiscordSocketClient>(),
+        x.GetRequiredService<ILogger<AnnouncementCrawlingWorker>>()
+    ))
+    .AddHostedService(x => new AnnouncementCrawlingWorker(
+        x.GetRequiredService<OfficialSiteAnnouncementCrawler>(),
+        x.GetRequiredService<DiscordSocketClient>(),
+        x.GetRequiredService<ILogger<AnnouncementCrawlingWorker>>()
+    ))
     .AddControllers();
 
 var app = builder

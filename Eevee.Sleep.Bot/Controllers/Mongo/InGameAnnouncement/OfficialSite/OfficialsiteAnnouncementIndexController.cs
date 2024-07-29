@@ -18,11 +18,11 @@ public static class OfficialSiteAnnouncememntIndexController {
             IsUpsert = true
         }).ToList();
         
-        return MongoConst.InGameAnnouncementOfficialSiteIndexCollection.BulkWriteAsync(models);
+        return MongoConst.OfficialSiteAnnouncementIndexCollection.BulkWriteAsync(models);
     }
 
     public static IEnumerable<OfficialSiteAnnouncementIndexModel> FindAllByLanguage(InGameAnnoucementLanguage language) {
-        return MongoConst.InGameAnnouncementOfficialSiteIndexCollection.Find(
+        return MongoConst.OfficialSiteAnnouncementIndexCollection.Find(
             Builders<OfficialSiteAnnouncementIndexModel>.Filter.Where(x => x.Language == language)
         ).ToEnumerable();
     }

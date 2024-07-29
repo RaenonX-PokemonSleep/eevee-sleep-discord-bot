@@ -11,18 +11,18 @@ public static class OfficialSiteAnnouncememntHistoryController {
         session.StartTransaction();
 
         try {
-            await MongoConst.InGameAnnouncementOfficialSiteHistoryCollection.InsertOneAsync(model);
-            var count = await MongoConst.InGameAnnouncementOfficialSiteHistoryCollection
+            await MongoConst.OfficialSiteAnnouncementHistoryCollection.InsertOneAsync(model);
+            var count = await MongoConst.OfficialSiteAnnouncementHistoryCollection
                 .CountDocumentsAsync(Builders<OfficialSiteAnnouncementDetailModel>.Filter.Where(x => x.AnnouncementId == model.AnnouncementId));
 
             if (count > MaxHistoryCount) {
-                var oldestRecord = await MongoConst.InGameAnnouncementOfficialSiteHistoryCollection
+                var oldestRecord = await MongoConst.OfficialSiteAnnouncementHistoryCollection
                     .Find(Builders<OfficialSiteAnnouncementDetailModel>.Filter.Where(x => x.AnnouncementId == model.AnnouncementId))
                     .Sort(Builders<OfficialSiteAnnouncementDetailModel>.Sort.Ascending(x => x.RecordCreatedUtc))
                     .Limit(1)
                     .FirstOrDefaultAsync();
 
-                await MongoConst.InGameAnnouncementOfficialSiteHistoryCollection.DeleteOneAsync(
+                await MongoConst.OfficialSiteAnnouncementHistoryCollection.DeleteOneAsync(
                     Builders<OfficialSiteAnnouncementDetailModel>.Filter.Where(x => x.AnnouncementId == oldestRecord.AnnouncementId)
                 );
             }
