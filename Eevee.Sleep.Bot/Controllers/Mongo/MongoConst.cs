@@ -1,7 +1,7 @@
 ﻿using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
 using Eevee.Sleep.Bot.Models.InGameAnnouncement.InGame;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.Officialsite;
 using Eevee.Sleep.Bot.Utils;
 using MongoDB.Driver;
 
@@ -33,14 +33,14 @@ public static class MongoConst {
 
     public static readonly IMongoDatabase GameDatabase = Client.GetDatabase("game");
 
-    public static readonly IMongoCollection<OfficialSiteAnnouncementIndexModel> OfficialSiteAnnouncementIndexCollection =
-        GameDatabase.GetCollection<OfficialSiteAnnouncementIndexModel>("announcement/OfficialSite/index");
+    public static readonly IMongoCollection<OfficialsiteAnnouncementIndexModel> OfficialsiteAnnouncementIndexCollection =
+        GameDatabase.GetCollection<OfficialsiteAnnouncementIndexModel>("announcement/Officialsite/index");
 
-    public static readonly IMongoCollection<OfficialSiteAnnouncementDetailModel> OfficialSiteAnnouncementDetailCollection =
-        GameDatabase.GetCollection<OfficialSiteAnnouncementDetailModel>("announcement/OfficialSite/details");
+    public static readonly IMongoCollection<OfficialsiteAnnouncementDetailModel> OfficialsiteAnnouncementDetailCollection =
+        GameDatabase.GetCollection<OfficialsiteAnnouncementDetailModel>("announcement/Officialsite/details");
 
-    public static readonly IMongoCollection<OfficialSiteAnnouncementDetailModel> OfficialSiteAnnouncementHistoryCollection =
-        GameDatabase.GetCollection<OfficialSiteAnnouncementDetailModel>("announcement/OfficialSite/history");
+    public static readonly IMongoCollection<OfficialsiteAnnouncementDetailModel> OfficialsiteAnnouncementHistoryCollection =
+        GameDatabase.GetCollection<OfficialsiteAnnouncementDetailModel>("announcement/Officialsite/history");
         
     public static readonly IMongoCollection<InGameAnnouncementIndexModel> InGameAnnouncementIndexCollection =
         GameDatabase.GetCollection<InGameAnnouncementIndexModel>("announcement/InGame/index");

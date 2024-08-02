@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.InGame.Interfaces;
 
 namespace Eevee.Sleep.Bot.Models.InGameAnnouncement.InGame;
 
@@ -37,6 +38,7 @@ public record InGameAnnouncementDetailResponse : IInGameAnnouncementResponse<InG
             Url = url,
             Text = Text,
             RecordCreatedUtc = DateTime.UtcNow,
+            RecordUpdatedUtc = DateTime.UtcNow,
             OriginalUpdatedUtc = UpdateAt.ToDateTimeFromSecond(),
             OriginalCreatedUtc = CreateAt.ToDateTimeFromSecond()
         };

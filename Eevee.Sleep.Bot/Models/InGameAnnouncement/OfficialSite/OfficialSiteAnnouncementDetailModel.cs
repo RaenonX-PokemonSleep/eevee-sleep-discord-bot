@@ -2,10 +2,10 @@ using Eevee.Sleep.Bot.Models.InGameAnnouncement.ApiResponses;
 using JetBrains.Annotations;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
+namespace Eevee.Sleep.Bot.Models.InGameAnnouncement.Officialsite;
 
 [BsonIgnoreExtraElements]
-public record OfficialSiteAnnouncementDetailModel: OfficialSiteAnnouncementMetaModel {
+public record OfficialsiteAnnouncementDetailModel: AnnouncementMetaModel {
     [UsedImplicitly]
     public required string Content { get; init; }
 

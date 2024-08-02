@@ -1,3 +1,4 @@
+using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement;
 using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement.InGame;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
@@ -7,12 +8,17 @@ using Eevee.Sleep.Bot.Workers.Scrapers;
 namespace Eevee.Sleep.Bot.Workers.Crawlers;
 
 public class InGameAnnouncementCrawler(
-    ILogger<InGameAnnouncementCrawler> logger
+    ILogger<InGameAnnouncementCrawler> logger,
+    AnnouncementDetailController<InGameAnnouncementDetailModel> InGameAnnouncementDetailController,
+    AnnouncementHistoryController<InGameAnnouncementDetailModel> InGameAnnouncememntHistoryController
 ) : IAnnoucementCrawler {
     private const int MAX_RETRY_COUNT = 3;
+
     private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(10);
+
     // Used to run only one process when called by multiple workers at the same time.
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
+
     private static readonly Dictionary<string, InGameAnnoucementLanguage> Urls = new(){
             { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/1/list_0_0.json", InGameAnnoucementLanguage.JP },
             { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/1/list_1_0.json", InGameAnnoucementLanguage.JP },

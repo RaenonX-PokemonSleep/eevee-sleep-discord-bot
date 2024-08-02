@@ -1,21 +1,24 @@
 using AngleSharp.Common;
-using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement.OfficialSite;
+using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement;
+using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement.Officialsite;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
-using Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement.OfficialSite;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.Officialsite;
+using Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement.Officialsite;
 
 namespace Eevee.Sleep.Bot.Workers.Crawlers;
 
-public class OfficialSiteAnnouncementCrawler(
-    ILogger<OfficialSiteAnnouncementCrawler> logger
+public class OfficialsiteAnnouncementCrawler(
+    ILogger<OfficialsiteAnnouncementCrawler> logger,
+    AnnouncementDetailController<OfficialsiteAnnouncementDetailModel> officialsiteAnnouncememntDetailController,
+    AnnouncementHistoryController<OfficialsiteAnnouncementDetailModel> officialsiteAnnouncememntHistoryController
 ) : IAnnoucementCrawler {
     private const int MAX_RETRY_COUNT = 3;
     private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(10);
     // Used to run only one process when called by multiple workers at the same time.
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
-    private static async Task<IEnumerable<OfficialSiteAnnouncementIndexModel>> GetIndexes() {
+    private static async Task<IEnumerable<OfficialsiteAnnouncementIndexModel>> GetIndexes() {
         Dictionary<string, InGameAnnoucementLanguage> BaseUrls = new(){
             { "https://www.pokemonsleep.net/news", InGameAnnoucementLanguage.JP },
             { "https://www.pokemonsleep.net/en/news", InGameAnnoucementLanguage.EN },
@@ -28,7 +31,7 @@ public class OfficialSiteAnnouncementCrawler(
         return results.SelectMany(x => x);
     }
 
-    private static async Task<IEnumerable<OfficialSiteAnnouncementDetailModel>> GetDetails(IEnumerable<OfficialSiteAnnouncementIndexModel> indexes) {
+    private static async Task<IEnumerable<OfficialsiteAnnouncementDetailModel>> GetDetails(IEnumerable<OfficialsiteAnnouncementIndexModel> indexes) {
         var detailTasks = indexes
             .AsParallel()
             .WithDegreeOfParallelism(5)
@@ -37,11 +40,11 @@ public class OfficialSiteAnnouncementCrawler(
         return await Task.WhenAll(detailTasks);
     }
 
-    private static async Task SaveDetailsAndHistories(IEnumerable<OfficialSiteAnnouncementDetailModel> details) {
-        var existedDetails = OfficialSiteAnnouncementDetailController.FindAllByIds(details.Select(x => x.AnnouncementId));
+    private async Task SaveDetailsAndHistories(List<OfficialsiteAnnouncementDetailModel> details) {
+        var existedDetails = officialsiteAnnouncememntDetailController.FindAllByIds(details.Select(x => x.AnnouncementId));
         var existedDetailsById = existedDetails.ToDictionary(x => x.AnnouncementId);
     
-        var shouldSaveDetail = new List<OfficialSiteAnnouncementDetailModel>();
+        var shouldSaveDetail = new List<OfficialsiteAnnouncementDetailModel>();
     
         foreach (var detail in details) {
             var detailModel = existedDetailsById.GetOrDefault(detail.AnnouncementId, null);
@@ -49,8 +52,8 @@ public class OfficialSiteAnnouncementCrawler(
                 shouldSaveDetail.Add(detail);
             }
         }
-        await OfficialSiteAnnouncementDetailController.BulkUpsert([..shouldSaveDetail]);
-        await OfficialSiteAnnouncememntHistoryController.BulkUpsert([..shouldSaveDetail]);
+        await officialsiteAnnouncememntDetailController.BulkUpsert([..shouldSaveDetail]);
+        await officialsiteAnnouncememntHistoryController.BulkInsert([..shouldSaveDetail]);
     }
 
     public async Task ExecuteAsync(int retryCount = 0) {
@@ -60,10 +63,10 @@ public class OfficialSiteAnnouncementCrawler(
 
         try {
             var indexes = await GetIndexes();
-            await OfficialSiteAnnouncememntIndexController.BulkUpsert([..indexes]);
+            await OfficialsiteAnnouncememntIndexController.BulkUpsert([..indexes]);
             
             var details = await GetDetails(indexes);
-            await SaveDetailsAndHistories(details);
+            await SaveDetailsAndHistories(details.ToList());
 
             retryCount = 0;
         } catch (DocumentProcessingException e) {

@@ -3,10 +3,10 @@ using JetBrains.Annotations;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Eevee.Sleep.Bot.Models.InGameAnnouncement.InGame;
+namespace Eevee.Sleep.Bot.Models.InGameAnnouncement;
 
 [BsonIgnoreExtraElements]
-public record InGameAnnouncementMetaModel {
+public record AnnouncementMetaModel {
     [UsedImplicitly]
     public required string AnnouncementId { get; init; }
 
@@ -21,8 +21,8 @@ public record InGameAnnouncementMetaModel {
     public required string Url { get; init; }
 
     [UsedImplicitly]
-    public required DateTime OriginalCreatedUtc { get; init; }
-
+    public required DateTime RecordCreatedUtc { get; init; }
+    
     [UsedImplicitly]
-    public required DateTime OriginalUpdatedUtc { get; init; }
+    public required DateTime RecordUpdatedUtc { get; init; }
 }

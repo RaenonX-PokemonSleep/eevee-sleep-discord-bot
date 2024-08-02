@@ -3,7 +3,7 @@ using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models.InGameAnnouncement.InGame;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement.OfficialSite;
+using Eevee.Sleep.Bot.Models.InGameAnnouncement.Officialsite;
 
 namespace Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 
@@ -29,7 +29,7 @@ public static class DiscordMessageMakerForInGameAnnouncement {
             .Build();
     }
 
-    public static Embed MakeOfficialSiteAnnouncementUpdateMessage(OfficialSiteAnnouncementDetailModel detail) {
+    public static Embed MakeOfficialsiteAnnouncementUpdateMessage(OfficialsiteAnnouncementDetailModel detail) {
         return new EmbedBuilder()
             .WithColor(Colors.Info)
             .WithTitle("In-game Announcement Updated!")

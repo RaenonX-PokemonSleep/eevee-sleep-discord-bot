@@ -40,8 +40,8 @@ public static class ConfigHelper {
         return GetInGameAnnouncementNotificationChannelSection().GetRequiredValue<ulong>(language.ToString());
     }
 
-    public static ulong GetOfficialSiteAnnouncementNotificationChannelId() {
-        return GetDiscordChannelSection().GetRequiredValue<ulong>("OfficialSiteAnnouncementNotification");
+    public static ulong GetOfficialsiteAnnouncementNotificationChannelId() {
+        return GetDiscordChannelSection().GetRequiredValue<ulong>("OfficialsiteAnnouncementNotification");
     }
 
     private static IConfigurationSection GetDiscordRolesSection() {
