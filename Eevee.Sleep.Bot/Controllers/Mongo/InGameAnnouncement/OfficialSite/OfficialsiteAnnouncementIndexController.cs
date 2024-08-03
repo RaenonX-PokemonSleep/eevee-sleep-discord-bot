@@ -21,7 +21,7 @@ public static class OfficialsiteAnnouncememntIndexController {
         return MongoConst.OfficialsiteAnnouncementIndexCollection.BulkWriteAsync(models);
     }
 
-    public static IEnumerable<OfficialsiteAnnouncementIndexModel> FindAllByLanguage(InGameAnnoucementLanguage language) {
+    public static IEnumerable<OfficialsiteAnnouncementIndexModel> FindAllByLanguage(InGameAnnouncementLanguage language) {
         return MongoConst.OfficialsiteAnnouncementIndexCollection.Find(
             Builders<OfficialsiteAnnouncementIndexModel>.Filter.Where(x => x.Language == language)
         ).ToEnumerable();

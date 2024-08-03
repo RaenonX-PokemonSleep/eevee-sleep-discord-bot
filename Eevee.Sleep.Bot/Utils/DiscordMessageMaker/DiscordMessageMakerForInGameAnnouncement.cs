@@ -43,18 +43,12 @@ public static class DiscordMessageMakerForInGameAnnouncement {
     }
 
     public static Embed MakeInGameAnnouncementUpdateMessage(InGameAnnouncementDetailModel detail) {
-        var content = detail.Text;
-        if (content.Length > 1024) {
-            content = string.Concat(content.AsSpan(0, 1021), "...");
-        }
-
         return new EmbedBuilder()
             .WithColor(Colors.Info)
             .WithTitle("In-game Announcement Updated!")
             .AddField("Title", detail.Title)
             .AddField("Announcement ID", detail.AnnouncementId)
             .AddField("Url", detail.Url)
-            .AddField("Content", content)
             .AddField("Updated", detail.OriginalUpdatedUtc)
             .AddField("Record Created", detail.RecordCreatedUtc)
             .WithCurrentTimestamp()

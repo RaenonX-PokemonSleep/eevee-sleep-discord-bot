@@ -30,7 +30,7 @@ public class AnnouncementDetailController<T>(
         ).ToEnumerable();
     }
 
-    public T? FindById(InGameAnnoucementLanguage language, string id) {
+    public T? FindById(InGameAnnouncementLanguage language, string id) {
         return collection.Find(
             Builders<T>.Filter.And(
                 Builders<T>.Filter.Where(x => x.Language == language),

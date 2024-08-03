@@ -19,13 +19,13 @@ public record InGameAnnouncementIndexResponse : IInGameAnnouncementResponse<InGa
     public required int Category { get; init; }
 
     [JsonPropertyName("imgUrl")]
-    public required string ImgUrl { get; init; }
+    public required string ImageUrl { get; init; }
 
     [JsonPropertyName("url")]
     public required string Url { get; init; }
 
     [JsonPropertyName("stAt")]
-    public required long StAt { get; init; }
+    public required long StartAt { get; init; }
 
     [JsonPropertyName("endAt")]
     public required long EndAt { get; init; }
@@ -39,7 +39,7 @@ public record InGameAnnouncementIndexResponse : IInGameAnnouncementResponse<InGa
     [JsonPropertyName("dataUpdateAt")]
     public required long DataUpdateAt { get; init; }
 
-    public InGameAnnouncementIndexModel ToModel(string url, InGameAnnoucementLanguage language) {
+    public InGameAnnouncementIndexModel ToModel(string url, InGameAnnouncementLanguage language) {
         return new InGameAnnouncementIndexModel {
             AnnouncementId = Id,
             Language = language,

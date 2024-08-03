@@ -1,6 +1,6 @@
 namespace Eevee.Sleep.Bot.Enums;
 
-public enum InGameAnnoucementLanguage {
+public enum InGameAnnouncementLanguage {
     JP,
     EN,
     ZH

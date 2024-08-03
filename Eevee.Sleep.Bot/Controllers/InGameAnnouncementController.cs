@@ -11,7 +11,7 @@ namespace Eevee.Sleep.Bot.Controllers;
 public class InGameAnnouncementController() : ControllerBase {
     [HttpGet("{Locale}", Name = "GetInGameAnnouncements")]
     public ActionResult<string> Get(string Locale) {
-        if (!Enum.TryParse<InGameAnnoucementLanguage>(Locale, true, out var language)) {
+        if (!Enum.TryParse<InGameAnnouncementLanguage>(Locale, true, out var language)) {
             return BadRequest();
         }
 
@@ -25,7 +25,7 @@ public class InGameAnnouncementController() : ControllerBase {
         string Locale, 
         string AnnouncementId
     ) {
-        if (!Enum.TryParse<InGameAnnoucementLanguage>(Locale, true, out var language)) {
+        if (!Enum.TryParse<InGameAnnouncementLanguage>(Locale, true, out var language)) {
             return BadRequest();
         }
 

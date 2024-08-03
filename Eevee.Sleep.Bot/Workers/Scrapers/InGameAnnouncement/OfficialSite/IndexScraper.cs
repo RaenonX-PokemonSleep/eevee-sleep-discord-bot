@@ -7,7 +7,7 @@ using MongoDB.Driver.Linq;
 namespace Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement.Officialsite;
 
 public static class IndexScraper {
-    public static async Task<List<OfficialsiteAnnouncementIndexModel>> GetAsync(string url, InGameAnnoucementLanguage language) {
+    public static async Task<List<OfficialsiteAnnouncementIndexModel>> GetAsync(string url, InGameAnnouncementLanguage language) {
         var document = await DocumentLoader.FetchDocumentAsync(url);
         var contents = document.QuerySelectorAll("ul.items > li > a.banner_2");
 
@@ -54,7 +54,7 @@ public static class IndexScraper {
         return IndexModels;
     }
 
-    public static async Task<IEnumerable<OfficialsiteAnnouncementIndexModel>> GetAllPagesAsync(string baseUrl, InGameAnnoucementLanguage language) {
+    public static async Task<IEnumerable<OfficialsiteAnnouncementIndexModel>> GetAllPagesAsync(string baseUrl, InGameAnnouncementLanguage language) {
         var document = await DocumentLoader.FetchDocumentAsync(baseUrl);
 
         // format: "1/23" to "23"

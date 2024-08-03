@@ -16,7 +16,7 @@ public record InGameAnnouncementDetailResponse : IInGameAnnouncementResponse<InG
     public required int Category { get; init; }
 
     [JsonPropertyName("imgUrl")]
-    public required string ImgUrl { get; init; }
+    public required string ImageUrl { get; init; }
 
     [JsonPropertyName("text")]
     public required string Text { get; init; }
@@ -30,7 +30,7 @@ public record InGameAnnouncementDetailResponse : IInGameAnnouncementResponse<InG
     [JsonPropertyName("dataUpdateAt")]
     public required long DataUpdateAt { get; init; }
 
-    public InGameAnnouncementDetailModel ToModel(string url, InGameAnnoucementLanguage language) {
+    public InGameAnnouncementDetailModel ToModel(string url, InGameAnnouncementLanguage language) {
         return new InGameAnnouncementDetailModel {
             AnnouncementId = Id,
             Language = language,

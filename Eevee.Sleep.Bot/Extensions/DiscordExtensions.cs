@@ -30,14 +30,14 @@ public static class DiscordExtensions {
 
     private static Task<IMessageChannel> GetInGameAnnouncementNoticeChannelsAsync(
         this IDiscordClient client,
-        InGameAnnoucementLanguage language
+        InGameAnnouncementLanguage language
     ) {
         return client.GetMessageChannel(ConfigHelper.GetInGameAnnouncementNotificationChannelId(language));
     }
 
     public static async Task SendMessageInInGameAnnouncementNoticeChannelAsync(
         this IDiscordClient client,
-        InGameAnnoucementLanguage language,
+        InGameAnnouncementLanguage language,
         string? message = null,
         Embed? embed = null,
         Embed[]? embeds = null

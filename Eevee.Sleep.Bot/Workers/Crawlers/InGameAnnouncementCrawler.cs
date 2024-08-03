@@ -19,17 +19,17 @@ public class InGameAnnouncementCrawler(
     // Used to run only one process when called by multiple workers at the same time.
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
-    private static readonly Dictionary<string, InGameAnnoucementLanguage> Urls = new(){
-            { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/1/list_0_0.json", InGameAnnoucementLanguage.JP },
-            { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/1/list_1_0.json", InGameAnnoucementLanguage.JP },
-            { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/1/list_2_0.json", InGameAnnoucementLanguage.JP },
-            { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/2/list_0_0.json", InGameAnnoucementLanguage.EN },
-            { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/2/list_1_0.json", InGameAnnoucementLanguage.EN },
-            { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/2/list_2_0.json", InGameAnnoucementLanguage.EN },
-            { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/8/list_0_0.json", InGameAnnoucementLanguage.ZH },
-            { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/8/list_1_0.json", InGameAnnoucementLanguage.ZH },
-            { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/8/list_2_0.json", InGameAnnoucementLanguage.ZH }
-        };
+    private static readonly Dictionary<string, InGameAnnouncementLanguage> Urls = new(){
+        { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/1/list_0_0.json", InGameAnnouncementLanguage.JP },
+        { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/1/list_1_0.json", InGameAnnouncementLanguage.JP },
+        { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/1/list_2_0.json", InGameAnnouncementLanguage.JP },
+        { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/2/list_0_0.json", InGameAnnouncementLanguage.EN },
+        { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/2/list_1_0.json", InGameAnnouncementLanguage.EN },
+        { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/2/list_2_0.json", InGameAnnouncementLanguage.EN },
+        { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/8/list_0_0.json", InGameAnnouncementLanguage.ZH },
+        { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/8/list_1_0.json", InGameAnnouncementLanguage.ZH },
+        { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/8/list_2_0.json", InGameAnnouncementLanguage.ZH }
+    };
 
     public async Task ExecuteAsync(int retryCount = 0) {
         if (retryCount == 0) {

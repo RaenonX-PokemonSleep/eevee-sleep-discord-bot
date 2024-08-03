@@ -35,7 +35,7 @@ public static class InGameAnnouncementIndexController {
         ).ToEnumerable();
     }
 
-    public static IEnumerable<InGameAnnouncementIndexModel> FindAllByLanguage(InGameAnnoucementLanguage language) {
+    public static IEnumerable<InGameAnnouncementIndexModel> FindAllByLanguage(InGameAnnouncementLanguage language) {
         return MongoConst.InGameAnnouncementIndexCollection.Find(
             Builders<InGameAnnouncementIndexModel>.Filter.Where(x => x.Language == language)
         ).ToEnumerable();

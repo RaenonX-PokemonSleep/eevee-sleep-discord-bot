@@ -19,10 +19,10 @@ public class OfficialsiteAnnouncementCrawler(
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
     private static async Task<IEnumerable<OfficialsiteAnnouncementIndexModel>> GetIndexes() {
-        Dictionary<string, InGameAnnoucementLanguage> BaseUrls = new(){
-            { "https://www.pokemonsleep.net/news", InGameAnnoucementLanguage.JP },
-            { "https://www.pokemonsleep.net/en/news", InGameAnnoucementLanguage.EN },
-            { "https://www.pokemonsleep.net/zh/news", InGameAnnoucementLanguage.ZH },
+        Dictionary<string, InGameAnnouncementLanguage> BaseUrls = new(){
+            { "https://www.pokemonsleep.net/news", InGameAnnouncementLanguage.JP },
+            { "https://www.pokemonsleep.net/en/news", InGameAnnouncementLanguage.EN },
+            { "https://www.pokemonsleep.net/zh/news", InGameAnnouncementLanguage.ZH },
         };
 
         var tasks = BaseUrls.Select(dict => IndexScraper.GetAllPagesAsync(dict.Key, dict.Value)).ToArray();
