@@ -10,8 +10,8 @@ namespace Eevee.Sleep.Bot.Workers.Crawlers;
 
 public class OfficialSiteAnnouncementCrawler(
     ILogger<OfficialSiteAnnouncementCrawler> logger,
-    AnnouncementDetailController<OfficialSiteAnnouncementDetailModel> officialsiteAnnouncememntDetailController,
-    AnnouncementHistoryController<OfficialSiteAnnouncementDetailModel> officialsiteAnnouncememntHistoryController
+    AnnouncementDetailController<OfficialSiteAnnouncementDetailModel> officialSiteAnnouncementDetailController,
+    AnnouncementHistoryController<OfficialSiteAnnouncementDetailModel> officialSiteAnnouncementHistoryController
 ) : IAnnoucementCrawler {
     private const int MAX_RETRY_COUNT = 3;
     private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(10);
@@ -41,7 +41,7 @@ public class OfficialSiteAnnouncementCrawler(
     }
 
     private async Task SaveDetailsAndHistories(List<OfficialSiteAnnouncementDetailModel> details) {
-        var existedDetails = officialsiteAnnouncememntDetailController.FindAllByIds(details.Select(x => x.AnnouncementId));
+        var existedDetails = officialSiteAnnouncementDetailController.FindAllByIds(details.Select(x => x.AnnouncementId));
         var existedDetailsById = existedDetails.ToDictionary(x => x.AnnouncementId);
     
         var shouldSaveDetail = new List<OfficialSiteAnnouncementDetailModel>();
@@ -52,8 +52,8 @@ public class OfficialSiteAnnouncementCrawler(
                 shouldSaveDetail.Add(detail);
             }
         }
-        await officialsiteAnnouncememntDetailController.BulkUpsert([..shouldSaveDetail]);
-        await officialsiteAnnouncememntHistoryController.BulkInsert([..shouldSaveDetail]);
+        await officialSiteAnnouncementDetailController.BulkUpsert([..shouldSaveDetail]);
+        await officialSiteAnnouncementHistoryController.BulkInsert([..shouldSaveDetail]);
     }
 
     public async Task ExecuteAsync(int retryCount = 0) {
@@ -63,7 +63,7 @@ public class OfficialSiteAnnouncementCrawler(
 
         try {
             var indexes = await GetIndexes();
-            await OfficialSiteAnnouncememntIndexController.BulkUpsert([..indexes]);
+            await OfficialSiteAnnouncementIndexController.BulkUpsert([..indexes]);
             
             var details = await GetDetails(indexes);
             await SaveDetailsAndHistories(details.ToList());

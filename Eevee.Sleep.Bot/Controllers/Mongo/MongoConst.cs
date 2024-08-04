@@ -34,20 +34,20 @@ public static class MongoConst {
     public static readonly IMongoDatabase GameDatabase = Client.GetDatabase("game");
 
     public static readonly IMongoCollection<OfficialSiteAnnouncementIndexModel> OfficialSiteAnnouncementIndexCollection =
-        GameDatabase.GetCollection<OfficialSiteAnnouncementIndexModel>("announcement/OfficialSite/index");
+        GameDatabase.GetCollection<OfficialSiteAnnouncementIndexModel>("announcement/officialSite/index");
 
     public static readonly IMongoCollection<OfficialSiteAnnouncementDetailModel> OfficialSiteAnnouncementDetailCollection =
-        GameDatabase.GetCollection<OfficialSiteAnnouncementDetailModel>("announcement/OfficialSite/details");
+        GameDatabase.GetCollection<OfficialSiteAnnouncementDetailModel>("announcement/officialSite/details");
 
     public static readonly IMongoCollection<OfficialSiteAnnouncementDetailModel> OfficialSiteAnnouncementHistoryCollection =
-        GameDatabase.GetCollection<OfficialSiteAnnouncementDetailModel>("announcement/OfficialSite/history");
+        GameDatabase.GetCollection<OfficialSiteAnnouncementDetailModel>("announcement/officialSite/history");
         
     public static readonly IMongoCollection<InGameAnnouncementIndexModel> InGameAnnouncementIndexCollection =
-        GameDatabase.GetCollection<InGameAnnouncementIndexModel>("announcement/InGame/index");
+        GameDatabase.GetCollection<InGameAnnouncementIndexModel>("announcement/inGame/index");
 
     public static readonly IMongoCollection<InGameAnnouncementDetailModel> InGameAnnouncementDetailCollection =
-        GameDatabase.GetCollection<InGameAnnouncementDetailModel>("announcement/InGame/details");
+        GameDatabase.GetCollection<InGameAnnouncementDetailModel>("announcement/inGame/details");
 
     public static readonly IMongoCollection<InGameAnnouncementDetailModel> InGameAnnouncementHistoryCollection =
-        GameDatabase.GetCollection<InGameAnnouncementDetailModel>("announcement/InGame/history");
+        GameDatabase.GetCollection<InGameAnnouncementDetailModel>("announcement/inGame/history");
 }

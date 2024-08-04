@@ -5,7 +5,7 @@ using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Controllers.Mongo.Announcement.OfficialSite;
 
-public static class OfficialSiteAnnouncememntIndexController {
+public static class OfficialSiteAnnouncementIndexController {
     public static Task BulkUpsert(OfficialSiteAnnouncementIndexModel[] model) {
         if (model.Length == 0) {
             // Nothing to do if `model` is empty

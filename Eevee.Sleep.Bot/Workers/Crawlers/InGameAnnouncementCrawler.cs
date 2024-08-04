@@ -10,7 +10,7 @@ namespace Eevee.Sleep.Bot.Workers.Crawlers;
 public class InGameAnnouncementCrawler(
     ILogger<InGameAnnouncementCrawler> logger,
     AnnouncementDetailController<InGameAnnouncementDetailModel> InGameAnnouncementDetailController,
-    AnnouncementHistoryController<InGameAnnouncementDetailModel> InGameAnnouncememntHistoryController
+    AnnouncementHistoryController<InGameAnnouncementDetailModel> InGameAnnouncementHistoryController
 ) : IAnnoucementCrawler {
     private const int MAX_RETRY_COUNT = 3;
 
@@ -51,7 +51,7 @@ public class InGameAnnouncementCrawler(
                 );
             var details = await Task.WhenAll(detailTasks);
             await InGameAnnouncementDetailController.BulkUpsert([..details]);
-            await InGameAnnouncememntHistoryController.BulkInsert([..details]);
+            await InGameAnnouncementHistoryController.BulkInsert([..details]);
 
             retryCount = 0;
         } catch (DocumentProcessingException e) {

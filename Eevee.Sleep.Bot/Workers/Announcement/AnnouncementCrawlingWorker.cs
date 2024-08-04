@@ -6,7 +6,7 @@ using Eevee.Sleep.Bot.Workers.Crawlers;
 
 namespace Eevee.Sleep.Bot.Workers.Announcement;
 
-public abstract class AnnouncementCrawlingWorker (
+public abstract class AnnouncementCrawlingWorker(
     IAnnoucementCrawler crawler,
     DiscordSocketClient client,
     ILogger<AnnouncementCrawlingWorker> logger

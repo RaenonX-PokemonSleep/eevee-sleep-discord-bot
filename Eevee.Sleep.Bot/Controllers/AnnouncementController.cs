@@ -8,18 +8,18 @@ namespace Eevee.Sleep.Bot.Controllers;
 
 [ApiController]
 [Route("/game/announcement")]
-public class InGameAnnouncementController() : ControllerBase {
-    [HttpGet("{Locale}", Name = "GetInGameAnnouncements")]
+public class AnnouncementController() : ControllerBase {
+    [HttpGet("{Locale}", Name = "GetAnnouncements")]
     public ActionResult<string> Get(string Locale) {
         if (!Enum.TryParse<AnnouncementLanguage>(Locale, true, out var language)) {
             return BadRequest();
         }
 
-        var announcement = OfficialSiteAnnouncememntIndexController.FindAllByLanguage(language);
+        var announcement = OfficialSiteAnnouncementIndexController.FindAllByLanguage(language);
         return Ok(announcement.Select(x => x.ToApiResponse()));
     }
 
-    [HttpGet("{Locale}/{AnnouncementId}", Name = "GetInGameAnnouncementDetails")]
+    [HttpGet("{Locale}/{AnnouncementId}", Name = "GetAnnouncementDetails")]
     public ActionResult<string> Get(
         AnnouncementDetailController<OfficialSiteAnnouncementDetailModel> OfficialSiteAnnouncementDetailController,
         string Locale, 
