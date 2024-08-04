@@ -6,7 +6,7 @@ using Eevee.Sleep.Bot.Controllers.Mongo.Announcement;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Handlers;
 using Eevee.Sleep.Bot.Models.Announcement.InGame;
-using Eevee.Sleep.Bot.Models.Announcement.Officialsite;
+using Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
 using Eevee.Sleep.Bot.Workers;
 using Eevee.Sleep.Bot.Workers.Announcement;
 using Eevee.Sleep.Bot.Workers.Crawlers;
@@ -28,11 +28,11 @@ builder.Services.AddSingleton(socketConfig)
     .AddSingleton<DiscordSocketClient>()
     .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
     .AddSingleton<InteractionHandler>()
-    .AddSingleton(x => new AnnouncementDetailController<OfficialsiteAnnouncementDetailModel>(
-        MongoConst.OfficialsiteAnnouncementDetailCollection
+    .AddSingleton(x => new AnnouncementDetailController<OfficialSiteAnnouncementDetailModel>(
+        MongoConst.OfficialSiteAnnouncementDetailCollection
     ))
-    .AddSingleton(x => new AnnouncementHistoryController<OfficialsiteAnnouncementDetailModel>(
-        MongoConst.OfficialsiteAnnouncementHistoryCollection
+    .AddSingleton(x => new AnnouncementHistoryController<OfficialSiteAnnouncementDetailModel>(
+        MongoConst.OfficialSiteAnnouncementHistoryCollection
     ))
     .AddSingleton(x => new AnnouncementDetailController<InGameAnnouncementDetailModel>(
         MongoConst.InGameAnnouncementDetailCollection
@@ -40,12 +40,12 @@ builder.Services.AddSingleton(socketConfig)
     .AddSingleton(x => new AnnouncementHistoryController<InGameAnnouncementDetailModel>(
         MongoConst.InGameAnnouncementHistoryCollection
     ))
-    .AddSingleton<OfficialsiteAnnouncementCrawler>()
+    .AddSingleton<OfficialSiteAnnouncementCrawler>()
     .AddSingleton<InGameAnnouncementCrawler>()
     .AddHostedService<DiscordClientWorker>()
-    .AddHostedService<OfficialsiteAnnouncementUpdateWatchingWorker>()
+    .AddHostedService<OfficialSiteAnnouncementUpdateWatchingWorker>()
     .AddHostedService<InGameAnnouncementUpdateWatchingWorker>()
-    .AddHostedService<OfficialsiteAnnouncementCrawlingWorker>()
+    .AddHostedService<OfficialSiteAnnouncementCrawlingWorker>()
     .AddHostedService<InGameAnnouncementCrawlingWorker>()
     .AddControllers();
 

@@ -1,7 +1,7 @@
 using Eevee.Sleep.Bot.Controllers.Mongo.Announcement;
-using Eevee.Sleep.Bot.Controllers.Mongo.Announcement.Officialsite;
+using Eevee.Sleep.Bot.Controllers.Mongo.Announcement.OfficialSite;
 using Eevee.Sleep.Bot.Enums;
-using Eevee.Sleep.Bot.Models.Announcement.Officialsite;
+using Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Eevee.Sleep.Bot.Controllers;
@@ -15,13 +15,13 @@ public class InGameAnnouncementController() : ControllerBase {
             return BadRequest();
         }
 
-        var announcement = OfficialsiteAnnouncememntIndexController.FindAllByLanguage(language);
+        var announcement = OfficialSiteAnnouncememntIndexController.FindAllByLanguage(language);
         return Ok(announcement.Select(x => x.ToApiResponse()));
     }
 
     [HttpGet("{Locale}/{AnnouncementId}", Name = "GetInGameAnnouncementDetails")]
     public ActionResult<string> Get(
-        AnnouncementDetailController<OfficialsiteAnnouncementDetailModel> OfficialsiteAnnouncementDetailController,
+        AnnouncementDetailController<OfficialSiteAnnouncementDetailModel> OfficialSiteAnnouncementDetailController,
         string Locale, 
         string AnnouncementId
     ) {
@@ -29,7 +29,7 @@ public class InGameAnnouncementController() : ControllerBase {
             return BadRequest();
         }
 
-        var announcement = OfficialsiteAnnouncementDetailController.FindById(language, AnnouncementId);
+        var announcement = OfficialSiteAnnouncementDetailController.FindById(language, AnnouncementId);
         if (announcement is null) {
             return NotFound();
         }

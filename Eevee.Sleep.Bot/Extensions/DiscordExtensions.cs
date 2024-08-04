@@ -46,17 +46,17 @@ public static class DiscordExtensions {
             .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 
-    private static Task<IMessageChannel> GetOfficialsiteAnnouncementNoticeChannelsAsync(this IDiscordClient client) {
+    private static Task<IMessageChannel> GetOfficialSiteAnnouncementNoticeChannelsAsync(this IDiscordClient client) {
         return client.GetMessageChannel(ConfigHelper.GetDiscordAdminAlertChannelId());
     }
 
-    public static async Task SendMessageInOfficialsiteAnnouncementNoticeChannelAsync(
+    public static async Task SendMessageInOfficialSiteAnnouncementNoticeChannelAsync(
         this IDiscordClient client,
         string? message = null,
         Embed? embed = null,
         Embed[]? embeds = null
     ) {
-        await (await client.GetOfficialsiteAnnouncementNoticeChannelsAsync())
+        await (await client.GetOfficialSiteAnnouncementNoticeChannelsAsync())
             .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 
