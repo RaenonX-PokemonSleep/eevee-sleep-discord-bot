@@ -11,16 +11,12 @@ using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Workers.Announcement;
 
-public class InGameAnnouncementUpdateWatchingWorker: AnnouncementUpdateWatchingWorker<InGameAnnouncementDetailModel> {
-    private readonly DiscordSocketClient _client;
-
-    public InGameAnnouncementUpdateWatchingWorker(
-        InGameAnnouncementCrawler crawler,
-        DiscordSocketClient client,
-        ILogger<InGameAnnouncementUpdateWatchingWorker> logger
-    ) : base(crawler, client, logger) {
-        _client = client;
-    }
+public class InGameAnnouncementUpdateWatchingWorker(
+    InGameAnnouncementCrawler crawler,
+    DiscordSocketClient client,
+    ILogger<InGameAnnouncementUpdateWatchingWorker> logger
+) : AnnouncementUpdateWatchingWorker<InGameAnnouncementDetailModel>(crawler, client, logger) {
+    private readonly DiscordSocketClient _client = client;
 
     protected override IMongoCollection<InGameAnnouncementDetailModel> GetMongoCollection() {
         return MongoConst.InGameAnnouncementDetailCollection;
@@ -40,9 +36,9 @@ public class InGameAnnouncementUpdateWatchingWorker: AnnouncementUpdateWatchingW
         Embed embed
     ) {
         return _client.SendMessageInInGameAnnouncementNoticeChannelAsync(
-            language: language,
-            message: message,
-            embed: embed
+            language,
+            message,
+            embed
         );
     }
 }

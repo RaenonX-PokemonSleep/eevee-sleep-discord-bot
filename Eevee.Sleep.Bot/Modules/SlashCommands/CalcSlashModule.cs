@@ -8,9 +8,10 @@ namespace Eevee.Sleep.Bot.Modules.SlashCommands;
 public class CalcSlashModule : InteractionModuleBase<SocketInteractionContext> {
     [SlashCommand("math", "Calculates math expression using Eval.NET.")]
     [UsedImplicitly]
-    public Task MathCalcAsync([Summary(description: "Math expression to evaluate.")] string expression) =>
-        RespondAsync(
-            text: $"Result: **{Evaluator.Execute(expression, EvalConfiguration.DecimalConfiguration)}**\n" +
-                  $"> Evaluated expression: `{expression}`"
+    public Task MathCalcAsync([Summary(description: "Math expression to evaluate.")] string expression) {
+        return RespondAsync(
+            $"Result: **{Evaluator.Execute(expression, EvalConfiguration.DecimalConfiguration)}**\n" +
+            $"> Evaluated expression: `{expression}`"
         );
+    }
 }

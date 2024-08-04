@@ -15,32 +15,34 @@ public partial class MessageAppModule : InteractionModuleBase<SocketInteractionC
     [UsedImplicitly]
     public async Task StealEmojiAsync(IMessage message) {
         if (message is not IUserMessage userMessage) {
-            await RespondAsync(text: "Can't steal emoji from non-user messages!");
+            await RespondAsync("Can't steal emoji from non-user messages!");
             return;
         }
 
         var content = userMessage.Content;
 
         if (!content.StartsWith('<') || !content.EndsWith('>')) {
-            await RespondAsync(text: "Single emoji message is required!");
+            await RespondAsync("Single emoji message is required!");
             return;
         }
 
         var contentRegexMatch = SingleEmojiRegex().Match(content);
 
         if (!contentRegexMatch.Success) {
-            await RespondAsync(text: "Emoji regex matching failed!");
+            await RespondAsync("Emoji regex matching failed!");
             return;
         }
 
         var emoteName = contentRegexMatch.Groups[1].Value;
         var emote = Emote.Parse(content);
 
-        await RespondWithModalAsync(new ModalBuilder()
-            .WithTitle("Emote Stealer")
-            .WithCustomId(ModalId.EmoteStealer.ToString())
-            .AddTextInput("Emote Name", ModalFieldId.EmoteName.ToString(), value: emoteName)
-            .AddTextInput("Emote Link", ModalFieldId.EmoteLink.ToString(), value: emote.Url)
-            .Build());
+        await RespondWithModalAsync(
+            new ModalBuilder()
+                .WithTitle("Emote Stealer")
+                .WithCustomId(ModalId.EmoteStealer.ToString())
+                .AddTextInput("Emote Name", ModalFieldId.EmoteName.ToString(), value: emoteName)
+                .AddTextInput("Emote Link", ModalFieldId.EmoteLink.ToString(), value: emote.Url)
+                .Build()
+        );
     }
 }

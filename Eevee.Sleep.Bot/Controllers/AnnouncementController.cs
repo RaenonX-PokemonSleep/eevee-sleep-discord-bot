@@ -7,11 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace Eevee.Sleep.Bot.Controllers;
 
 [ApiController]
-[Route("/game/announcement")]
-public class AnnouncementController() : ControllerBase {
-    [HttpGet("{Locale}", Name = "GetAnnouncements")]
-    public ActionResult<string> Get(string Locale) {
-        if (!Enum.TryParse<AnnouncementLanguage>(Locale, true, out var language)) {
+[Route("/game/announcement/{locale}")]
+public class AnnouncementController : ControllerBase {
+    [HttpGet("", Name = "GetAnnouncements")]
+    public ActionResult<string> Get(string locale) {
+        if (!Enum.TryParse<AnnouncementLanguage>(locale, true, out var language)) {
             return BadRequest();
         }
 
@@ -19,17 +19,17 @@ public class AnnouncementController() : ControllerBase {
         return Ok(announcement.Select(x => x.ToApiResponse()));
     }
 
-    [HttpGet("{Locale}/{AnnouncementId}", Name = "GetAnnouncementDetails")]
+    [HttpGet("{announcementId}", Name = "GetAnnouncementDetails")]
     public ActionResult<string> Get(
-        AnnouncementDetailController<OfficialSiteAnnouncementDetailModel> OfficialSiteAnnouncementDetailController,
-        string Locale, 
-        string AnnouncementId
+        AnnouncementDetailController<OfficialSiteAnnouncementDetailModel> officialSiteAnnouncementDetailController,
+        string locale,
+        string announcementId
     ) {
-        if (!Enum.TryParse<AnnouncementLanguage>(Locale, true, out var language)) {
+        if (!Enum.TryParse<AnnouncementLanguage>(locale, true, out var language)) {
             return BadRequest();
         }
 
-        var announcement = OfficialSiteAnnouncementDetailController.FindById(language, AnnouncementId);
+        var announcement = officialSiteAnnouncementDetailController.FindById(language, announcementId);
         if (announcement is null) {
             return NotFound();
         }

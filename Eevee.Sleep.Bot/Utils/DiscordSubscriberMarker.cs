@@ -8,7 +8,7 @@ public static class DiscordSubscriberMarker {
             await serverUser.AddRoleAsync(ConfigHelper.GetDiscordSubscriberRoleId());
         }
     }
-    
+
     public static async Task MarkUserUnsubscribed(IUser user) {
         if (user is IGuildUser serverUser) {
             await serverUser.RemoveRoleAsync(ConfigHelper.GetDiscordSubscriberRoleId());

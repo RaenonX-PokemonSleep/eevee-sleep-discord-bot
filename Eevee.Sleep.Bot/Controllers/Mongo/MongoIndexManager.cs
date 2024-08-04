@@ -21,7 +21,7 @@ public static class MongoIndexManager {
             OfficialSiteAnnouncementHistoryAnnounceIdIndex(),
             InGameAnnouncementIndexAnnounceIdIndex(),
             InGameAnnouncementDetailAnnounceIdIndex(),
-            InGameAnnouncementHistoryAnnounceIdIndex()
+            InGameAnnouncementHistoryAnnounceIdIndex(),
         };
     }
 
@@ -52,7 +52,7 @@ public static class MongoIndexManager {
 
     private static Task<string> ActivationPresetTagIndex() {
         var indexOptions = new CreateIndexOptions {
-            Unique = true
+            Unique = true,
         };
         var indexKeys = Builders<ActivationPresetModel>.IndexKeys
             .Ascending(data => data.Source)
@@ -64,7 +64,7 @@ public static class MongoIndexManager {
 
     private static Task<string> ActivationPresetUuidIndex() {
         var indexOptions = new CreateIndexOptions {
-            Unique = true
+            Unique = true,
         };
         var indexKeys = Builders<ActivationPresetModel>.IndexKeys
             .Ascending(data => data.Uuid);
@@ -88,7 +88,7 @@ public static class MongoIndexManager {
 
         return MongoConst.DiscordTrackedRoleCollection.Indexes.CreateOneAsync(indexModel);
     }
-    
+
     private static Task<string> OfficialSiteAnnouncementIndexAnnounceIdIndex() {
         var indexKeys = Builders<OfficialSiteAnnouncementIndexModel>.IndexKeys
             .Ascending(data => data.AnnouncementId);

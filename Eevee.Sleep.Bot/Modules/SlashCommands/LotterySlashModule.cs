@@ -14,8 +14,8 @@ public class LotterySlashModule : InteractionModuleBase<SocketInteractionContext
     [DefaultMemberPermissions(GuildPermission.Administrator)]
     [UsedImplicitly]
     public Task RoleBasedLotteryAsync(
-        [Summary(name: "role", description: "Lottery target role.")] SocketRole role,
-        [Summary(name: "count", description: "Count of members to pull.")] int count
+        [Summary("role", "Lottery target role.")] SocketRole role,
+        [Summary("count", "Count of members to pull.")] int count
     ) {
         try {
             var targetRoleId = role.Id;
@@ -29,7 +29,7 @@ public class LotterySlashModule : InteractionModuleBase<SocketInteractionContext
                 .ToArray();
 
             return RespondAsync(
-                text: string.Join(" ", result.Select(x => MentionUtils.MentionUser(x.Id))),
+                string.Join(" ", result.Select(x => MentionUtils.MentionUser(x.Id))),
                 embed: DiscordMessageMakerForLottery.MakeLotteryResult(targetRoleId, count, result)
             );
         } catch (ArgumentException e) {

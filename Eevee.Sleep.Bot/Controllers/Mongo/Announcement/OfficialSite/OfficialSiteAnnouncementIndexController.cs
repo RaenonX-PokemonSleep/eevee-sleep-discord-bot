@@ -12,13 +12,17 @@ public static class OfficialSiteAnnouncementIndexController {
             return Task.CompletedTask;
         }
 
-        var models = model.Select(index => new ReplaceOneModel<OfficialSiteAnnouncementIndexModel>(
-            Builders<OfficialSiteAnnouncementIndexModel>.Filter.Where(x => x.AnnouncementId == index.AnnouncementId),
-            index
-        ) {
-            IsUpsert = true
-        }).ToList();
-        
+        var models = model.Select(
+            index => new ReplaceOneModel<OfficialSiteAnnouncementIndexModel>(
+                Builders<OfficialSiteAnnouncementIndexModel>.Filter.Where(
+                    x => x.AnnouncementId == index.AnnouncementId
+                ),
+                index
+            ) {
+                IsUpsert = true,
+            }
+        ).ToList();
+
         return MongoConst.OfficialSiteAnnouncementIndexCollection.BulkWriteAsync(models);
     }
 

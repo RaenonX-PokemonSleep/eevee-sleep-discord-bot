@@ -18,16 +18,16 @@ public static class DiscordMessageMakerForRoleChange {
         ButtonId buttonId
     ) {
         var builder = new ComponentBuilder();
-        
+
         for (var idx = 0; idx < roles.Length; idx++) {
             var role = roles[idx];
-            
+
             builder.WithButton(
-                label: (idx + 1).ToString(),
-                customId: ButtonInteractionInfoSerializer.Serialize(
+                (idx + 1).ToString(),
+                ButtonInteractionInfoSerializer.Serialize(
                     new ButtonInteractionInfo {
                         ButtonId = buttonId,
-                        CustomId = role.RoleId
+                        CustomId = role.RoleId,
                     }
                 )
             );
@@ -47,12 +47,12 @@ public static class DiscordMessageMakerForRoleChange {
             .WithAuthor(user)
             .WithTitle("Your owned roles")
             .AddField(
-                name: "Roles before change",
-                value: previousRoleIds.MentionAllRoles()
+                "Roles before change",
+                previousRoleIds.MentionAllRoles()
             )
             .AddField(
-                name: "Roles after change",
-                value: currentRoleIds.MentionAllRoles()
+                "Roles after change",
+                currentRoleIds.MentionAllRoles()
             )
             .WithCurrentTimestamp()
             .Build();
@@ -64,9 +64,9 @@ public static class DiscordMessageMakerForRoleChange {
             .WithAuthor(user)
             .WithTitle("Your owned roles")
             .AddField(
-                name: "Roles",
-                value: roleIds.MentionAllRoles(),
-                inline: true
+                "Roles",
+                roleIds.MentionAllRoles(),
+                true
             )
             .WithCurrentTimestamp()
             .Build();
@@ -93,13 +93,15 @@ public static class DiscordMessageMakerForRoleChange {
         return new EmbedBuilder()
             .WithColor(color)
             .WithTitle(message)
-            .AddField("Role", MentionUtils.MentionRole(roleId), inline: true)
-            .AddField("Role owner count", roleOwnedUserCount, inline: true)
-            .AddField("Currently tracked roles", DiscordTrackedRoleController
-                .FindAllTrackedRoles()
-                .Select(x => x.RoleId)
-                .ToArray()
-                .MentionAllRoles()
+            .AddField("Role", MentionUtils.MentionRole(roleId), true)
+            .AddField("Role owner count", roleOwnedUserCount, true)
+            .AddField(
+                "Currently tracked roles",
+                DiscordTrackedRoleController
+                    .FindAllTrackedRoles()
+                    .Select(x => x.RoleId)
+                    .ToArray()
+                    .MentionAllRoles()
             )
             .WithCurrentTimestamp()
             .Build();

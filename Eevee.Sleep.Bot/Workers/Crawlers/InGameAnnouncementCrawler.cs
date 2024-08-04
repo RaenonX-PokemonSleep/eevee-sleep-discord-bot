@@ -9,17 +9,15 @@ namespace Eevee.Sleep.Bot.Workers.Crawlers;
 
 public class InGameAnnouncementCrawler(
     ILogger<InGameAnnouncementCrawler> logger,
-    AnnouncementDetailController<InGameAnnouncementDetailModel> InGameAnnouncementDetailController,
-    AnnouncementHistoryController<InGameAnnouncementDetailModel> InGameAnnouncementHistoryController
-) : IAnnoucementCrawler {
-    private const int MAX_RETRY_COUNT = 3;
-
+    AnnouncementDetailController<InGameAnnouncementDetailModel> detailController,
+    AnnouncementHistoryController<InGameAnnouncementDetailModel> historyController
+) : IAnnouncementCrawler {
     private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(10);
 
     // Used to run only one process when called by multiple workers at the same time.
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
-    private static readonly Dictionary<string, AnnouncementLanguage> Urls = new(){
+    private static readonly Dictionary<string, AnnouncementLanguage> Urls = new() {
         { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/1/list_0_0.json", AnnouncementLanguage.JP },
         { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/1/list_1_0.json", AnnouncementLanguage.JP },
         { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/1/list_2_0.json", AnnouncementLanguage.JP },
@@ -28,7 +26,7 @@ public class InGameAnnouncementCrawler(
         { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/2/list_2_0.json", AnnouncementLanguage.EN },
         { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/8/list_0_0.json", AnnouncementLanguage.ZH },
         { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/8/list_1_0.json", AnnouncementLanguage.ZH },
-        { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/8/list_2_0.json", AnnouncementLanguage.ZH }
+        { "https://view.sleep.pokemon.co.jp/news/news_list/data/36922246/8/list_2_0.json", AnnouncementLanguage.ZH },
     };
 
     public async Task ExecuteAsync(int retryCount = 0) {
@@ -37,8 +35,10 @@ public class InGameAnnouncementCrawler(
         }
 
         try {
-            var indexTasks = Urls.Select(async url => (await JsonDocumentFetcher<IEnumerable<InGameAnnouncementIndexResponse>>.FetchAsync(url.Key))
-                .Select(x => x.ToModel(url.Key, url.Value))
+            var indexTasks = Urls.Select(
+                async url =>
+                    (await JsonDocumentFetcher<IEnumerable<InGameAnnouncementIndexResponse>>.FetchAsync(url.Key))
+                    .Select(x => x.ToModel(url.Key, url.Value))
             );
             var indexes = (await Task.WhenAll(indexTasks)).SelectMany(x => x);
             var updatedIndexes = await InGameAnnouncementIndexController.BulkUpsert([..indexes]);
@@ -46,19 +46,21 @@ public class InGameAnnouncementCrawler(
             var detailTasks = updatedIndexes
                 .AsParallel()
                 .WithDegreeOfParallelism(5)
-                .Select(async index => (await JsonDocumentFetcher<InGameAnnouncementDetailResponse>.FetchAsync(index.Url))
-                    .ToModel(index.Url, index.Language)
+                .Select(
+                    async index =>
+                        (await JsonDocumentFetcher<InGameAnnouncementDetailResponse>.FetchAsync(index.Url))
+                        .ToModel(index.Url, index.Language)
                 );
             var details = await Task.WhenAll(detailTasks);
-            await InGameAnnouncementDetailController.BulkUpsert([..details]);
-            await InGameAnnouncementHistoryController.BulkInsert([..details]);
+            await detailController.BulkUpsert([..details]);
+            await historyController.BulkInsert([..details]);
 
             retryCount = 0;
         } catch (DocumentProcessingException e) {
             retryCount++;
             logger.LogError("{Message} Retries: {RetryCount}", e.Message, retryCount);
 
-            if (retryCount >= MAX_RETRY_COUNT) {
+            if (retryCount >= IAnnouncementCrawler.MaxRetryCount) {
                 logger.LogError("Failed to get in-game news. Retry count exceeded.");
                 throw new MaxAttemptExceededException("Failed to get in-game news. Retry count exceeded.", e);
             }

@@ -17,7 +17,7 @@ public record ActivationPresetModel {
 
     [UsedImplicitly]
     public required string Name { get; init; }
-    
+
     [UsedImplicitly]
     public required Dictionary<string, bool> Activation { get; init; }
 

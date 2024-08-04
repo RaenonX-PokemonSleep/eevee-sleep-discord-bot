@@ -15,13 +15,15 @@ public record OfficialSiteAnnouncementDetailModel : AnnouncementMetaModel {
     [UsedImplicitly]
     public required DateOnly OriginalUpdated { get; init; }
 
-    public AnnouncementDetailResponse ToApiResponse() => new() {
-        Title = Title,
-        OfficialLink = Url,
-        LastUpdated = new() {
-            Official = OriginalUpdated.ToDateTime(new TimeOnly(0), DateTimeKind.Utc),
-            Server = RecordUpdatedUtc
-        },
-        Content = Content
-    };
+    public AnnouncementDetailResponse ToApiResponse() {
+        return new AnnouncementDetailResponse {
+            Title = Title,
+            OfficialLink = Url,
+            LastUpdated = new AnnouncementLastUpdatedResponse {
+                Official = OriginalUpdated.ToDateTime(new TimeOnly(0), DateTimeKind.Utc),
+                Server = RecordUpdatedUtc,
+            },
+            Content = Content,
+        };
+    }
 }

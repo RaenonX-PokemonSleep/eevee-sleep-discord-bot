@@ -13,6 +13,7 @@ public static class LogHelper {
         builder => builder.AddSimpleConsole(LoggingConfigureAction)
     );
 
-    public static ILogger CreateLogger(Type @class) =>
-        Factory.CreateLogger(@class.FullName ?? @class.Assembly.Location);
+    public static ILogger CreateLogger(Type @class) {
+        return Factory.CreateLogger(@class.FullName ?? @class.Assembly.Location);
+    }
 }

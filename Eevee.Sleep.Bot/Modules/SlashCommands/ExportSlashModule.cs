@@ -14,7 +14,7 @@ public class ExportSlashModule : InteractionModuleBase<SocketInteractionContext>
     [DefaultMemberPermissions(GuildPermission.Administrator)]
     [UsedImplicitly]
     public Task ExportRoleAsync(
-        [Summary(name: "role", description: "Export target role.")] SocketRole role
+        [Summary("role", "Export target role.")] SocketRole role
     ) {
         try {
             var targetRoleId = role.Id;
@@ -26,15 +26,17 @@ public class ExportSlashModule : InteractionModuleBase<SocketInteractionContext>
                 .ToArray();
 
             return RespondWithFileAsync(
-                fileStream: new MemoryStream(Encoding.UTF8.GetBytes(
-                    string.Join(
-                        "\n",
-                        string.Join(",", "ID", "Username", "Display Name"),
-                        result.Select(x => string.Join(",", x.Id, x.Username, x.DisplayName)).MergeLines()
+                new MemoryStream(
+                    Encoding.UTF8.GetBytes(
+                        string.Join(
+                            "\n",
+                            string.Join(",", "ID", "Username", "Display Name"),
+                            result.Select(x => string.Join(",", x.Id, x.Username, x.DisplayName)).MergeLines()
+                        )
                     )
-                )),
-                fileName: $"{targetRoleId}.csv",
-                text: $"{result.Length} results."
+                ),
+                $"{targetRoleId}.csv",
+                $"{result.Length} results."
             );
         } catch (ArgumentException e) {
             return RespondAsync(e.Message, ephemeral: true);

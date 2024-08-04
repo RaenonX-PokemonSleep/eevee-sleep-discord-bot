@@ -48,6 +48,6 @@ public static class StringExtensions {
     }
 
     public static int ToInt(this string str, int defaultValue = 0) {
-        return int.TryParse(str, out int val) ? val : defaultValue;
+        return int.TryParse(str, out var val) ? val : defaultValue;
     }
 }

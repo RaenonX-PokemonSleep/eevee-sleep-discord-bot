@@ -1,33 +1,31 @@
 using System.Text.Json;
 using Eevee.Sleep.Bot.Exceptions;
+using Eevee.Sleep.Bot.Modules;
 
 namespace Eevee.Sleep.Bot.Workers.Scrapers;
 
-static class JsonDocumentFetcher<T> {
-    private static readonly HttpClient client = new() {
-        Timeout = TimeSpan.FromSeconds(120)
-    };
-    
+internal static class JsonDocumentFetcher<T> {
     public static async Task<T> FetchAsync(string url) {
         try {
-            var response = await client.GetAsync(url);
+            var response = await HttpModule.Client.GetAsync(url);
             response.EnsureSuccessStatusCode();
-            
+
             var content = await response.Content.ReadAsStringAsync();
             var model = JsonSerializer.Deserialize<T>(content) ?? throw new FetchDocumentFailedException(
-                    message: "Failed to fetch document.",
-                    context: new Dictionary<string, string?> {
-                        { "url", url },
-                        { "status", response.StatusCode.ToString()}
-                    });
+                "Failed to fetch document.",
+                new Dictionary<string, string?> {
+                    { "url", url },
+                    { "status", response.StatusCode.ToString() },
+                }
+            );
 
             return model;
         } catch (Exception e) {
             throw new FetchDocumentFailedException(
-                message: "Failed to fetch document.",
-                context: new Dictionary<string, string?> {
+                "Failed to fetch document.",
+                new Dictionary<string, string?> {
                     { "url", url },
-                    { "exception", e.Message }
+                    { "exception", e.Message },
                 }
             );
         }

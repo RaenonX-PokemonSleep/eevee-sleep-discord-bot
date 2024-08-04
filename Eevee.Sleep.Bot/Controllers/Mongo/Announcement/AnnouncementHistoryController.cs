@@ -8,7 +8,7 @@ public class AnnouncementHistoryController<T>(
 ) where T : AnnouncementMetaModel {
     private const int MaxHistoryCount = 3;
 
-    public async Task Insert(T model) {
+    private async Task Insert(T model) {
         using var session = await MongoConst.Client.StartSessionAsync();
         session.StartTransaction();
 
@@ -28,6 +28,7 @@ public class AnnouncementHistoryController<T>(
                     Builders<T>.Filter.Where(x => x.AnnouncementId == oldestRecord.AnnouncementId)
                 );
             }
+
             await session.CommitTransactionAsync();
         } catch (Exception) {
             await session.AbortTransactionAsync();

@@ -4,9 +4,9 @@ using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Extensions;
 
-public static class IMongoCollectionExtensions {
+public static class MongoCollectionExtensions {
     public static IEnumerable<T> FindAllByLanguage<T>(
-        this IMongoCollection<T> collection, 
+        this IMongoCollection<T> collection,
         AnnouncementLanguage language
     ) where T : AnnouncementMetaModel {
         return collection.Find(

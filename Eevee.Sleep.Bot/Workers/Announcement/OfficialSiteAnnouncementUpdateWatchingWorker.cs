@@ -1,4 +1,4 @@
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
@@ -10,16 +10,12 @@ using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Workers.Announcement;
 
-public class OfficialSiteAnnouncementUpdateWatchingWorker: AnnouncementUpdateWatchingWorker<OfficialSiteAnnouncementDetailModel> {
-    private readonly DiscordSocketClient _client;
-
-    public OfficialSiteAnnouncementUpdateWatchingWorker(
-        OfficialSiteAnnouncementCrawler crawler,
-        DiscordSocketClient client,
-        ILogger<OfficialSiteAnnouncementUpdateWatchingWorker> logger
-    ) : base(crawler, client, logger) {
-        _client = client;
-    }
+public class OfficialSiteAnnouncementUpdateWatchingWorker(
+    OfficialSiteAnnouncementCrawler crawler,
+    DiscordSocketClient client,
+    ILogger<OfficialSiteAnnouncementUpdateWatchingWorker> logger
+) : AnnouncementUpdateWatchingWorker<OfficialSiteAnnouncementDetailModel>(crawler, client, logger) {
+    private readonly DiscordSocketClient _client = client;
 
     protected override IMongoCollection<OfficialSiteAnnouncementDetailModel> GetMongoCollection() {
         return MongoConst.OfficialSiteAnnouncementDetailCollection;
@@ -38,9 +34,6 @@ public class OfficialSiteAnnouncementUpdateWatchingWorker: AnnouncementUpdateWat
         AnnouncementLanguage language,
         Embed embed
     ) {
-        return _client.SendMessageInOfficialSiteAnnouncementNoticeChannelAsync(
-            message: message,
-            embed: embed
-        );
+        return _client.SendMessageInOfficialSiteAnnouncementNoticeChannelAsync(message, embed);
     }
 }

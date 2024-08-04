@@ -7,16 +7,18 @@ using Eevee.Sleep.Bot.Workers.Crawlers;
 namespace Eevee.Sleep.Bot.Workers.Announcement;
 
 public abstract class AnnouncementCrawlingWorker(
-    IAnnoucementCrawler crawler,
+    IAnnouncementCrawler crawler,
     DiscordSocketClient client,
     ILogger<AnnouncementCrawlingWorker> logger
 ) : BackgroundService {
-    private readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(60);
-    private readonly CancellationTokenSource CancellationTokenSource = new();
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly TimeSpan _checkInterval = TimeSpan.FromSeconds(60);
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
         logger.LogInformation("Starting in-game announcement update crawler.");
-        cancellationToken.Register(() => logger.LogInformation("Stopping in-game announcement update crawler: cancellation token received."));
+        cancellationToken.Register(
+            () => logger.LogInformation("Stopping in-game announcement update crawler: cancellation token received.")
+        );
 
         while (!cancellationToken.IsCancellationRequested) {
             logger.LogInformation("Checking in-game announcement updates.");
@@ -27,11 +29,11 @@ public abstract class AnnouncementCrawlingWorker(
                 await client.SendMessageInAdminAlertChannel(
                     embed: DiscordMessageMakerForAnnouncement.MakeDocumentProcessingErrorMessage(e.InnerException)
                 );
-                CancellationTokenSource.Cancel();
+                await _cancellationTokenSource.CancelAsync();
                 break;
             }
 
-            await Task.Delay(CheckInterval, cancellationToken);
+            await Task.Delay(_checkInterval, cancellationToken);
         }
     }
 }

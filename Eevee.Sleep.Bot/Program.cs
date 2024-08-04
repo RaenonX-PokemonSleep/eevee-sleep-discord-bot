@@ -17,7 +17,7 @@ var socketConfig = new DiscordSocketConfig {
         ~GatewayIntents.GuildScheduledEvents &
         ~GatewayIntents.GuildInvites &
         ~GatewayIntents.GuildPresences,
-    AlwaysDownloadUsers = true
+    AlwaysDownloadUsers = true,
 };
 
 var builder = WebApplication.CreateBuilder(args)
@@ -28,18 +28,26 @@ builder.Services.AddSingleton(socketConfig)
     .AddSingleton<DiscordSocketClient>()
     .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
     .AddSingleton<InteractionHandler>()
-    .AddSingleton(x => new AnnouncementDetailController<OfficialSiteAnnouncementDetailModel>(
-        MongoConst.OfficialSiteAnnouncementDetailCollection
-    ))
-    .AddSingleton(x => new AnnouncementHistoryController<OfficialSiteAnnouncementDetailModel>(
-        MongoConst.OfficialSiteAnnouncementHistoryCollection
-    ))
-    .AddSingleton(x => new AnnouncementDetailController<InGameAnnouncementDetailModel>(
-        MongoConst.InGameAnnouncementDetailCollection
-    ))
-    .AddSingleton(x => new AnnouncementHistoryController<InGameAnnouncementDetailModel>(
-        MongoConst.InGameAnnouncementHistoryCollection
-    ))
+    .AddSingleton(
+        () => new AnnouncementDetailController<OfficialSiteAnnouncementDetailModel>(
+            MongoConst.OfficialSiteAnnouncementDetailCollection
+        )
+    )
+    .AddSingleton(
+        () => new AnnouncementHistoryController<OfficialSiteAnnouncementDetailModel>(
+            MongoConst.OfficialSiteAnnouncementHistoryCollection
+        )
+    )
+    .AddSingleton(
+        () => new AnnouncementDetailController<InGameAnnouncementDetailModel>(
+            MongoConst.InGameAnnouncementDetailCollection
+        )
+    )
+    .AddSingleton(
+        () => new AnnouncementHistoryController<InGameAnnouncementDetailModel>(
+            MongoConst.InGameAnnouncementHistoryCollection
+        )
+    )
     .AddSingleton<OfficialSiteAnnouncementCrawler>()
     .AddSingleton<InGameAnnouncementCrawler>()
     .AddHostedService<DiscordClientWorker>()

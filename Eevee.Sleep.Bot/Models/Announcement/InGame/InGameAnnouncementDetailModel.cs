@@ -5,6 +5,7 @@ namespace Eevee.Sleep.Bot.Models.Announcement.InGame;
 
 [BsonIgnoreExtraElements]
 public record InGameAnnouncementDetailModel : AnnouncementMetaModel {
+    [UsedImplicitly]
     public required string Text { get; init; }
 
     [UsedImplicitly]

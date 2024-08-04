@@ -12,21 +12,21 @@ public static class DetailScraper {
 
         if (string.IsNullOrWhiteSpace(date) || string.IsNullOrWhiteSpace(content)) {
             throw new ContentStructureChangedException(
-                message: "Date or content is empty. Failed to get detail.",
-                context: new Dictionary<string, string?> {
+                "Date or content is empty. Failed to get detail.",
+                new Dictionary<string, string?> {
                     { "title", index.Title },
                     { "url", index.Url },
                     { "language", index.Language.ToString() },
                     { "date", date },
                     { "content", content },
                     { "id", index.AnnouncementId },
-                    { "statusCode", document.StatusCode.ToString()}
+                    { "statusCode", document.StatusCode.ToString() },
                 }
             );
         }
 
         await Task.Delay(500);
-        return new OfficialSiteAnnouncementDetailModel() {
+        return new OfficialSiteAnnouncementDetailModel {
             AnnouncementId = index.AnnouncementId,
             Title = index.Title,
             Language = index.Language,
@@ -35,7 +35,7 @@ public static class DetailScraper {
             ContentHash = content.ToSha256Hash(),
             OriginalUpdated = DateOnly.Parse(date),
             RecordCreatedUtc = DateTime.UtcNow,
-            RecordUpdatedUtc = DateTime.UtcNow
+            RecordUpdatedUtc = DateTime.UtcNow,
         };
     }
 }

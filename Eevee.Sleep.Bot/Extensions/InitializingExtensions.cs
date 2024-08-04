@@ -14,14 +14,16 @@ public static class InitializingExtensions {
     }
 
     public static void AddCorsFromConfig(this IServiceCollection services) {
-        services.AddCors(options => {
-            options.AddDefaultPolicy(policy => {
-                var origin = ConfigHelper.GetAllowedOrigin();
-                Logger.LogInformation("CORS Origin: {Origin}", origin);
+        services.AddCors(
+            options => options.AddDefaultPolicy(
+                policy => {
+                    var origin = ConfigHelper.GetAllowedOrigin();
+                    Logger.LogInformation("CORS Origin: {Origin}", origin);
 
-                policy.AllowCredentials().AllowAnyHeader().WithOrigins(origin);
-            });
-        });
+                    policy.AllowCredentials().AllowAnyHeader().WithOrigins(origin);
+                }
+            )
+        );
     }
 
     public static async Task BootAsync(this IHost host) {

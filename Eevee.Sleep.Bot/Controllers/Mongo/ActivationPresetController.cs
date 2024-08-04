@@ -9,10 +9,12 @@ public static class ActivationPresetController {
         return MongoConst.AuthActivationPresetCollection
             .Find(x => x.Source == GlobalConst.SubscriptionSourceOfDiscord)
             .ToEnumerable()
-            .Select(x => new ActivationPresetRole {
-                RoleId = ulong.Parse(x.Tag),
-                Suspended = x.Suspended
-            })
+            .Select(
+                x => new ActivationPresetRole {
+                    RoleId = ulong.Parse(x.Tag),
+                    Suspended = x.Suspended,
+                }
+            )
             .ToHashSet();
     }
 }

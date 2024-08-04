@@ -1,5 +1,5 @@
-﻿namespace Eevee.Sleep.Bot.Enums; 
+﻿namespace Eevee.Sleep.Bot.Enums;
 
 public enum ModalId {
-    EmoteStealer
+    EmoteStealer,
 }

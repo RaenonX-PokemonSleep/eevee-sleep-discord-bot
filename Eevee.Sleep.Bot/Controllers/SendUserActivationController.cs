@@ -22,41 +22,45 @@ public class SendUserActivationController(
             activationMessages.Length
         );
 
-        Task.WhenAll(activationMessages.Select(async x => {
-            var userId = Convert.ToUInt64(x.UserId);
-            var user = await client.GetUserAsync(userId);
+        Task.WhenAll(
+            activationMessages.Select(
+                async x => {
+                    var userId = Convert.ToUInt64(x.UserId);
+                    var user = await client.GetUserAsync(userId);
 
-            if (user is null) {
-                logger.LogInformation(
-                    "Failed to send activation message to {UserId} - User not found",
-                    x.UserId
-                );
-                await client.SendMessageInAdminAlertChannel(
-                    $"Failed to send activation message to {MentionUtils.MentionUser(userId)} - User not found"
-                );
-                return;
-            }
+                    if (user is null) {
+                        logger.LogInformation(
+                            "Failed to send activation message to {UserId} - User not found",
+                            x.UserId
+                        );
+                        await client.SendMessageInAdminAlertChannel(
+                            $"Failed to send activation message to {MentionUtils.MentionUser(userId)} - User not found"
+                        );
+                        return;
+                    }
 
-            logger.LogInformation(
-                "Activation message sent to {UserId} with link {ActivationLink} - requested via API",
-                x.UserId,
-                x.Link
-            );
-            // Prevent accidentally sending messages to the users
-            if (env.IsProduction()) {
-                await user.SendMessageAsync(
-                    x.Link,
-                    embeds: DiscordMessageMakerForActivation.MakeActivationNote()
-                );
-            }
+                    logger.LogInformation(
+                        "Activation message sent to {UserId} with link {ActivationLink} - requested via API",
+                        x.UserId,
+                        x.Link
+                    );
+                    // Prevent accidentally sending messages to the users
+                    if (env.IsProduction()) {
+                        await user.SendMessageAsync(
+                            x.Link,
+                            embeds: DiscordMessageMakerForActivation.MakeActivationNote()
+                        );
+                    }
 
-            await Task.WhenAll(
-                DiscordSubscriberMarker.MarkUserSubscribed(user),
-                client.SendMessageInAdminAlertChannel(
-                    $"Activation message sent to {MentionUtils.MentionUser(userId)} with [link]({x.Link}) - requested via API"
-                )
-            );
-        }));
+                    await Task.WhenAll(
+                        DiscordSubscriberMarker.MarkUserSubscribed(user),
+                        client.SendMessageInAdminAlertChannel(
+                            $"Activation message sent to {MentionUtils.MentionUser(userId)} with [link]({x.Link}) - requested via API"
+                        )
+                    );
+                }
+            )
+        );
 
         return Ok();
     }

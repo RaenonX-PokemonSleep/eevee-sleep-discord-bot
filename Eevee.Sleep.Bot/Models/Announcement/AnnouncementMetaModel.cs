@@ -22,7 +22,7 @@ public record AnnouncementMetaModel {
 
     [UsedImplicitly]
     public required DateTime RecordCreatedUtc { get; init; }
-    
+
     [UsedImplicitly]
     public required DateTime RecordUpdatedUtc { get; init; }
 }

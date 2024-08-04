@@ -59,7 +59,7 @@ public static class DiscordMessageMakerForActivation {
                     - 갑자기 구독으로 인한 혜택을 받을 수 없다면 <@503484431437398016> 로 연락해주세요.
                     """
                 )
-                .Build()
+                .Build(),
         ];
     }
 

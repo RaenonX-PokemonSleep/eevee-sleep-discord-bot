@@ -16,7 +16,7 @@ public static class ActivationController {
 
         var earliestGeneration = new[] {
             (await removeActivationKeyTask)?.GeneratedAt,
-            (await removeActivationDataTask)?.GeneratedAt
+            (await removeActivationDataTask)?.GeneratedAt,
         }.Min();
 
         if (earliestGeneration is null) {

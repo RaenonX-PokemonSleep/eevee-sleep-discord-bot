@@ -13,13 +13,15 @@ public class AnnouncementDetailController<T>(
             return Task.CompletedTask;
         }
 
-        var details = model.Select(detail => new ReplaceOneModel<T>(
-            Builders<T>.Filter.Where(x => x.AnnouncementId == detail.AnnouncementId),
-            detail
-        ) {
-            IsUpsert = true
-        });
-        
+        var details = model.Select(
+            detail => new ReplaceOneModel<T>(
+                Builders<T>.Filter.Where(x => x.AnnouncementId == detail.AnnouncementId),
+                detail
+            ) {
+                IsUpsert = true,
+            }
+        );
+
         return collection.BulkWriteAsync(details);
     }
 

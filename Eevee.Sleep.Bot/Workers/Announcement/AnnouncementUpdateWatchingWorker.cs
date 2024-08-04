@@ -11,10 +11,10 @@ using MongoDB.Driver;
 namespace Eevee.Sleep.Bot.Workers.Announcement;
 
 public abstract class AnnouncementUpdateWatchingWorker<T>(
-    IAnnoucementCrawler crawler,
+    IAnnouncementCrawler crawler,
     DiscordSocketClient client,
     ILogger<AnnouncementUpdateWatchingWorker<T>> logger
-) : BackgroundService where T : AnnouncementMetaModel{
+) : BackgroundService where T : AnnouncementMetaModel {
     protected abstract IMongoCollection<T> GetMongoCollection();
 
     protected abstract ulong? GetNotifyRoleId(AnnouncementLanguage language);
@@ -35,38 +35,44 @@ public abstract class AnnouncementUpdateWatchingWorker<T>(
             await crawler.ExecuteAsync();
         } catch (MaxAttemptExceededException e) {
             await client.SendMessageInAdminAlertChannel(
-                embed: DiscordMessageMakerForAnnouncement.MakeUpdateWachingWorkerInitializeFailedMessage(e.InnerException)
+                embed: DiscordMessageMakerForAnnouncement.MakeUpdateWachingWorkerInitializeFailedMessage(
+                    e.InnerException
+                )
             );
         }
 
         var options = new ChangeStreamOptions { FullDocument = ChangeStreamFullDocumentOption.UpdateLookup };
         var pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<T>>()
-            .Match(x =>
-                x.OperationType == ChangeStreamOperationType.Update ||
-                x.OperationType == ChangeStreamOperationType.Modify ||
-                x.OperationType == ChangeStreamOperationType.Insert
+            .Match(
+                x =>
+                    x.OperationType == ChangeStreamOperationType.Update ||
+                    x.OperationType == ChangeStreamOperationType.Modify ||
+                    x.OperationType == ChangeStreamOperationType.Insert
             );
 
         using var cursor = await GetMongoCollection()
             .WatchAsync(pipeline, options, cancellationToken);
 
-        await cursor.ForEachAsync(async change => {
-            var detail = change.FullDocument;
+        await cursor.ForEachAsync(
+            async change => {
+                var detail = change.FullDocument;
 
-            logger.LogInformation(
-                "Received in-game announcement detail update in {Language} ({Title} / #{Id})",
-                detail.Language,
-                detail.Title,
-                detail.AnnouncementId
-            );
+                logger.LogInformation(
+                    "Received in-game announcement detail update in {Language} ({Title} / #{Id})",
+                    detail.Language,
+                    detail.Title,
+                    detail.AnnouncementId
+                );
 
-            var notifyRole = GetNotifyRoleId(detail.Language);
+                var notifyRole = GetNotifyRoleId(detail.Language);
 
-            await SendMessageInAnnouncementNoticeChannelAsync(
-                message: notifyRole is not null ? MentionUtils.MentionRole(notifyRole.Value) : null,
-                language: detail.Language,
-                embed: MakeAnnouncementUpdateMessage(detail)
-            );
-        }, cancellationToken);
+                await SendMessageInAnnouncementNoticeChannelAsync(
+                    notifyRole is not null ? MentionUtils.MentionRole(notifyRole.Value) : null,
+                    detail.Language,
+                    MakeAnnouncementUpdateMessage(detail)
+                );
+            },
+            cancellationToken
+        );
     }
 }
