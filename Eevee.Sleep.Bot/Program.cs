@@ -2,13 +2,13 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
-using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement;
+using Eevee.Sleep.Bot.Controllers.Mongo.Announcement;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Handlers;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement.InGame;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement.Officialsite;
+using Eevee.Sleep.Bot.Models.Announcement.InGame;
+using Eevee.Sleep.Bot.Models.Announcement.Officialsite;
 using Eevee.Sleep.Bot.Workers;
-using Eevee.Sleep.Bot.Workers.InGameAnnouncement;
+using Eevee.Sleep.Bot.Workers.Announcement;
 using Eevee.Sleep.Bot.Workers.Crawlers;
 
 var socketConfig = new DiscordSocketConfig {

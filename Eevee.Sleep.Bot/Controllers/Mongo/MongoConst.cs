@@ -1,7 +1,7 @@
 ﻿using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement.InGame;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement.Officialsite;
+using Eevee.Sleep.Bot.Models.Announcement.InGame;
+using Eevee.Sleep.Bot.Models.Announcement.Officialsite;
 using Eevee.Sleep.Bot.Utils;
 using MongoDB.Driver;
 

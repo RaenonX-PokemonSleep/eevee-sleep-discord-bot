@@ -1,10 +1,10 @@
 using AngleSharp.Common;
-using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement;
-using Eevee.Sleep.Bot.Controllers.Mongo.InGameAnnouncement.Officialsite;
+using Eevee.Sleep.Bot.Controllers.Mongo.Announcement;
+using Eevee.Sleep.Bot.Controllers.Mongo.Announcement.Officialsite;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
-using Eevee.Sleep.Bot.Models.InGameAnnouncement.Officialsite;
-using Eevee.Sleep.Bot.Workers.Scrapers.InGameAnnouncement.Officialsite;
+using Eevee.Sleep.Bot.Models.Announcement.Officialsite;
+using Eevee.Sleep.Bot.Workers.Scrapers.Announcement.Officialsite;
 
 namespace Eevee.Sleep.Bot.Workers.Crawlers;
 
@@ -19,10 +19,10 @@ public class OfficialsiteAnnouncementCrawler(
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
     private static async Task<IEnumerable<OfficialsiteAnnouncementIndexModel>> GetIndexes() {
-        Dictionary<string, InGameAnnouncementLanguage> BaseUrls = new(){
-            { "https://www.pokemonsleep.net/news", InGameAnnouncementLanguage.JP },
-            { "https://www.pokemonsleep.net/en/news", InGameAnnouncementLanguage.EN },
-            { "https://www.pokemonsleep.net/zh/news", InGameAnnouncementLanguage.ZH },
+        Dictionary<string, AnnouncementLanguage> BaseUrls = new(){
+            { "https://www.pokemonsleep.net/news", AnnouncementLanguage.JP },
+            { "https://www.pokemonsleep.net/en/news", AnnouncementLanguage.EN },
+            { "https://www.pokemonsleep.net/zh/news", AnnouncementLanguage.ZH },
         };
 
         var tasks = BaseUrls.Select(dict => IndexScraper.GetAllPagesAsync(dict.Key, dict.Value)).ToArray();
