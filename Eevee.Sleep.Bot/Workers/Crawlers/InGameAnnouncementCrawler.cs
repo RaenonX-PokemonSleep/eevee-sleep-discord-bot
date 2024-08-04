@@ -34,7 +34,7 @@ public class InGameAnnouncementCrawler(
     public async Task ExecuteAsync(int retryCount = 0) {
         if (retryCount == 0) {
             await Semaphore.WaitAsync();
-        } 
+        }
 
         try {
             var indexTasks = Urls.Select(async url => (await JsonDocumentFetcher<IEnumerable<InGameAnnouncementIndexResponse>>.FetchAsync(url.Key))

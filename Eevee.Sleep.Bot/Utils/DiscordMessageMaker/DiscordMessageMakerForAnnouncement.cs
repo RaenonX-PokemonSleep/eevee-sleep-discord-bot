@@ -32,7 +32,7 @@ public static class DiscordMessageMakerForAnnouncement {
     public static Embed MakeOfficialsiteAnnouncementUpdateMessage(OfficialsiteAnnouncementDetailModel detail) {
         return new EmbedBuilder()
             .WithColor(Colors.Info)
-            .WithTitle("In-game Announcement Updated!")
+            .WithTitle("Official Website Announcement Updated!")
             .AddField("Title", detail.Title)
             .AddField("Announcement ID", detail.AnnouncementId)
             .AddField("Url", detail.Url)

@@ -1,4 +1,5 @@
 using Eevee.Sleep.Bot.Enums;
+using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models.Announcement.InGame;
 using MongoDB.Driver;
 
@@ -36,8 +37,6 @@ public static class InGameAnnouncementIndexController {
     }
 
     public static IEnumerable<InGameAnnouncementIndexModel> FindAllByLanguage(AnnouncementLanguage language) {
-        return MongoConst.InGameAnnouncementIndexCollection.Find(
-            Builders<InGameAnnouncementIndexModel>.Filter.Where(x => x.Language == language)
-        ).ToEnumerable();
+        return MongoConst.InGameAnnouncementIndexCollection.FindAllByLanguage(language);
     }
 }

@@ -4,7 +4,7 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace Eevee.Sleep.Bot.Models.Announcement.Officialsite;
 
 [BsonIgnoreExtraElements]
-public record OfficialsiteAnnouncementIndexModel: AnnouncementMetaModel {
+public record OfficialsiteAnnouncementIndexModel : AnnouncementMetaModel {
     public AnnouncementIndexResponse ToApiResponse() => new() {
         Title = Title,
         OfficialLink = Url,

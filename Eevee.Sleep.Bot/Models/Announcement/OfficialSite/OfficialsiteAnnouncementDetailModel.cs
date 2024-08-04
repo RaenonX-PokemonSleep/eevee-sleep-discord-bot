@@ -5,7 +5,7 @@ using MongoDB.Bson.Serialization.Attributes;
 namespace Eevee.Sleep.Bot.Models.Announcement.Officialsite;
 
 [BsonIgnoreExtraElements]
-public record OfficialsiteAnnouncementDetailModel: AnnouncementMetaModel {
+public record OfficialsiteAnnouncementDetailModel : AnnouncementMetaModel {
     [UsedImplicitly]
     public required string Content { get; init; }
 
