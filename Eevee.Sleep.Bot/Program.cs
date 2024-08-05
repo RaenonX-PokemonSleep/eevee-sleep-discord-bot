@@ -29,22 +29,22 @@ builder.Services.AddSingleton(socketConfig)
     .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
     .AddSingleton<InteractionHandler>()
     .AddSingleton(
-        () => new AnnouncementDetailController<OfficialSiteAnnouncementDetailModel>(
+        new AnnouncementDetailController<OfficialSiteAnnouncementDetailModel>(
             MongoConst.OfficialSiteAnnouncementDetailCollection
         )
     )
     .AddSingleton(
-        () => new AnnouncementHistoryController<OfficialSiteAnnouncementDetailModel>(
+        new AnnouncementHistoryController<OfficialSiteAnnouncementDetailModel>(
             MongoConst.OfficialSiteAnnouncementHistoryCollection
         )
     )
     .AddSingleton(
-        () => new AnnouncementDetailController<InGameAnnouncementDetailModel>(
+        new AnnouncementDetailController<InGameAnnouncementDetailModel>(
             MongoConst.InGameAnnouncementDetailCollection
         )
     )
     .AddSingleton(
-        () => new AnnouncementHistoryController<InGameAnnouncementDetailModel>(
+        new AnnouncementHistoryController<InGameAnnouncementDetailModel>(
             MongoConst.InGameAnnouncementHistoryCollection
         )
     )
