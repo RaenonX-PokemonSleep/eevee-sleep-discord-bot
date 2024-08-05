@@ -33,7 +33,7 @@ public static class StringExtensions {
     }
 
     public static string MergeLines(this IEnumerable<string> lines) {
-        return StringHelper.MergeLines(lines);
+        return StringHelper.MergeLines(lines.ToArray());
     }
 
     public static string ToSha256Hash(this string value) {
@@ -48,6 +48,6 @@ public static class StringExtensions {
     }
 
     public static int ToInt(this string str, int defaultValue = 0) {
-        return int.TryParse(str, out int val) ? val : defaultValue;
+        return int.TryParse(str, out var val) ? val : defaultValue;
     }
 }

@@ -16,7 +16,9 @@ public static class GuildMemberLeftEventHandler {
             user.Id,
             user.Username
         );
-        var subscriptionDuration = await ActivationController.RemoveDiscordActivationAndGetSubscriptionDuration(user.Id.ToString());
+        var subscriptionDuration = await ActivationController.RemoveDiscordActivationAndGetSubscriptionDuration(
+            user.Id.ToString()
+        );
 
         if (subscriptionDuration is not null) {
             await client.SendMessageInAdminAlertChannel(

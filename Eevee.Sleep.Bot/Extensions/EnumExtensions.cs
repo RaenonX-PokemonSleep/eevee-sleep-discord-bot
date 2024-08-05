@@ -15,7 +15,7 @@ public static class EnumExtensions {
                 nameof(severity),
                 severity,
                 $"Unhandled Discord log severity: {severity}"
-            )
+            ),
         };
     }
 }

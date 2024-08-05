@@ -7,5 +7,7 @@ namespace Eevee.Sleep.Bot.Modules.SlashCommands;
 public class BotSlashModule : InteractionModuleBase<SocketInteractionContext> {
     [SlashCommand("ping", "Pings the bot and returns its latency.")]
     [UsedImplicitly]
-    public Task PingAsync() => RespondAsync(text: $"Bot Latency: {Context.Client.Latency} ms", ephemeral: true);
+    public Task PingAsync() {
+        return RespondAsync($"Bot Latency: {Context.Client.Latency} ms", ephemeral: true);
+    }
 }

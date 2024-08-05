@@ -10,7 +10,7 @@ public static class ButtonClickedHandler {
         SocketGuildUser user
     ) {
         await user.RemoveRolesAsync(
-            roleIds: DiscordTrackedRoleController
+            DiscordTrackedRoleController
                 .FindAllTrackedRoleIdsByRoleIds(user.Roles.Select(r => r.Id).ToArray())
                 .Select(r => r.RoleId)
         );

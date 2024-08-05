@@ -33,7 +33,7 @@ public static class GuildMemberUpdatedEventHandler {
         if (activeRoles.Count <= 0) {
             await client.SendMessageInAdminAlertChannel(
                 $"All roles to add to {MentionUtils.MentionUser(user.Id)} (@{user.Username}) are suspended",
-                embed: await DiscordMessageMakerForActivation.MakeUserSubscribed(user, rolesAdded, Colors.Info)
+                await DiscordMessageMakerForActivation.MakeUserSubscribed(user, rolesAdded, Colors.Info)
             );
             Logger.LogInformation(
                 "Skipped generating activation link due to role suspension for user {UserId} (@{UserName})",
@@ -50,7 +50,7 @@ public static class GuildMemberUpdatedEventHandler {
         if (string.IsNullOrEmpty(activationLink)) {
             await client.SendMessageInAdminAlertChannel(
                 $"Activation link failed to generate for user {MentionUtils.MentionUser(user.Id)} (@{user.Username})",
-                embed: await DiscordMessageMakerForActivation.MakeUserSubscribed(user, rolesAdded, Colors.Warning)
+                await DiscordMessageMakerForActivation.MakeUserSubscribed(user, rolesAdded, Colors.Warning)
             );
             Logger.LogWarning(
                 "Activation link failed to generate for user {UserId} (@{UserName})",
@@ -77,7 +77,7 @@ public static class GuildMemberUpdatedEventHandler {
                 await client.SendMessageInAdminAlertChannel(
                     $"Error occurred during activation link delivery to {MentionUtils.MentionUser(user.Id)}\n" +
                     $"> {activationLink}",
-                    embed: DiscordMessageMakerForError.MakeDiscordHttpException(e)
+                    DiscordMessageMakerForError.MakeDiscordHttpException(e)
                 );
             }
         }
@@ -89,8 +89,8 @@ public static class GuildMemberUpdatedEventHandler {
 
     private static async Task HandleRolesAdded(ulong userId, ulong[] addedRoles) {
         await DiscordRoleRecordController.AddRoles(
-            userId: userId,
-            roles: DiscordTrackedRoleController
+            userId,
+            DiscordTrackedRoleController
                 .FindAllTrackedRoleIdsByRoleIds(addedRoles)
                 .Select(x => x.RoleId)
                 .ToArray()
@@ -102,8 +102,10 @@ public static class GuildMemberUpdatedEventHandler {
         IReadOnlyCollection<ulong> roleIds,
         IUser user
     ) {
-        var subscriptionDuration = await ActivationController.RemoveDiscordActivationAndGetSubscriptionDuration(user.Id.ToString());
-        
+        var subscriptionDuration = await ActivationController.RemoveDiscordActivationAndGetSubscriptionDuration(
+            user.Id.ToString()
+        );
+
         await client.SendMessageInAdminAlertChannel(
             embed: await DiscordMessageMakerForActivation.MakeUserUnsubscribed(user, subscriptionDuration, roleIds)
         );

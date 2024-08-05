@@ -30,19 +30,33 @@ public static class DiscordExtensions {
 
     private static Task<IMessageChannel> GetInGameAnnouncementNoticeChannelsAsync(
         this IDiscordClient client,
-        InGameAnnoucementLanguage language
+        AnnouncementLanguage language
     ) {
         return client.GetMessageChannel(ConfigHelper.GetInGameAnnouncementNotificationChannelId(language));
     }
 
     public static async Task SendMessageInInGameAnnouncementNoticeChannelAsync(
         this IDiscordClient client,
-        InGameAnnoucementLanguage language,
+        AnnouncementLanguage language,
         string? message = null,
         Embed? embed = null,
         Embed[]? embeds = null
     ) {
         await (await client.GetInGameAnnouncementNoticeChannelsAsync(language))
+            .SendMessageAsync(message, embed: embed, embeds: embeds);
+    }
+
+    private static Task<IMessageChannel> GetOfficialSiteAnnouncementNoticeChannelsAsync(this IDiscordClient client) {
+        return client.GetMessageChannel(ConfigHelper.GetDiscordAdminAlertChannelId());
+    }
+
+    public static async Task SendMessageInOfficialSiteAnnouncementNoticeChannelAsync(
+        this IDiscordClient client,
+        string? message = null,
+        Embed? embed = null,
+        Embed[]? embeds = null
+    ) {
+        await (await client.GetOfficialSiteAnnouncementNoticeChannelsAsync())
             .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 

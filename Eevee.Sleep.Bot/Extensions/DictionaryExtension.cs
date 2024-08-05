@@ -6,13 +6,10 @@ namespace Eevee.Sleep.Bot.Extensions;
 public static class DictionaryExtensions {
     private static readonly JsonSerializerOptions Options = new() {
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-        WriteIndented = true
+        WriteIndented = true,
     };
-    
-    public static string ToJsonString<K, V>(this IDictionary<K, V?> dict) {
-        return JsonSerializer.Serialize(
-            value: dict,
-            options: Options
-        );
+
+    public static string ToJsonString<TK, TV>(this IDictionary<TK, TV?> dict) {
+        return JsonSerializer.Serialize(dict, Options);
     }
 }

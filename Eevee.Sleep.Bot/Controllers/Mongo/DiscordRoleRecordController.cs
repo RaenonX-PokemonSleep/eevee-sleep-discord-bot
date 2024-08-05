@@ -34,12 +34,14 @@ public static class DiscordRoleRecordController {
 
         return MongoConst.DiscordRoleRecordCollection.BulkWriteAsync(
             userIds
-                .Select(userId => new UpdateOneModel<RoleRecordModel>(
-                    Builders<RoleRecordModel>.Filter.Where(r => r.UserId == userId),
-                    Builders<RoleRecordModel>.Update.AddToSetEach(r => r.Roles, roles)
-                ) {
-                    IsUpsert = true
-                })
+                .Select(
+                    userId => new UpdateOneModel<RoleRecordModel>(
+                        Builders<RoleRecordModel>.Filter.Where(r => r.UserId == userId),
+                        Builders<RoleRecordModel>.Update.AddToSetEach(r => r.Roles, roles)
+                    ) {
+                        IsUpsert = true,
+                    }
+                )
                 .ToList()
         );
     }

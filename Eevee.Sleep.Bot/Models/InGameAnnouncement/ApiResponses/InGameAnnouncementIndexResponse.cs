@@ -1,3 +1,0 @@
-namespace Eevee.Sleep.Bot.Models.InGameAnnouncement.ApiResponses;
-
-public record InGameAnnouncementIndexResponse: InGameAnnouncementResponse;

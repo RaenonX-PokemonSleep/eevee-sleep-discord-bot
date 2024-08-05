@@ -9,11 +9,13 @@ public static class HttpRequestHelper {
     ) {
         var response = await Client.PostAsync(
             ConfigHelper.GetInternalApiGenerateActivation(),
-            new FormUrlEncodedContent(new Dictionary<string, string> {
-                { "token", ConfigHelper.GetInternalOutboundApiToken() },
-                { "roleIds", string.Join(",", roleIds) },
-                { "discordId", discordId }
-            })
+            new FormUrlEncodedContent(
+                new Dictionary<string, string> {
+                    { "token", ConfigHelper.GetInternalOutboundApiToken() },
+                    { "roleIds", string.Join(",", roleIds) },
+                    { "discordId", discordId },
+                }
+            )
         );
 
         return await response.Content.ReadAsStringAsync();

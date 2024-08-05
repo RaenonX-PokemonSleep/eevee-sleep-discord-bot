@@ -39,8 +39,8 @@ public class InteractionHandler(
     }
 
     private static Task OnInteractionExecuted(IInteractionContext context, IResult result) {
+        // Ignoring unknown command since it's possible to happen for follow-up modal interactions
         if (result.IsSuccess || result.Error == InteractionCommandError.UnknownCommand) {
-            // Ignoring unknown command since it's possible to happen for follow up modal interactions
             return Task.CompletedTask;
         }
 
@@ -132,11 +132,11 @@ public class InteractionHandler(
                 await ButtonClickedHandler.DisplayRoleButtonClicked(info, user);
 
                 await component.RespondAsync(
-                    StringHelper.MergeLines([
+                    StringHelper.MergeLines(
                         $"{MentionUtils.MentionRole(info.CustomId)} has been selected to display.",
                         "Ownership of the other tracked roles on Discord are removed. " +
                         "You can add them back using `/role add` or `/role display`."
-                    ]),
+                    ),
                     ephemeral: true
                 );
                 break;
@@ -151,11 +151,11 @@ public class InteractionHandler(
                 await ButtonClickedHandler.RemoveRoleButtonClicked(info, user);
 
                 await component.RespondAsync(
-                    StringHelper.MergeLines([
+                    StringHelper.MergeLines(
                         $"{MentionUtils.MentionRole(info.CustomId)} has been removed.",
                         "The actual ownership of the role is unaffected. " +
                         "You can add them back using `/role add` or `/role display`."
-                    ]),
+                    ),
                     ephemeral: true
                 );
                 break;

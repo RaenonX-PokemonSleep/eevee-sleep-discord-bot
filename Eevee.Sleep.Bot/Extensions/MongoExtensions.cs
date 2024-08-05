@@ -6,7 +6,6 @@ using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Extensions;
 
-
 public static class MongoExtensions {
     public static IMongoClient Initialize(this IMongoClient client) {
         RegisterConvention();
@@ -17,9 +16,9 @@ public static class MongoExtensions {
 
     private static void RegisterConvention() {
         ConventionRegistry.Register(
-            name: "CamelCaseConvention",
-            conventions: new ConventionPack { new CamelCaseElementNameConvention() },
-            filter: _ => true
+            "CamelCaseConvention",
+            new ConventionPack { new CamelCaseElementNameConvention() },
+            _ => true
         );
     }
 
