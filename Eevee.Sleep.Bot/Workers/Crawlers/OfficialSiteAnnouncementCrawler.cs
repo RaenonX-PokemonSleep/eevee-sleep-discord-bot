@@ -68,7 +68,7 @@ public class OfficialSiteAnnouncementCrawler(
     ) {
         var detailTasks = indexes
             .AsParallel()
-            .WithDegreeOfParallelism(5)
+            .WithDegreeOfParallelism(1)
             .Select(DetailScraper.GetAsync);
 
         return await Task.WhenAll(detailTasks);
