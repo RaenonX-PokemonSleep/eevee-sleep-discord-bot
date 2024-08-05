@@ -11,10 +11,8 @@ public static class DiscordMessageMakerForLottery {
             .WithColor(Colors.Info)
             .WithDescription(
                 StringHelper.MergeLines(
-                    [
-                        $"# {MentionUtils.MentionRole(roleId)} x {count}",
-                        members.Select(x => $"- {MentionUtils.MentionUser(x.Id)}").MergeLines(),
-                    ]
+                    $"# {MentionUtils.MentionRole(roleId)} x {count}",
+                    members.Select(x => $"- {MentionUtils.MentionUser(x.Id)}").MergeLines()
                 )
             )
             .WithCurrentTimestamp()

@@ -133,11 +133,9 @@ public class InteractionHandler(
 
                 await component.RespondAsync(
                     StringHelper.MergeLines(
-                        [
-                            $"{MentionUtils.MentionRole(info.CustomId)} has been selected to display.",
-                            "Ownership of the other tracked roles on Discord are removed. " +
-                            "You can add them back using `/role add` or `/role display`.",
-                        ]
+                        $"{MentionUtils.MentionRole(info.CustomId)} has been selected to display.",
+                        "Ownership of the other tracked roles on Discord are removed. " +
+                        "You can add them back using `/role add` or `/role display`."
                     ),
                     ephemeral: true
                 );
@@ -154,11 +152,9 @@ public class InteractionHandler(
 
                 await component.RespondAsync(
                     StringHelper.MergeLines(
-                        [
-                            $"{MentionUtils.MentionRole(info.CustomId)} has been removed.",
-                            "The actual ownership of the role is unaffected. " +
-                            "You can add them back using `/role add` or `/role display`.",
-                        ]
+                        $"{MentionUtils.MentionRole(info.CustomId)} has been removed.",
+                        "The actual ownership of the role is unaffected. " +
+                        "You can add them back using `/role add` or `/role display`."
                     ),
                     ephemeral: true
                 );
