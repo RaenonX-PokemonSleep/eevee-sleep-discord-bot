@@ -255,4 +255,20 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
 
         await Context.Interaction.RespondAsync(messages.MergeLines());
     }
+
+    [SlashCommand("reorder", "Reorder the target role to be at the position right below the base role.")]
+    [RequireUserPermission(GuildPermission.Administrator)]
+    [UsedImplicitly]
+    public async Task ReorderRoleAsync(
+        [Summary("target", "Role to change the order.")] IRole target,
+        [Summary("above", "Target role will be placed right above this role.")] IRole above
+    ) {
+        // Position `0` is the very bottom in Discord list
+        await Context.Guild.ReorderRolesAsync([new ReorderRoleProperties(target.Id, above.Position)]);
+
+        await Context.Interaction.RespondAsync(
+            $"{MentionUtils.MentionRole(target.Id)} is now moved to right above {MentionUtils.MentionRole(above.Id)}!",
+            ephemeral: true
+        );
+    }
 }
