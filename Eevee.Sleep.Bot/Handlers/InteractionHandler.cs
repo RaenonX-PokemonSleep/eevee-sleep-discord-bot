@@ -12,6 +12,7 @@ using IResult = Discord.Interactions.IResult;
 namespace Eevee.Sleep.Bot.Handlers;
 
 public class InteractionHandler(
+    ILogger<InteractionHandler> logger,
     DiscordSocketClient client,
     InteractionService handler,
     IServiceProvider services,
@@ -35,7 +36,16 @@ public class InteractionHandler(
     }
 
     private async Task ReadyAsync() {
-        await handler.RegisterCommandsGloballyAsync();
+        if (env.IsDevelopment()) {
+            var guildId = ConfigHelper.GetDiscordWorkingGuild();
+            logger.LogInformation("Registering commands to Guild ID #{GuildId}", guildId);
+            await handler.RegisterCommandsToGuildAsync(guildId);
+        }
+
+        if (env.IsProduction()) {
+            logger.LogInformation("Globally registering commands");
+            await handler.RegisterCommandsGloballyAsync();
+        }
     }
 
     private static Task OnInteractionExecuted(IInteractionContext context, IResult result) {
