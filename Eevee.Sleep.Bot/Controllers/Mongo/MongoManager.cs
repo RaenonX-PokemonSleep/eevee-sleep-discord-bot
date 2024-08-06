@@ -13,6 +13,13 @@ public static class MongoManager {
 
         BsonSerializer.RegisterSerializer(new DateOnlySerializer());
 
+        MongoCollectionConfigManager.EnableChangeStreamPreAndPostImagesOnCollection(
+            MongoConst.AuthActivationDataCollection
+        );
+        MongoCollectionConfigManager.EnableChangeStreamPreAndPostImagesOnCollection(
+            MongoConst.AuthActivationKeyCollection
+        );
+
         await Task.WhenAll(MongoIndexManager.Initialize());
     }
 

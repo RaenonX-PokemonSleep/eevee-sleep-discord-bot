@@ -8,6 +8,8 @@ using Eevee.Sleep.Bot.Handlers;
 using Eevee.Sleep.Bot.Models.Announcement.InGame;
 using Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
 using Eevee.Sleep.Bot.Workers;
+using Eevee.Sleep.Bot.Workers.ActivationChecker;
+using Eevee.Sleep.Bot.Workers.ActivationChecker.Removal;
 using Eevee.Sleep.Bot.Workers.Announcement;
 using Eevee.Sleep.Bot.Workers.Crawlers;
 
@@ -57,6 +59,9 @@ builder.Services
     .AddHostedService<InGameAnnouncementUpdateWatchingWorker>()
     .AddHostedService<OfficialSiteAnnouncementCrawlingWorker>()
     .AddHostedService<InGameAnnouncementCrawlingWorker>()
+    .AddHostedService<ActivationCheckerWorker>()
+    .AddHostedService<ActivationKeyRemovalWatcher>()
+    .AddHostedService<ActivationDataRemovalWatcher>()
     .AddControllers();
 
 var app = builder

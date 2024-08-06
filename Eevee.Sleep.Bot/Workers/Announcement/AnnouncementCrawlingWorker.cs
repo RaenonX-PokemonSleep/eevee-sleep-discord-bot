@@ -17,7 +17,7 @@ public abstract class AnnouncementCrawlingWorker(
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
         logger.LogInformation("Starting in-game announcement update crawler.");
         cancellationToken.Register(
-            () => logger.LogInformation("Stopping in-game announcement update crawler: cancellation token received.")
+            () => logger.LogInformation("Stopping in-game announcement update crawler: Cancellation token received.")
         );
 
         while (!cancellationToken.IsCancellationRequested) {

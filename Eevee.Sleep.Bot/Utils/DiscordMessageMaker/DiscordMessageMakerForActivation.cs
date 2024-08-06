@@ -78,14 +78,22 @@ public static class DiscordMessageMakerForActivation {
         return MakeUserSubscribed(user, roles, Colors.Success);
     }
 
-    public static async Task<Embed> MakeUserSubscribed(IUser user, HashSet<ActivationPresetRole> roles, Color color) {
-        await DiscordSubscriberMarker.MarkUserSubscribed(user);
+    public static async Task<Embed> MakeUserSubscribed(
+        IUser user,
+        HashSet<ActivationPresetRole> roles,
+        Color color,
+        bool isExternal = false
+    ) {
+        if (!isExternal) {
+            await DiscordSubscriberMarker.MarkUserSubscribed(user);
+        }
 
         var builder = new EmbedBuilder()
             .WithColor(color)
             .WithAuthor(user)
             .WithTitle("Member Subscribed")
             .AddField("User", user.Mention)
+            .AddField("External (Non-Discord)", isExternal)
             .WithFooter($"ID: {user.Id}")
             .WithCurrentTimestamp();
 
@@ -105,7 +113,8 @@ public static class DiscordMessageMakerForActivation {
     public static async Task<Embed> MakeUserUnsubscribed(
         IUser user,
         TimeSpan? subscriptionDuration,
-        IEnumerable<ulong>? roleIds = null
+        IEnumerable<ulong>? roleIds = null,
+        bool isExternal = false
     ) {
         var builder = new EmbedBuilder()
             .WithColor(Colors.Danger)
@@ -116,6 +125,7 @@ public static class DiscordMessageMakerForActivation {
                 "Subscription Duration",
                 subscriptionDuration.HasValue ? subscriptionDuration.Value.ToString("c") : "(N/A)"
             )
+            .AddField("External (Non-Discord)", isExternal)
             .WithFooter($"ID: {user.Id}")
             .WithCurrentTimestamp();
 
@@ -123,9 +133,11 @@ public static class DiscordMessageMakerForActivation {
             return builder.Build();
         }
 
-        // If `roleIds` is not null, it means that the user is still in the server.
-        // Therefore, mark the user unsubscribed, which removes the role
-        await DiscordSubscriberMarker.MarkUserUnsubscribed(user);
+        if (!isExternal) {
+            // If `roleIds` is not null, it means that the user is still in the server.
+            // Therefore, mark the user unsubscribed, which removes the role
+            await DiscordSubscriberMarker.MarkUserUnsubscribed(user);
+        }
 
         builder = builder.AddField("Role", roleIds.Select(MentionUtils.MentionRole).MergeToSameLine());
 

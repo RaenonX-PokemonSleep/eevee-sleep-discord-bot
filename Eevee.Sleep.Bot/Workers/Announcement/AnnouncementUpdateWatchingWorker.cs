@@ -30,7 +30,7 @@ public abstract class AnnouncementUpdateWatchingWorker<T>(
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
         // If UpdateWatchingWorker enters the waiting state before CrawlingWorker before initialization, 
         // it will be notified by the number of news, so check the news first and then enter the waiting state.
-        logger.LogInformation("Starting initialization process of the ingame announcement update worker.");
+        logger.LogInformation("Starting initialization process of the in-game announcement update worker.");
         try {
             await crawler.ExecuteAsync();
         } catch (MaxAttemptExceededException e) {

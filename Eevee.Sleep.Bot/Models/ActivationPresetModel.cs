@@ -23,4 +23,7 @@ public record ActivationPresetModel {
 
     [UsedImplicitly]
     public required bool Suspended { get; init; }
+
+    [UsedImplicitly]
+    public required string? LinkedDiscordRoleIdString { get; init; }
 }

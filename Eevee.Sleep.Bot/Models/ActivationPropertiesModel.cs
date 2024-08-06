@@ -17,14 +17,11 @@ public record ActivationPropertiesModel {
     public required ActivationContactModel Contact { get; init; }
 
     [UsedImplicitly]
-    public required bool IsSpecial { get; init; }
-
-    [UsedImplicitly]
     public required bool? IsCmsMod { get; init; }
 
     [UsedImplicitly]
     public required string Note { get; init; }
 
     [UsedImplicitly]
-    public required Dictionary<string, bool> Activation { get; init; }
+    public required string? LinkedPresetUuid { get; init; }
 }

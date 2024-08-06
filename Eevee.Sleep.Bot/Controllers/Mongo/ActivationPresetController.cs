@@ -17,4 +17,17 @@ public static class ActivationPresetController {
             )
             .ToHashSet();
     }
+
+    public static ActivationPresetModel? GetPresetByUuid(string? presetUuid) {
+        return presetUuid is null ?
+            null :
+            MongoConst.AuthActivationPresetCollection.Find(x => x.Uuid == presetUuid).FirstOrDefault();
+    }
+
+    public static Dictionary<string, ActivationPresetModel> GetPresetDictByUuid(IEnumerable<string> uuidList) {
+        return MongoConst.AuthActivationPresetCollection
+            .Find(Builders<ActivationPresetModel>.Filter.In(x => x.Uuid, uuidList))
+            .ToEnumerable()
+            .ToDictionary(x => x.Uuid);
+    }
 }
