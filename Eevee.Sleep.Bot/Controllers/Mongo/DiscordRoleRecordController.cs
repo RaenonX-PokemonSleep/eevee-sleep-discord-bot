@@ -53,4 +53,12 @@ public static class DiscordRoleRecordController {
 
         return result?.Roles ?? [];
     }
+
+    public static async Task<Dictionary<ulong, RoleRecordModel>> GetRoleRecordLookup(IEnumerable<ulong> userIds) {
+        var result = await MongoConst.DiscordRoleRecordCollection.Find(
+            Builders<RoleRecordModel>.Filter.In(x => x.UserId, userIds)
+        ).ToListAsync();
+
+        return result.ToDictionary(x => x.UserId);
+    }
 }
