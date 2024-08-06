@@ -7,7 +7,7 @@ namespace Eevee.Sleep.Bot.Controllers.Mongo;
 public static class ActivationPresetController {
     public static HashSet<ActivationPresetRole> GetTaggedRoles() {
         return MongoConst.AuthActivationPresetCollection
-            .Find(x => x.Source == GlobalConst.SubscriptionSourceOfDiscord)
+            .Find(x => x.Source == GlobalConst.SubscriptionSource.Discord)
             .ToEnumerable()
             .Select(
                 x => new ActivationPresetRole {

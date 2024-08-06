@@ -31,16 +31,18 @@ public static class ActivationController {
         var activationKeyList = await MongoConst.AuthActivationKeyCollection.Find(
             x =>
                 (
-                    x.Source == GlobalConst.SubscriptionSourceOfGithub ||
-                    x.Source == GlobalConst.SubscriptionSourceOfPatreon
+                    x.Source == GlobalConst.SubscriptionSource.Github ||
+                    x.Source == GlobalConst.SubscriptionSource.Patreon ||
+                    x.Source == GlobalConst.SubscriptionSource.Afdian
                 ) &&
                 x.Contact.Discord != null
         ).ToListAsync();
         var activationDataList = await MongoConst.AuthActivationDataCollection.Find(
             x =>
                 (
-                    x.Source == GlobalConst.SubscriptionSourceOfGithub ||
-                    x.Source == GlobalConst.SubscriptionSourceOfPatreon
+                    x.Source == GlobalConst.SubscriptionSource.Github ||
+                    x.Source == GlobalConst.SubscriptionSource.Patreon ||
+                    x.Source == GlobalConst.SubscriptionSource.Afdian
                 ) &&
                 x.Contact.Discord != null
         ).ToListAsync();
