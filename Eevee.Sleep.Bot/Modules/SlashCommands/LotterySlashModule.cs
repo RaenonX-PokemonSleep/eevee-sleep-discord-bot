@@ -2,7 +2,6 @@
 using Discord.Interactions;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Extensions;
-using Eevee.Sleep.Bot.Utils;
 using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using JetBrains.Annotations;
 
@@ -20,7 +19,7 @@ public class LotterySlashModule : InteractionModuleBase<SocketInteractionContext
         try {
             var targetRoleId = role.Id;
 
-            var result = Context.Client.GetGuild(ConfigHelper.GetDiscordWorkingGuild())
+            var result = Context.Client.GetCurrentWorkingGuild()
                 .Roles
                 .Single(x => x.Id == targetRoleId)
                 .Members

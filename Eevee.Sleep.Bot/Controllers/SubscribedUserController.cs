@@ -2,7 +2,6 @@ using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
-using Eevee.Sleep.Bot.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Eevee.Sleep.Bot.Controllers;
@@ -25,7 +24,7 @@ public class SubscribedUserController(
             taggedRoleIds.Count
         );
 
-        return client.GetGuild(ConfigHelper.GetDiscordWorkingGuild())
+        return client.GetCurrentWorkingGuild()
             .Roles
             .Where(x => taggedRoleIds.Contains(x.Id))
             .SelectMany(

@@ -3,7 +3,6 @@ using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Extensions;
-using Eevee.Sleep.Bot.Utils;
 using JetBrains.Annotations;
 
 namespace Eevee.Sleep.Bot.Modules.SlashCommands;
@@ -19,7 +18,7 @@ public class ExportSlashModule : InteractionModuleBase<SocketInteractionContext>
         try {
             var targetRoleId = role.Id;
 
-            var result = Context.Client.GetGuild(ConfigHelper.GetDiscordWorkingGuild())
+            var result = Context.Client.GetCurrentWorkingGuild()
                 .Roles
                 .Single(x => x.Id == targetRoleId)
                 .Members

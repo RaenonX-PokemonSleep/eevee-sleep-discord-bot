@@ -60,6 +60,10 @@ public static class DiscordExtensions {
             .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 
+    public static SocketGuild GetCurrentWorkingGuild(this DiscordSocketClient client) {
+        return client.GetGuild(ConfigHelper.GetDiscordWorkingGuild());
+    }
+
     public static string MentionAllRoles(this ulong[] roles) {
         return roles.Length == 0 ? "(N/A)" : roles.Select(MentionUtils.MentionRole).MergeToSameLine();
     }
