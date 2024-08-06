@@ -23,8 +23,10 @@ var socketConfig = new DiscordSocketConfig {
 var builder = WebApplication.CreateBuilder(args)
     .BuildCommon();
 
+builder.Services.ConfigureBackgroundServiceExceptionBehaviorToIgnore();
 builder.Services.AddCorsFromConfig();
-builder.Services.AddSingleton(socketConfig)
+builder.Services
+    .AddSingleton(socketConfig)
     .AddSingleton<DiscordSocketClient>()
     .AddSingleton(x => new InteractionService(x.GetRequiredService<DiscordSocketClient>()))
     .AddSingleton<InteractionHandler>()

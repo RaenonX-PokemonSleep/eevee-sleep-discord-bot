@@ -26,6 +26,14 @@ public static class InitializingExtensions {
         );
     }
 
+    public static void ConfigureBackgroundServiceExceptionBehaviorToIgnore(this IServiceCollection services) {
+        services.Configure<HostOptions>(
+            options => {
+                options.BackgroundServiceExceptionBehavior = BackgroundServiceExceptionBehavior.Ignore;
+            }
+        );
+    }
+
     public static async Task BootAsync(this IHost host) {
         await MongoManager.Initialize();
         await host.RunAsync();
