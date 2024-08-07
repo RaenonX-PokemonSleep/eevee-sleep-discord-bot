@@ -13,7 +13,7 @@ public class ActivationCheckerWorker(
     ILogger<ActivationCheckerWorker> logger
 ) : BackgroundService {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private readonly TimeSpan _checkInterval = TimeSpan.FromSeconds(5);
+    private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(5);
 
     private List<ActivationCheckerExternalActivation> GetActivationCheckerExternalActivationCollection(
         ActivationPropertiesModel[] externalSubscribers
