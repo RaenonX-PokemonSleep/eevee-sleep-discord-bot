@@ -92,6 +92,10 @@ public static class ConfigHelper {
         return GetInternalApiTokenSection().GetRequiredValue<string>("Outbound");
     }
 
+    public static string GetChesterApiToken() {
+        return GetInternalApiTokenSection().GetRequiredValue<string>("Chester");
+    }
+
     public static string GetAllowedOrigin() {
         return Config.GetRequiredValue<string>("AllowedOrigin");
     }
