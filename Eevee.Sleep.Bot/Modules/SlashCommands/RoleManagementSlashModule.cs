@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 namespace Eevee.Sleep.Bot.Modules.SlashCommands;
 
 [Group("role", "Commands for managing the roles of a user.")]
+[CommandContextType(InteractionContextType.Guild)]
 public class RoleManagementSlashModule : InteractionModuleBase<SocketInteractionContext> {
     private async Task SendEphemeralMessageToBeDeletedAsync(string text) {
         await Context.Interaction.RespondAsync(
