@@ -50,7 +50,8 @@ public class InGameAnnouncementCrawler(
             retryCount++;
             logger.LogError("{Message} Retries: {RetryCount}", e.Message, retryCount);
 
-            if (retryCount >= IAnnouncementCrawler.MaxRetryCount) {
+            if (e is not FetchVersionNumberFailedException && retryCount >= IAnnouncementCrawler.MaxRetryCount) {
+                // Only stop re-trying if the failure is not originated from version number fetching
                 logger.LogError("Failed to get in-game news. Retry count exceeded.");
                 throw new MaxAttemptExceededException("Failed to get in-game news. Retry count exceeded.", e);
             }
