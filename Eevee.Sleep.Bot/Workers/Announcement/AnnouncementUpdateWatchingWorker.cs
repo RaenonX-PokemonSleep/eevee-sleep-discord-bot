@@ -35,7 +35,7 @@ public abstract class AnnouncementUpdateWatchingWorker<T>(
             await crawler.ExecuteAsync();
         } catch (MaxAttemptExceededException e) {
             await client.SendMessageInAdminAlertChannel(
-                embed: DiscordMessageMakerForAnnouncement.MakeUpdateWachingWorkerInitializeFailedMessage(
+                embed: DiscordMessageMakerForAnnouncement.MakeUpdateWatchingWorkerInitializeFailedMessage(
                     e.InnerException
                 )
             );

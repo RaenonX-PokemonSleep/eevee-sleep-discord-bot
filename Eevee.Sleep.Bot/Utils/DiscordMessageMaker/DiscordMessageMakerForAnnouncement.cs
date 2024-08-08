@@ -8,7 +8,7 @@ using Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
 namespace Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 
 public static class DiscordMessageMakerForAnnouncement {
-    public static Embed MakeUpdateWachingWorkerInitializeFailedMessage(DocumentProcessingException exception) {
+    public static Embed MakeUpdateWatchingWorkerInitializeFailedMessage(DocumentProcessingException exception) {
         return new EmbedBuilder()
             .WithColor(Colors.Danger)
             .WithTitle("Failed to initialize in-game announcement watching worker")

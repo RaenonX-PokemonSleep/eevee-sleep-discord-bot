@@ -34,6 +34,6 @@ public class OfficialSiteAnnouncementUpdateWatchingWorker(
         AnnouncementLanguage language,
         Embed embed
     ) {
-        return _client.SendMessageInOfficialSiteAnnouncementNoticeChannelAsync(message, embed);
+        return _client.SendMessageInOfficialSiteAnnouncementNoticeChannelAsync(language, message, embed);
     }
 }

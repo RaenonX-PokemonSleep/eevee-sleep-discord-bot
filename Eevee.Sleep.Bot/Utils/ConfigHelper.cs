@@ -40,8 +40,12 @@ public static class ConfigHelper {
         return GetInGameAnnouncementNotificationChannelSection().GetRequiredValue<ulong>(language.ToString());
     }
 
-    public static ulong GetOfficialSiteAnnouncementNotificationChannelId() {
-        return GetDiscordChannelSection().GetRequiredValue<ulong>("OfficialSiteAnnouncementNotification");
+    private static IConfigurationSection GetOfficialSiteAnnouncementNotificationChannelSection() {
+        return GetDiscordChannelSection().GetRequiredSection("OfficialSiteAnnouncementNotification");
+    }
+
+    public static ulong GetOfficialSiteAnnouncementNotificationChannelId(AnnouncementLanguage language) {
+        return GetOfficialSiteAnnouncementNotificationChannelSection().GetRequiredValue<ulong>(language.ToString());
     }
 
     private static IConfigurationSection GetDiscordRolesSection() {
@@ -53,7 +57,7 @@ public static class ConfigHelper {
     }
 
     private static IConfigurationSection GetInGameAnnouncementNotificationRoleSection() {
-        return GetDiscordRolesSection().GetRequiredSection("InGameAnnouncementNotification");
+        return GetDiscordRolesSection().GetRequiredSection("AnnouncementNotification");
     }
 
     public static ulong? GetInGameAnnouncementNotificationRoleId(AnnouncementLanguage language) {
