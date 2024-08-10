@@ -1,13 +1,14 @@
-﻿using Eevee.Sleep.Bot.Models;
+﻿using System.Linq.Expressions;
+using Eevee.Sleep.Bot.Models;
 using Eevee.Sleep.Bot.Utils;
 using MongoDB.Driver;
 
 namespace Eevee.Sleep.Bot.Controllers.Mongo;
 
 public static class ActivationPresetController {
-    public static HashSet<ActivationPresetRole> GetTaggedRoles() {
+    private static HashSet<ActivationPresetRole> GetTaggedRoles(Expression<Func<ActivationPresetModel, bool>> filter) {
         return MongoConst.AuthActivationPresetCollection
-            .Find(x => x.Source == GlobalConst.SubscriptionSource.Discord)
+            .Find(filter)
             .ToEnumerable()
             .Select(
                 x => new ActivationPresetRole {
@@ -16,6 +17,20 @@ public static class ActivationPresetController {
                 }
             )
             .ToHashSet();
+    }
+
+    public static HashSet<ActivationPresetRole> GetTaggedRolesAll() {
+        return GetTaggedRoles(
+            x =>
+                x.Source == GlobalConst.SubscriptionSource.Discord ||
+                x.Source == GlobalConst.SubscriptionSource.DiscordOneTime
+        );
+    }
+
+    public static HashSet<ActivationPresetRole> GetTaggedRolesSubscribersOnly() {
+        return GetTaggedRoles(
+            x => x.Source == GlobalConst.SubscriptionSource.Discord
+        );
     }
 
     public static ActivationPresetModel? GetPresetByUuid(string? presetUuid) {

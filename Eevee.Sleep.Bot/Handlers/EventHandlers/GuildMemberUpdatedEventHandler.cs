@@ -133,7 +133,7 @@ public static class GuildMemberUpdatedEventHandler {
         }
 
         var taggedRoles = ActivationPresetController
-            .GetTaggedRoles();
+            .GetTaggedRolesAll();
 
         var rolesAdded = updated.Roles
             .ExceptBy(original.Value.Roles.Select(x => x.Id), role => role.Id)

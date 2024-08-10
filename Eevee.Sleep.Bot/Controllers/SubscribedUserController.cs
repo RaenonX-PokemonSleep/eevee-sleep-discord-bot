@@ -14,7 +14,7 @@ public class SubscribedUserController(
 ) : ControllerBase {
     [HttpGet(Name = "GetSubscribedUsers")]
     public IEnumerable<SubscribedUserModel> Get() {
-        var taggedRoleIds = ActivationPresetController.GetTaggedRoles()
+        var taggedRoleIds = ActivationPresetController.GetTaggedRolesSubscribersOnly()
             .Select(x => x.RoleId)
             .ToHashSet();
 
