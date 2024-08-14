@@ -64,6 +64,16 @@ public static class ConfigHelper {
         return GetInGameAnnouncementNotificationRoleSection().GetValue<ulong>(language.ToString());
     }
 
+    private static IConfigurationSection GetGameAnnouncementSection() {
+        return GetDiscordSection().GetRequiredSection("GameAnnouncement");
+    }
+
+    public static string GetGameAnnouncementProxyUrl(string announcementId) {
+        return GetGameAnnouncementSection()
+            .GetRequiredValue<string>("ProxyUrlTemplate")
+            .Replace("{id}", announcementId);
+    }
+
     private static IConfigurationSection GetApiSection() {
         return Config.GetRequiredSection("Api");
     }
