@@ -26,7 +26,7 @@ public class SendUserActivationController(
             activationMessages.Select(
                 async x => {
                     var userId = Convert.ToUInt64(x.UserId);
-                    var user = await client.GetUserAsync(userId);
+                    var user = client.GetCurrentWorkingGuild().GetUser(userId);
 
                     if (user is null) {
                         logger.LogInformation(
