@@ -87,7 +87,58 @@ public static class GuildMemberUpdatedEventHandler {
         );
     }
 
-    private static async Task HandleRolesAdded(ulong userId, ulong[] addedRoles) {
+    private static async Task RemoveRestrictedRoles(
+        IDiscordClient client,
+        ulong userId,
+        ulong[] roleIds
+    ) {
+        var restrictedRoles = DiscordRestrictedRoleController
+            .FindAllRestrictedRoleByRoleIds(roleIds);
+
+        var guild = await client.GetCurrentWorkingGuild();
+        var user = await client.GetGuildUserAsync(userId);
+        if (user == null) {
+            Logger.LogWarning("Guild user {UserId} not found in guild {GuildId}", userId, guild.Id);
+            return;
+        }
+
+        foreach (var restrictedRole in restrictedRoles) {
+            if (restrictedRole.WhitelistedUserIds.Contains(userId)) {
+                continue;
+            }
+
+            if (!restrictedRole.MinAccountAgeDays.HasValue) {
+                continue;
+            }
+
+            var accountCreationDate = user.CreatedAt.UtcDateTime;
+            var accountAge = DateTime.UtcNow - accountCreationDate;
+            if (accountAge.Days >= restrictedRole.MinAccountAgeDays) {
+                continue;
+            }
+
+            await user.RemoveRoleAsync(restrictedRole.RoleId);
+
+            var embed = DiscordMessageMakerForRoleRestriction.MakeRoleRestrictedNote(
+                roleName: guild.GetRole(restrictedRole.RoleId)?.Name ?? "Unknown", 
+                user: user, 
+                minAccountAgeDays: restrictedRole.MinAccountAgeDays.Value,
+                guildName: guild.Name
+            );
+            await user.SendMessageAsync(
+                embed: embed
+            );
+            await client.SendMessageInAdminAlertChannel(
+                embed: embed
+            );
+        }
+    }
+
+    private static async Task HandleRolesAdded(
+        IDiscordClient client,
+        ulong userId, 
+        ulong[] addedRoles
+    ) {
         await DiscordRoleRecordController.AddRoles(
             userId,
             DiscordTrackedRoleController
@@ -95,6 +146,8 @@ public static class GuildMemberUpdatedEventHandler {
                 .Select(x => x.RoleId)
                 .ToArray()
         );
+
+        await RemoveRestrictedRoles(client, userId, addedRoles);
     }
 
     private static async Task HandleRolesRemoved(
@@ -149,7 +202,7 @@ public static class GuildMemberUpdatedEventHandler {
             .ToHashSet();
 
         if (rolesAdded.Length > 0) {
-            await HandleRolesAdded(original.Id, rolesAdded);
+            await HandleRolesAdded(client, original.Id, rolesAdded);
         }
 
         if (taggedRolesAdded.Count > 0) {
