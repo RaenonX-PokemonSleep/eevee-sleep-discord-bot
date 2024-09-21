@@ -60,6 +60,14 @@ public static class ConfigHelper {
         return GetDiscordRolesSection().GetRequiredSection("AnnouncementNotification");
     }
 
+    private static IConfigurationSection GetRoleRestrictionSection() {
+        return GetDiscordRolesSection().GetRequiredSection("Restrict");
+    }
+
+    public static ulong GetRoleRestrictionOwnerUserId() {
+        return GetRoleRestrictionSection().GetRequiredValue<ulong>("OwnerUserIdForPing");
+    }
+
     public static ulong? GetInGameAnnouncementNotificationRoleId(AnnouncementLanguage language) {
         return GetInGameAnnouncementNotificationRoleSection().GetValue<ulong>(language.ToString());
     }

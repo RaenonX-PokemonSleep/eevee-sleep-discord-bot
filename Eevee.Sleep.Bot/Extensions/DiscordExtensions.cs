@@ -68,6 +68,14 @@ public static class DiscordExtensions {
         return client.GetGuild(ConfigHelper.GetDiscordWorkingGuild());
     }
 
+    public static Task<IGuild> GetCurrentWorkingGuild(this IDiscordClient client) {
+        return client.GetGuildAsync(ConfigHelper.GetDiscordWorkingGuild());
+    }
+
+    public static Task<IGuildUser> GetGuildUserAsync(this IDiscordClient client, ulong userId) {
+        return client.GetCurrentWorkingGuild().Result.GetUserAsync(userId);
+    }
+
     public static string MentionAllRoles(this ulong[] roles) {
         return roles.Length == 0 ? "(N/A)" : roles.Select(MentionUtils.MentionRole).MergeToSameLine();
     }

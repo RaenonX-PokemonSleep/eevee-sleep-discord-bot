@@ -15,6 +15,7 @@ public static class MongoIndexManager {
             ActivationPresetUuidIndex(),
             DiscordRoleRecordUserIdIndex(),
             DiscordTrackedRoleRoleIdIndex(),
+            DiscordRestrictedRoleRoleIdIndex(),
             OfficialSiteAnnouncementIndexAnnounceIdIndex(),
             OfficialSiteAnnouncementDetailAnnounceIdIndex(),
             OfficialSiteAnnouncementDetailLanguageAnnounceIdIndex(),
@@ -87,6 +88,17 @@ public static class MongoIndexManager {
         var indexModel = new CreateIndexModel<TrackedRoleModel>(indexKeys);
 
         return MongoConst.DiscordTrackedRoleCollection.Indexes.CreateOneAsync(indexModel);
+    }
+
+    private static Task<string> DiscordRestrictedRoleRoleIdIndex() {
+        var indexKeys = Builders<RoleRestrictionModel>.IndexKeys
+            .Ascending(data => data.RoleId);
+        var indexModel = new CreateIndexModel<RoleRestrictionModel>(
+            indexKeys, 
+            new CreateIndexOptions { Unique = true }
+        );
+
+        return MongoConst.DiscordRestrictedRoleCollection.Indexes.CreateOneAsync(indexModel);
     }
 
     private static Task<string> OfficialSiteAnnouncementIndexAnnounceIdIndex() {

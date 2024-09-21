@@ -36,6 +36,10 @@ public static class MongoConst {
         DiscordTrackedRoleCollection =
             DiscordDatabase.GetCollection<TrackedRoleModel>("role/tracked");
 
+    public static readonly IMongoCollection<RoleRestrictionModel>
+        DiscordRestrictedRoleCollection =
+            DiscordDatabase.GetCollection<RoleRestrictionModel>("role/restricted");
+
     private static readonly IMongoDatabase GameDatabase = Client.GetDatabase("game");
 
     public static readonly IMongoCollection<OfficialSiteAnnouncementIndexModel>
