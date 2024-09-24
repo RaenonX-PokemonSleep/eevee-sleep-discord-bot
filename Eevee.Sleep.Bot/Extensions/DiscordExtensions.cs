@@ -32,13 +32,14 @@ public static class DiscordExtensions {
         return client.GetMessageChannel(ConfigHelper.GetDiscordRoleRestrictedNotificationChannelId());
     }
 
-    public static async Task SendMessageInRoleRestrictedChannel(
+    public static async Task<IUserMessage> SendMessageInRoleRestrictedChannel(
         this IDiscordClient client,
         string? message = null,
         Embed? embed = null,
         Embed[]? embeds = null
     ) {
-        await (await client.GetRoleRestrictedChannelAsync()).SendMessageAsync(message, embed: embed, embeds: embeds);
+        return await (await client.GetRoleRestrictedChannelAsync())
+            .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 
     private static Task<IMessageChannel> GetInGameAnnouncementNoticeChannelsAsync(
@@ -91,6 +92,11 @@ public static class DiscordExtensions {
 
     public static string MentionAllRoles(this ulong[] roles) {
         return roles.Length == 0 ? "(N/A)" : roles.Select(MentionUtils.MentionRole).MergeToSameLine();
+    }
+
+    public static async Task AutoDeleteAfterSeconds(this IUserMessage message, int seconds) {
+        await Task.Delay(TimeSpan.FromSeconds(seconds));
+        await message.DeleteAsync();
     }
 
     public static SocketGuildUser AsGuildUser(this IUser user) {

@@ -7,12 +7,27 @@ using Eevee.Sleep.Bot.Utils;
 namespace Eevee.Sleep.Bot.Workers;
 
 public class DiscordClientWorker(IServiceProvider services, DiscordSocketClient client) : BackgroundService {
-    private async Task SendTestMessage() {
-        var message = await client.SendMessageInAdminAlertChannel("`SYSTEM` Admin alert sending test");
+    private async Task SendTestMessageMasterAlert() {
+        var message = await client.SendMessageInAdminAlertChannel(
+            "`SYSTEM` Admin alert sending test - Master Alert"
+        );
 
-        await Task.Delay(TimeSpan.FromSeconds(30));
+        await message.AutoDeleteAfterSeconds(10);
+    }
 
-        await message.DeleteAsync();
+    private async Task SendTestMessageRoleRestrictedAlert() {
+        var message = await client.SendMessageInRoleRestrictedChannel(
+            "`SYSTEM` Admin alert sending test - Role Restricted"
+        );
+
+        await message.AutoDeleteAfterSeconds(10);
+    }
+
+    private Task SendTestMessage() {
+        return Task.WhenAll(
+            SendTestMessageMasterAlert(),
+            SendTestMessageRoleRestrictedAlert()
+        );
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
