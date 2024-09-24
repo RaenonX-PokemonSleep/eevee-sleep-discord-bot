@@ -97,10 +97,6 @@ public static class GuildMemberUpdatedEventHandler {
 
         var guild = await client.GetCurrentWorkingGuild();
         var user = await client.GetGuildUserAsync(userId);
-        if (user == null) {
-            Logger.LogWarning("Guild user {UserId} not found in guild {GuildId}", userId, guild.Id);
-            return;
-        }
 
         foreach (var restrictedRole in restrictedRoles) {
             if (restrictedRole.WhitelistedUserIds.Contains(userId)) {
