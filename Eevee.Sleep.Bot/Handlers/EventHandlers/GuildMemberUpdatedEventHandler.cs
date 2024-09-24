@@ -116,23 +116,19 @@ public static class GuildMemberUpdatedEventHandler {
             await user.RemoveRoleAsync(restrictedRole.RoleId);
 
             var embed = DiscordMessageMakerForRoleRestriction.MakeRoleRestrictedNote(
-                roleName: guild.GetRole(restrictedRole.RoleId)?.Name ?? "Unknown", 
-                user: user, 
+                roleName: guild.GetRole(restrictedRole.RoleId)?.Name ?? "Unknown",
+                user: user,
                 minAccountAgeDays: restrictedRole.MinAccountAgeDays.Value,
                 guildName: guild.Name
             );
-            await user.SendMessageAsync(
-                embed: embed
-            );
-            await client.SendMessageInAdminAlertChannel(
-                embed: embed
-            );
+            await user.SendMessageAsync(embed: embed);
+            await client.SendMessageInRoleRestrictedChannel(embed: embed);
         }
     }
 
     private static async Task HandleRolesAdded(
         IDiscordClient client,
-        ulong userId, 
+        ulong userId,
         ulong[] addedRoles
     ) {
         await DiscordRoleRecordController.AddRoles(

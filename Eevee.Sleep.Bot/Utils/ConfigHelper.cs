@@ -36,6 +36,10 @@ public static class ConfigHelper {
         return GetDiscordChannelSection().GetRequiredSection("InGameAnnouncementNotification");
     }
 
+    public static ulong GetDiscordRoleRestrictedNotificationChannelId() {
+        return GetDiscordChannelSection().GetRequiredValue<ulong>("RoleRestricted");
+    }
+
     public static ulong GetInGameAnnouncementNotificationChannelId(AnnouncementLanguage language) {
         return GetInGameAnnouncementNotificationChannelSection().GetRequiredValue<ulong>(language.ToString());
     }

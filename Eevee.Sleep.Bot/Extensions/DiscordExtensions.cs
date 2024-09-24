@@ -28,6 +28,19 @@ public static class DiscordExtensions {
             .SendMessageAsync(message, embed: embed, embeds: embeds);
     }
 
+    private static Task<IMessageChannel> GetRoleRestrictedChannelAsync(this IDiscordClient client) {
+        return client.GetMessageChannel(ConfigHelper.GetDiscordRoleRestrictedNotificationChannelId());
+    }
+
+    public static async Task SendMessageInRoleRestrictedChannel(
+        this IDiscordClient client,
+        string? message = null,
+        Embed? embed = null,
+        Embed[]? embeds = null
+    ) {
+        await (await client.GetRoleRestrictedChannelAsync()).SendMessageAsync(message, embed: embed, embeds: embeds);
+    }
+
     private static Task<IMessageChannel> GetInGameAnnouncementNoticeChannelsAsync(
         this IDiscordClient client,
         AnnouncementLanguage language
