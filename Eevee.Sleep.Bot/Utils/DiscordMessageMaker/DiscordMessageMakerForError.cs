@@ -24,6 +24,15 @@ public static class DiscordMessageMakerForError {
             .Build();
     }
 
+    public static Embed MakeGeneralException(Exception e) {
+        return new EmbedBuilder()
+            .WithColor(Colors.Warning)
+            .WithTitle($"{e.Source}: {e.Message}")
+            .WithDescription($"```{e.StackTrace}```")
+            .WithCurrentTimestamp()
+            .Build();
+    }
+
     public static Embed MakeDiscordHttpException(HttpException e) {
         return new EmbedBuilder()
             .WithColor(Colors.Warning)

@@ -1,3 +1,4 @@
+using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo.Announcement;
 using Eevee.Sleep.Bot.Controllers.Mongo.Announcement.InGame;
 using Eevee.Sleep.Bot.Enums;
@@ -10,6 +11,7 @@ namespace Eevee.Sleep.Bot.Workers.Crawlers;
 
 public class InGameAnnouncementCrawler(
     ILogger<InGameAnnouncementCrawler> logger,
+    DiscordSocketClient client,
     AnnouncementDetailController<InGameAnnouncementDetailModel> detailController,
     AnnouncementHistoryController<InGameAnnouncementDetailModel> historyController
 ) : IAnnouncementCrawler {
@@ -67,7 +69,7 @@ public class InGameAnnouncementCrawler(
     }
 
     private async Task<Dictionary<string, AnnouncementLanguage>> GetAnnouncementUrls() {
-        var versionNumber = await ChesterMicroservice.FetchVersionNumber();
+        var versionNumber = await ChesterMicroservice.FetchVersionNumber(client);
 
         logger.LogInformation("Current `inV` version number: {version}", versionNumber);
 
