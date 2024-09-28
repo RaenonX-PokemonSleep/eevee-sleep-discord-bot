@@ -70,6 +70,9 @@ public class InGameAnnouncementCrawler(
 
     private async Task<Dictionary<string, AnnouncementLanguage>> GetAnnouncementUrls() {
         var versionNumber = await ChesterMicroservice.FetchVersionNumber(client);
+        if (versionNumber == null) {
+            return [];
+        }
 
         logger.LogInformation("Current `inV` version number: {version}", versionNumber);
 
