@@ -35,10 +35,6 @@ public record InGameAnnouncementDetailResponse : IInGameAnnouncementResponse<InG
     [UsedImplicitly]
     public required long UpdateAt { get; init; }
 
-    [JsonPropertyName("dataUpdateAt")]
-    [UsedImplicitly]
-    public required long DataUpdateAt { get; init; }
-
     public InGameAnnouncementDetailModel ToModel(string url, AnnouncementLanguage language) {
         return new InGameAnnouncementDetailModel {
             AnnouncementId = Id,
