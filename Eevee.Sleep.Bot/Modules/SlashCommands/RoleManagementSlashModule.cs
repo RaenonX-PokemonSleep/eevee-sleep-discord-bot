@@ -128,6 +128,8 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
     [SlashCommand("add-all", "Add all owned tracked roles.")]
     [UsedImplicitly]
     public async Task AddAllRoleAsync() {
+        await Context.Interaction.RespondAsync(text: "Adding all owned tracked roles...", ephemeral: true);
+
         var user = Context.User.AsGuildUser();
 
         var previousRoleIds = DiscordTrackedRoleController
@@ -137,20 +139,29 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
 
         await user.AddRolesAsync(DiscordRoleRecordController.FindRoleIdsByUserId(user.Id));
 
-        await Context.Interaction.RespondAsync(
-            embed: DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
-                user,
-                previousRoleIds,
-                DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
-                Colors.Success
-            ),
-            ephemeral: true
+        var response = await Context.Interaction.GetOriginalResponseAsync();
+        if (response is null) {
+            throw new NullReferenceException("Original response not found");
+        }
+
+        await response.ModifyAsync(
+            x => {
+                x.Content = null;
+                x.Embed = DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
+                    user,
+                    previousRoleIds,
+                    DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
+                    Colors.Success
+                );
+            }
         );
     }
 
     [SlashCommand("remove-all", "Remove all tracked roles.")]
     [UsedImplicitly]
     public async Task RemoveAllRoleAsync() {
+        await Context.Interaction.RespondAsync(text: "Removing all owned tracked roles...", ephemeral: true);
+
         var user = Context.User.AsGuildUser();
 
         var previousRoleIds = DiscordTrackedRoleController
@@ -160,14 +171,21 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
 
         await user.RemoveRolesAsync(DiscordRoleRecordController.FindRoleIdsByUserId(user.Id));
 
-        await Context.Interaction.RespondAsync(
-            embed: DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
-                user,
-                previousRoleIds,
-                [],
-                Colors.Danger
-            ),
-            ephemeral: true
+        var response = await Context.Interaction.GetOriginalResponseAsync();
+        if (response is null) {
+            throw new NullReferenceException("Original response not found");
+        }
+
+        await response.ModifyAsync(
+            x => {
+                x.Content = null;
+                x.Embed = DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
+                    user,
+                    previousRoleIds,
+                    DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
+                    Colors.Success
+                );
+            }
         );
     }
 
