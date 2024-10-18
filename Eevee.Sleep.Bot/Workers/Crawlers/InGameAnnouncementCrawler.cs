@@ -69,37 +69,37 @@ public class InGameAnnouncementCrawler(
     }
 
     private async Task<Dictionary<string, AnnouncementLanguage>> GetAnnouncementUrls() {
-        var versionNumber = await ChesterMicroservice.FetchVersionNumber(client);
+        var currentVersion = await ChesterMicroservice.FetchCurrentVersion(client);
 
-        logger.LogInformation("Current `inV` version number: {version}", versionNumber);
+        logger.LogInformation("Current game data versions: {currentVersion}", currentVersion);
 
         return new Dictionary<string, AnnouncementLanguage> {
             {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{versionNumber}/1/list_0_0.json",
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/1/list_0_0.json",
                 AnnouncementLanguage.JP
             }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{versionNumber}/1/list_1_0.json",
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/1/list_1_0.json",
                 AnnouncementLanguage.JP
             }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{versionNumber}/1/list_2_0.json",
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/1/list_2_0.json",
                 AnnouncementLanguage.JP
             }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{versionNumber}/2/list_0_0.json",
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/2/list_0_0.json",
                 AnnouncementLanguage.EN
             }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{versionNumber}/2/list_1_0.json",
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/2/list_1_0.json",
                 AnnouncementLanguage.EN
             }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{versionNumber}/2/list_2_0.json",
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/2/list_2_0.json",
                 AnnouncementLanguage.EN
             }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{versionNumber}/8/list_0_0.json",
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/8/list_0_0.json",
                 AnnouncementLanguage.ZH
             }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{versionNumber}/8/list_1_0.json",
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/8/list_1_0.json",
                 AnnouncementLanguage.ZH
             }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{versionNumber}/8/list_2_0.json",
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/8/list_2_0.json",
                 AnnouncementLanguage.ZH
             },
         };

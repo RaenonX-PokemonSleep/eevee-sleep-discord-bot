@@ -2,6 +2,7 @@
 using Eevee.Sleep.Bot.Models;
 using Eevee.Sleep.Bot.Models.Announcement.InGame;
 using Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
+using Eevee.Sleep.Bot.Models.ChesterMicroService;
 using Eevee.Sleep.Bot.Utils;
 using MongoDB.Driver;
 
@@ -65,4 +66,7 @@ public static class MongoConst {
     public static readonly IMongoCollection<InGameAnnouncementDetailModel>
         InGameAnnouncementHistoryCollection =
             GameDatabase.GetCollection<InGameAnnouncementDetailModel>("announcement/inGame/history");
+
+    public static readonly IMongoCollection<ChesterCurrentVersion> GameChesterCurrentVersionCollection =
+        GameDatabase.GetCollection<ChesterCurrentVersion>("currentVersion/chester");
 }
