@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Json;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Exceptions;
@@ -20,6 +21,11 @@ public static class ChesterMicroservice {
 
         try {
             var response = await HttpModule.Client.GetAsync(url);
+
+            if (response.StatusCode == HttpStatusCode.ServiceUnavailable) {
+                throw new OfficialServerInMaintenanceException();
+            }
+
             response.EnsureSuccessStatusCode();
 
             var newCurrentVersion = await JsonSerializer.DeserializeAsync<ChesterCurrentVersion>(
@@ -51,6 +57,11 @@ public static class ChesterMicroservice {
             }
 
             return newCurrentVersion;
+        } catch (OfficialServerInMaintenanceException e) {
+            var message = await client.SendMessageInAdminAlertChannel(message: "Official Server is in Maintenance!");
+            await message.AutoDeleteAfterSeconds(10);
+
+            throw;
         } catch (JsonException e) {
             await client.SendMessageInAdminAlertChannel(
                 message: "Failed to parse game data version JSON response!",

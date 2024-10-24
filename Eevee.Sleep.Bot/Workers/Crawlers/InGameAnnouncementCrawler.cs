@@ -48,6 +48,8 @@ public class InGameAnnouncementCrawler(
             await historyController.BulkInsert([..details]);
 
             retryCount = 0;
+        } catch (OfficialServerInMaintenanceException) {
+            logger.LogInformation("Official server in maintenance during in-game announcement check.");
         } catch (DocumentProcessingException e) {
             retryCount++;
             logger.LogError("{Message} Retries: {RetryCount}", e.Message, retryCount);
