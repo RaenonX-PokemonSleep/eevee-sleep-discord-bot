@@ -11,6 +11,8 @@ using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 namespace Eevee.Sleep.Bot.Modules.ExternalServices;
 
 public static class ChesterMicroservice {
+    private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(10);
+
     private static readonly JsonSerializerOptions JsonOptions = new() {
         PropertyNameCaseInsensitive = true,
     };
@@ -57,7 +59,7 @@ public static class ChesterMicroservice {
             }
 
             return newCurrentVersion;
-        } catch (OfficialServerInMaintenanceException e) {
+        } catch (OfficialServerInMaintenanceException) {
             var message = await client.SendMessageInAdminAlertChannel(message: "Official Server is in Maintenance!");
             await message.AutoDeleteAfterSeconds(10);
 
@@ -74,14 +76,13 @@ public static class ChesterMicroservice {
             );
         } catch (Exception e) {
             await client.SendMessageInAdminAlertChannel(
-                message: "Failed to fetch game data version number!",
+                message: "Failed to fetch game data version number! Retrying in 30 secs...",
                 embed: DiscordMessageMakerForError.MakeGeneralException(e)
             );
 
-            throw new FetchVersionNumberFailedException(
-                $"Failed to fetch version number ({e.GetType().Name}).",
-                new Dictionary<string, string?> { { "exception", e.Message } }
-            );
+            // Keep running until the attempt limit is exceeded
+            await Task.Delay(RetryInterval);
+            return await FetchCurrentVersion(client);
         }
     }
 }
