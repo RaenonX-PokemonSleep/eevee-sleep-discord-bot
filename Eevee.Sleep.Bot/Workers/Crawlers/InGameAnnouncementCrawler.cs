@@ -70,40 +70,35 @@ public class InGameAnnouncementCrawler(
         }
     }
 
+    private static Dictionary<string, AnnouncementLanguage> GetAnnouncementUrlsOfLanguage(
+        AnnouncementLanguage language,
+        uint version
+    ) {
+        return new Dictionary<string, AnnouncementLanguage> {
+            {
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/android/{version}/{Convert.ToInt32(language)}/list_0_0.json",
+                language
+            }, {
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/android/{version}/{Convert.ToInt32(language)}/list_1_0.json",
+                language
+            }, {
+                $"https://view.sleep.pokemon.co.jp/news/news_list/data/android/{version}/{Convert.ToInt32(language)}/list_2_0.json",
+                language
+            },
+        };
+    }
+
     private async Task<Dictionary<string, AnnouncementLanguage>> GetAnnouncementUrls() {
         var currentVersion = await ChesterMicroservice.FetchCurrentVersion(client);
 
         logger.LogInformation("Current game data versions: {currentVersion}", currentVersion);
 
-        return new Dictionary<string, AnnouncementLanguage> {
-            {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/1/list_0_0.json",
-                AnnouncementLanguage.JP
-            }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/1/list_1_0.json",
-                AnnouncementLanguage.JP
-            }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/1/list_2_0.json",
-                AnnouncementLanguage.JP
-            }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/2/list_0_0.json",
-                AnnouncementLanguage.EN
-            }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/2/list_1_0.json",
-                AnnouncementLanguage.EN
-            }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/2/list_2_0.json",
-                AnnouncementLanguage.EN
-            }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/8/list_0_0.json",
-                AnnouncementLanguage.ZH
-            }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/8/list_1_0.json",
-                AnnouncementLanguage.ZH
-            }, {
-                $"https://view.sleep.pokemon.co.jp/news/news_list/data/{currentVersion.InV}/8/list_2_0.json",
-                AnnouncementLanguage.ZH
-            },
-        };
+        return new[] {
+                GetAnnouncementUrlsOfLanguage(AnnouncementLanguage.JP, currentVersion.InV),
+                GetAnnouncementUrlsOfLanguage(AnnouncementLanguage.EN, currentVersion.InV),
+                GetAnnouncementUrlsOfLanguage(AnnouncementLanguage.ZH, currentVersion.InV),
+            }
+            .SelectMany(dict => dict)
+            .ToDictionary(pair => pair.Key, pair => pair.Value);
     }
 }
