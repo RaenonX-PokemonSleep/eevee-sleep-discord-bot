@@ -19,7 +19,7 @@ public static class ChesterMicroservice {
 
     public static async Task<ChesterCurrentVersion> FetchCurrentVersion(DiscordSocketClient client) {
         var url =
-            $"https://pks.yuh926.com/api/sleep/getOfficalCurrentVersion?token={ConfigHelper.GetChesterApiToken()}";
+            $"https://stable-pks.yuh926.com/api/sleep/getOfficalCurrentVersion?token={ConfigHelper.GetChesterApiToken()}";
 
         try {
             var response = await HttpModule.Client.GetAsync(url);
