@@ -1,4 +1,5 @@
 using Discord;
+using Discord.Net;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
@@ -46,10 +47,18 @@ public class SendUserActivationController(
                     );
                     // Prevent accidentally sending messages to the users
                     if (env.IsProduction()) {
-                        await user.SendMessageAsync(
-                            x.Link,
-                            embeds: DiscordMessageMakerForActivation.MakeActivationNote()
-                        );
+                        try {
+                            await user.SendMessageAsync(
+                                x.Link,
+                                embeds: DiscordMessageMakerForActivation.MakeActivationNote()
+                            );
+                        } catch (HttpException e) {
+                            await client.SendMessageInAdminAlertChannel(
+                                $"Error occurred during activation link delivery to {MentionUtils.MentionUser(user.Id)} by API\n" +
+                                $"> {x.Link}",
+                                DiscordMessageMakerForError.MakeDiscordHttpException(e)
+                            );
+                        }
                     }
 
                     await Task.WhenAll(
