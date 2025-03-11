@@ -45,4 +45,39 @@ public partial class MessageAppModule : InteractionModuleBase<SocketInteractionC
                 .Build()
         );
     }
+
+    [MessageCommand("Steal Sticker")]
+    [UsedImplicitly]
+    public async Task StealStickerAsync(IMessage message) {
+        if (message is not IUserMessage userMessage) {
+            await RespondAsync("Can't steal sticker from non-user messages!");
+            return;
+        }
+
+        var sticker = userMessage.Stickers.FirstOrDefault();
+        if (sticker is null) {
+            await RespondAsync("Message doesn't contain any stickers!");
+            return;
+        }
+
+        if (sticker is not ISticker castSticker) {
+            await RespondAsync("Sticker failed to parse!");
+            return;
+        }
+
+        await RespondWithModalAsync(
+            new ModalBuilder()
+                .WithTitle("Sticker Stealer")
+                .WithCustomId(ModalId.StickerStealer.ToString())
+                .AddTextInput("Sticker Name", ModalFieldId.StickerName.ToString(), value: castSticker.Name)
+                .AddTextInput(
+                    "Sticker Description",
+                    ModalFieldId.StickerDescription.ToString(),
+                    value: string.IsNullOrEmpty(castSticker.Description) ? castSticker.Name : castSticker.Description,
+                    required: false
+                )
+                .AddTextInput("Sticker Link", ModalFieldId.StickerLink.ToString(), value: castSticker.GetStickerUrl())
+                .Build()
+        );
+    }
 }

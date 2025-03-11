@@ -110,9 +110,9 @@ public class InteractionHandler(
                     throw new ArgumentException("Guild ID is null from modal!");
                 }
 
-                using var client1 = new HttpClient();
+                using var httpClient = new HttpClient();
 
-                var emoteHttpResponse = await client1.GetAsync(emoteLink);
+                var emoteHttpResponse = await httpClient.GetAsync(emoteLink);
                 var stream = await emoteHttpResponse.Content.ReadAsStreamAsync();
 
                 await client.GetGuild(guildId.Value).CreateEmoteAsync(
@@ -120,6 +120,46 @@ public class InteractionHandler(
                     new Image(stream)
                 );
                 await modal.RespondAsync($"Emote stolen as **{emoteName}**!");
+                break;
+            }
+            case ModalId.StickerStealer: {
+                var stickerName = components
+                    .First(x => x.CustomId.ToModalFieldId() == ModalFieldId.StickerName).Value;
+                if (stickerName is null) {
+                    throw new ArgumentException("Sticker name should not be empty! (Sticker name not found)");
+                }
+
+                var stickerDescription = components
+                    .First(x => x.CustomId.ToModalFieldId() == ModalFieldId.StickerDescription).Value;
+                if (stickerDescription is null) {
+                    throw new ArgumentException(
+                        "Sticker description should not be empty! (Sticker description not found)"
+                    );
+                }
+
+                var stickerLink = components
+                    .First(x => x.CustomId.ToModalFieldId() == ModalFieldId.StickerLink).Value;
+                if (stickerLink is null) {
+                    throw new ArgumentException("Sticker link should not be empty! (Sticker link not found)");
+                }
+
+                var guildId = modal.GuildId;
+                if (guildId is null) {
+                    throw new ArgumentException("Guild ID is null from modal!");
+                }
+
+                using var httpClient = new HttpClient();
+
+                var stickerHttpResponse = await httpClient.GetAsync(stickerLink);
+                var stream = await stickerHttpResponse.Content.ReadAsStreamAsync();
+
+                await client.GetGuild(guildId.Value).CreateStickerAsync(
+                    name: stickerName,
+                    image: new Image(stream),
+                    tags: [stickerName],
+                    description: stickerDescription
+                );
+                await modal.RespondAsync($"Sticker stolen as **{stickerName}**!");
                 break;
             }
             case null:

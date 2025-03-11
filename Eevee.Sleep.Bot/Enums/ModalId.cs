@@ -2,4 +2,5 @@
 
 public enum ModalId {
     EmoteStealer,
+    StickerStealer,
 }
