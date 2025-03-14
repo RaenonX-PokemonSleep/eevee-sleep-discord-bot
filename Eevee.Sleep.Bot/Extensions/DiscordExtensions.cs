@@ -56,8 +56,10 @@ public static class DiscordExtensions {
         Embed? embed = null,
         Embed[]? embeds = null
     ) {
-        await (await client.GetInGameAnnouncementNoticeChannelsAsync(language))
+        var sentMessage = await (await client.GetInGameAnnouncementNoticeChannelsAsync(language))
             .SendMessageAsync(message, embed: embed, embeds: embeds);
+        
+        await sentMessage.CrosspostAsync();
     }
 
     private static Task<IMessageChannel> GetOfficialSiteAnnouncementNoticeChannelsAsync(
@@ -74,8 +76,10 @@ public static class DiscordExtensions {
         Embed? embed = null,
         Embed[]? embeds = null
     ) {
-        await (await client.GetOfficialSiteAnnouncementNoticeChannelsAsync(language))
+        var sentMessage = await (await client.GetOfficialSiteAnnouncementNoticeChannelsAsync(language))
             .SendMessageAsync(message, embed: embed, embeds: embeds);
+
+        await sentMessage.CrosspostAsync();
     }
 
     public static SocketGuild GetCurrentWorkingGuild(this DiscordSocketClient client) {
