@@ -19,7 +19,7 @@ public static class ChesterMicroservice {
 
     public static async Task<ChesterCurrentVersion> FetchCurrentVersion(DiscordSocketClient client) {
         var url =
-            $"https://stable-pks.yuh926.com/api/sleep/getOfficalCurrentVersion?token={ConfigHelper.GetChesterApiToken()}";
+            $"http://nokotools.sytes.net/api/sleep/getOfficalCurrentVersion?token={ConfigHelper.GetChesterApiToken()}";
 
         try {
             var response = await HttpModule.Client.GetAsync(url);
@@ -76,7 +76,7 @@ public static class ChesterMicroservice {
             );
         } catch (Exception e) {
             await client.SendMessageInAdminAlertChannel(
-                message: "Failed to fetch game data version number! Retrying in 30 secs...",
+                message: $"Failed to fetch game data version number! Retrying in {RetryInterval} secs...",
                 embed: DiscordMessageMakerForError.MakeGeneralException(e)
             );
 
