@@ -95,14 +95,6 @@ public static class DiscordMessageMakerForRoleChange {
             .WithTitle(message)
             .AddField("Role", MentionUtils.MentionRole(roleId), true)
             .AddField("Role owner count", roleOwnedUserCount, true)
-            .AddField(
-                "Currently tracked roles",
-                DiscordTrackedRoleController
-                    .FindAllTrackedRoles()
-                    .Select(x => x.RoleId)
-                    .ToArray()
-                    .MentionAllRoles()
-            )
             .WithCurrentTimestamp()
             .Build();
     }

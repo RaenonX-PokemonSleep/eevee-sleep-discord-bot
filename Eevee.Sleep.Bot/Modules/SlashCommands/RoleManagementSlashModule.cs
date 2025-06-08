@@ -144,8 +144,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             throw new NullReferenceException("Original response not found");
         }
 
-        await response.ModifyAsync(
-            x => {
+        await response.ModifyAsync(x => {
                 x.Content = null;
                 x.Embed = DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
                     user,
@@ -176,8 +175,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             throw new NullReferenceException("Original response not found");
         }
 
-        await response.ModifyAsync(
-            x => {
+        await response.ModifyAsync(x => {
                 x.Content = null;
                 x.Embed = DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
                     user,
@@ -227,7 +225,14 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
 
         await DiscordRoleRecordController.BulkAddRoles(roleOwnedUsers, [role.Id]);
 
+        var trackedRolesMentions = DiscordTrackedRoleController
+            .FindAllTrackedRoles()
+            .Select(x => x.RoleId)
+            .ToArray()
+            .MentionAllRoles();
+
         await Context.Interaction.RespondAsync(
+            text: $"Currently tracked roles:\n{trackedRolesMentions}",
             embed: DiscordMessageMakerForRoleChange.MakeTrackRoleResult(
                 role.Id,
                 roleOwnedUsers.Length,
@@ -249,7 +254,14 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             .ToArray();
         await DiscordRoleRecordController.BulkRemoveRoles(roleOwnedUsers, [role.Id]);
 
+        var trackedRolesMentions = DiscordTrackedRoleController
+            .FindAllTrackedRoles()
+            .Select(x => x.RoleId)
+            .ToArray()
+            .MentionAllRoles();
+
         await Context.Interaction.RespondAsync(
+            text: $"Currently tracked roles:\n{trackedRolesMentions}",
             embed: DiscordMessageMakerForRoleChange.MakeTrackRoleResult(
                 role.Id,
                 roleOwnedUsers.Length,
