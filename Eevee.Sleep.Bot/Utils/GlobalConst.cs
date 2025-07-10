@@ -14,8 +14,8 @@ public static class GlobalConst {
     }
 
     public static class DiscordPaginationParams {
-        public const int ttl = 3 * 60; // 3 minutes
-        public const int ItemsPerPage = 4;
+        public const int Ttl = 3 * 60; // 3 minutes
 
+        public const int ItemsPerPage = 4;
     }
 }

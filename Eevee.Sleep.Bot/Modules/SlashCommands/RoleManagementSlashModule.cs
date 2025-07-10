@@ -52,11 +52,13 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             Context.User.Id.ToString(),
             new PaginationState<TrackedRoleModel> {
                 CurrentPage = 1,
-                TotalPages = (int)Math.Ceiling((double)roles.Length / GlobalConst.DiscordPaginationParams.ItemsPerPage),
+                TotalPages = (int)Math.Ceiling(
+                    (double)roles.Length / GlobalConst.DiscordPaginationParams.ItemsPerPage
+                ),
                 Collection = roles,
-                ActionButtonId = ButtonId.RoleChanger
+                ActionButtonId = ButtonId.RoleChanger,
             },
-            ttl: TimeSpan.FromSeconds(GlobalConst.DiscordPaginationParams.ttl)
+            ttl: TimeSpan.FromSeconds(GlobalConst.DiscordPaginationParams.Ttl)
         );
 
         string[] messages = [
@@ -98,11 +100,13 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             Context.User.Id.ToString(),
             new PaginationState<TrackedRoleModel> {
                 CurrentPage = 1,
-                TotalPages = (int)Math.Ceiling((double)roles.Length / GlobalConst.DiscordPaginationParams.ItemsPerPage),
+                TotalPages = (int)Math.Ceiling(
+                    (double)roles.Length / GlobalConst.DiscordPaginationParams.ItemsPerPage
+                ),
                 Collection = roles,
-                ActionButtonId = ButtonId.RoleAdder
+                ActionButtonId = ButtonId.RoleAdder,
             },
-            ttl: TimeSpan.FromSeconds(GlobalConst.DiscordPaginationParams.ttl)
+            ttl: TimeSpan.FromSeconds(GlobalConst.DiscordPaginationParams.Ttl)
         );
 
         string[] messages = [
@@ -138,11 +142,13 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             Context.User.Id.ToString(),
             new PaginationState<TrackedRoleModel> {
                 CurrentPage = 1,
-                TotalPages = (int)Math.Ceiling((double)roles.Length / GlobalConst.DiscordPaginationParams.ItemsPerPage),
+                TotalPages = (int)Math.Ceiling(
+                    (double)roles.Length / GlobalConst.DiscordPaginationParams.ItemsPerPage
+                ),
                 Collection = roles,
-                ActionButtonId = ButtonId.RoleRemover
+                ActionButtonId = ButtonId.RoleRemover,
             },
-            ttl: TimeSpan.FromSeconds(GlobalConst.DiscordPaginationParams.ttl)
+            ttl: TimeSpan.FromSeconds(GlobalConst.DiscordPaginationParams.Ttl)
         );
 
         string[] messages = [
@@ -188,8 +194,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
                 DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
                 Colors.Success
             );
-        }
-        );
+        });
     }
 
     [SlashCommand("remove-all", "Remove all tracked roles.")]
@@ -219,8 +224,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
                 DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
                 Colors.Success
             );
-        }
-        );
+        });
     }
 
     [SlashCommand("show", "Shows all the owned tracked roles.")]
