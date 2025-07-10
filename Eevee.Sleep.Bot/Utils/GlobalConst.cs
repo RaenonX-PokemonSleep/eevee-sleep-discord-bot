@@ -12,4 +12,10 @@ public static class GlobalConst {
 
         public const string Afdian = "afdian";
     }
+
+    public static class DiscordPaginationParams {
+        public const int ttl = 3 * 60; // 3 minutes
+        public const int ItemsPerPage = 4;
+
+    }
 }

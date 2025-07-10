@@ -5,6 +5,8 @@ using Discord.WebSocket;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Handlers.EventHandlers;
+using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Models.Pagination;
 using Eevee.Sleep.Bot.Utils;
 using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using IResult = Discord.Interactions.IResult;
@@ -172,6 +174,17 @@ public class InteractionHandler(
     private static async Task OnButtonClicked(SocketMessageComponent component) {
         var info = ButtonInteractionInfoSerializer.Deserialize(component.Data.CustomId);
         var buttonId = info?.ButtonId;
+        var discordPaginationState = DiscordPaginationContext<TrackedRoleModel>.GetState(
+            component.User.Id.ToString()
+        );
+
+        if (discordPaginationState is null) {
+            await component.RespondAsync(
+                "The command has expired. Please run the command again.",
+                ephemeral: true
+            );
+            return;
+        }
 
         if (info is null || component.User is not SocketGuildUser user) {
             throw new ArgumentException("Button interaction info or user is null!");
@@ -189,6 +202,11 @@ public class InteractionHandler(
                     ),
                     ephemeral: true
                 );
+
+                if (discordPaginationState is not null) {
+                    DiscordPaginationContext<TrackedRoleModel>.RemoveState(component.User.Id.ToString());
+                }
+
                 break;
             case ButtonId.RoleAdder:
                 await ButtonClickedHandler.AddRoleButtonClicked(info, user);
@@ -196,6 +214,11 @@ public class InteractionHandler(
                     $"{MentionUtils.MentionRole(info.CustomId)} has been added.",
                     ephemeral: true
                 );
+
+                if (discordPaginationState is not null) {
+                    DiscordPaginationContext<TrackedRoleModel>.RemoveState(component.User.Id.ToString());
+                }
+
                 break;
             case ButtonId.RoleRemover:
                 await ButtonClickedHandler.RemoveRoleButtonClicked(info, user);
@@ -208,6 +231,53 @@ public class InteractionHandler(
                     ),
                     ephemeral: true
                 );
+
+                if (discordPaginationState is not null) {
+                    DiscordPaginationContext<TrackedRoleModel>.RemoveState(component.User.Id.ToString());
+                }
+
+                break;
+            case ButtonId.PageNext:
+                if (discordPaginationState.CurrentPage >= discordPaginationState.TotalPages) {
+                    await component.RespondAsync(
+                        "You are already on the last page.",
+                        ephemeral: true
+                    );
+                    return;
+                }
+
+                await component.RespondAsync(
+                    ephemeral: true,
+                    components: DiscordMessageMakerForRoleChange.MakeRoleSelectButton(
+                        discordPaginationState.Collection.ToArray(),
+                        discordPaginationState.ActionButtonId,
+                        discordPaginationState.CurrentPage + 1,
+                        GlobalConst.DiscordPaginationParams.ItemsPerPage
+                    )
+                );
+                DiscordPaginationContext<TrackedRoleModel>.GotoNextPage(component.User.Id.ToString());
+
+                break;
+            case ButtonId.PagePrevious:
+                if (discordPaginationState.CurrentPage <= 1) {
+                    await component.RespondAsync(
+                        "You are already on the first page.",
+                        ephemeral: true
+                    );
+                    return;
+                }
+
+                await component.RespondAsync(
+                    ephemeral: true,
+                    components: DiscordMessageMakerForRoleChange.MakeRoleSelectButton(
+                        discordPaginationState.Collection.ToArray(),
+                        discordPaginationState.ActionButtonId,
+                        discordPaginationState.CurrentPage - 1,
+                        GlobalConst.DiscordPaginationParams.ItemsPerPage
+                    )
+                );
+                DiscordPaginationContext<TrackedRoleModel>.GotoPreviousPage(component.User.Id.ToString());
+
                 break;
             default:
                 throw new ArgumentException($"Unhandled button ID: {buttonId}.");

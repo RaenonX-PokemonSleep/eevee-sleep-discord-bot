@@ -4,4 +4,6 @@ public enum ButtonId {
     RoleChanger,
     RoleAdder,
     RoleRemover,
+    PageNext,
+    PagePrevious,
 }
