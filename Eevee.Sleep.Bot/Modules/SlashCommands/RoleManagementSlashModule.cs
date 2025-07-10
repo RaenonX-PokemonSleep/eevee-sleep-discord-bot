@@ -3,6 +3,9 @@ using Discord.Interactions;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
+using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Models.Pagination;
+using Eevee.Sleep.Bot.Utils;
 using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using JetBrains.Annotations;
 
@@ -45,6 +48,19 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             return SendEphemeralMessageToBeDeletedAsync("No roles available for selection.");
         }
 
+        DiscordPaginationContext<TrackedRoleModel>.SaveState(
+            Context.User.Id.ToString(),
+            new PaginationState<TrackedRoleModel> {
+                CurrentPage = 1,
+                TotalPages = (int)Math.Ceiling(
+                    (double)roles.Length / GlobalConst.DiscordPaginationParams.ItemsPerPage
+                ),
+                Collection = roles,
+                ActionButtonId = ButtonId.RoleChanger,
+            },
+            ttl: TimeSpan.FromSeconds(GlobalConst.DiscordPaginationParams.Ttl)
+        );
+
         string[] messages = [
             "Select the role to display.",
             "",
@@ -80,6 +96,19 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
             return SendEphemeralMessageToBeDeletedAsync("No roles available for addition.");
         }
 
+        DiscordPaginationContext<TrackedRoleModel>.SaveState(
+            Context.User.Id.ToString(),
+            new PaginationState<TrackedRoleModel> {
+                CurrentPage = 1,
+                TotalPages = (int)Math.Ceiling(
+                    (double)roles.Length / GlobalConst.DiscordPaginationParams.ItemsPerPage
+                ),
+                Collection = roles,
+                ActionButtonId = ButtonId.RoleAdder,
+            },
+            ttl: TimeSpan.FromSeconds(GlobalConst.DiscordPaginationParams.Ttl)
+        );
+
         string[] messages = [
             "Select a role to obtain the ownership on Discord.",
             "This does not guarantee that the selected role will show. To ensure the selected role shows up, use `/role display` instead.",
@@ -108,6 +137,19 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         if (roles.Length == 0) {
             return SendEphemeralMessageToBeDeletedAsync("No roles available for removal.");
         }
+
+        DiscordPaginationContext<TrackedRoleModel>.SaveState(
+            Context.User.Id.ToString(),
+            new PaginationState<TrackedRoleModel> {
+                CurrentPage = 1,
+                TotalPages = (int)Math.Ceiling(
+                    (double)roles.Length / GlobalConst.DiscordPaginationParams.ItemsPerPage
+                ),
+                Collection = roles,
+                ActionButtonId = ButtonId.RoleRemover,
+            },
+            ttl: TimeSpan.FromSeconds(GlobalConst.DiscordPaginationParams.Ttl)
+        );
 
         string[] messages = [
             "Select a role to remove the ownership on Discord.",
@@ -145,15 +187,14 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         }
 
         await response.ModifyAsync(x => {
-                x.Content = null;
-                x.Embed = DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
-                    user,
-                    previousRoleIds,
-                    DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
-                    Colors.Success
-                );
-            }
-        );
+            x.Content = null;
+            x.Embed = DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
+                user,
+                previousRoleIds,
+                DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
+                Colors.Success
+            );
+        });
     }
 
     [SlashCommand("remove-all", "Remove all tracked roles.")]
@@ -176,15 +217,14 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         }
 
         await response.ModifyAsync(x => {
-                x.Content = null;
-                x.Embed = DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
-                    user,
-                    previousRoleIds,
-                    DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
-                    Colors.Success
-                );
-            }
-        );
+            x.Content = null;
+            x.Embed = DiscordMessageMakerForRoleChange.MakeChangeRoleResult(
+                user,
+                previousRoleIds,
+                DiscordRoleRecordController.FindRoleIdsByUserId(user.Id),
+                Colors.Success
+            );
+        });
     }
 
     [SlashCommand("show", "Shows all the owned tracked roles.")]

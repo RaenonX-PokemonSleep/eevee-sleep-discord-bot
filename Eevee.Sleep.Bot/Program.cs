@@ -12,6 +12,7 @@ using Eevee.Sleep.Bot.Workers.ActivationChecker;
 using Eevee.Sleep.Bot.Workers.ActivationChecker.Removal;
 using Eevee.Sleep.Bot.Workers.Announcement;
 using Eevee.Sleep.Bot.Workers.Crawlers;
+using Eevee.Sleep.Bot.Workers.PaginationContext;
 
 var socketConfig = new DiscordSocketConfig {
     GatewayIntents =
@@ -62,6 +63,7 @@ builder.Services
     .AddHostedService<ActivationCheckerWorker>()
     .AddHostedService<ActivationKeyRemovalWatcher>()
     .AddHostedService<ActivationDataRemovalWatcher>()
+    .AddHostedService<DiscordPaginationContextCleanupWorker>()
     .AddControllers();
 
 var app = builder

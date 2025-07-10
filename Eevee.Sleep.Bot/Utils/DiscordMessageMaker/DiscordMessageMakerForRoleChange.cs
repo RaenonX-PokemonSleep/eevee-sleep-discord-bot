@@ -1,5 +1,4 @@
 using Discord;
-using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
@@ -15,15 +14,21 @@ public static class DiscordMessageMakerForRoleChange {
 
     public static MessageComponent MakeRoleSelectButton(
         TrackedRoleModel[] roles,
-        ButtonId buttonId
+        ButtonId buttonId,
+        int currentPage = 1,
+        int itemsPerPage = GlobalConst.DiscordPaginationParams.ItemsPerPage
     ) {
         var builder = new ComponentBuilder();
+        var totalPages = (int)Math.Ceiling((double)roles.Length / itemsPerPage);
+        var startIndex = (currentPage - 1) * itemsPerPage;
+        var pageRoles = roles.Skip(startIndex).Take(itemsPerPage).ToArray();
 
-        for (var idx = 0; idx < roles.Length; idx++) {
-            var role = roles[idx];
+        // Add role buttons
+        for (var idx = 0; idx < pageRoles.Length; idx++) {
+            var role = pageRoles[idx];
 
             builder.WithButton(
-                (idx + 1).ToString(),
+                (startIndex + idx + 1).ToString(),
                 ButtonInteractionInfoSerializer.Serialize(
                     new ButtonInteractionInfo {
                         ButtonId = buttonId,
@@ -31,6 +36,42 @@ public static class DiscordMessageMakerForRoleChange {
                     }
                 )
             );
+        }
+
+        // Add pagination buttons if needed
+        if (totalPages > 1) {
+            var paginationRow = new ActionRowBuilder();
+
+            paginationRow.WithButton(
+                "◀",
+                ButtonInteractionInfoSerializer.Serialize(
+                    new ButtonInteractionInfo {
+                        ButtonId = ButtonId.PagePrevious,
+                        CustomId = (ulong)buttonId,
+                    }
+                ),
+                disabled: currentPage == 1
+            );
+
+            paginationRow.WithButton(
+                $"{currentPage}/{totalPages}",
+                "page_info",
+                ButtonStyle.Secondary,
+                disabled: true
+            );
+
+            paginationRow.WithButton(
+                "▶",
+                ButtonInteractionInfoSerializer.Serialize(
+                    new ButtonInteractionInfo {
+                        ButtonId = ButtonId.PageNext,
+                        CustomId = (ulong)buttonId,
+                    }
+                ),
+                disabled: currentPage == totalPages
+            );
+
+            builder.AddRow(paginationRow);
         }
 
         return builder.Build();
