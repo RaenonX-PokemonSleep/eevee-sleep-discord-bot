@@ -17,72 +17,96 @@ public static class ChesterMicroservice {
         PropertyNameCaseInsensitive = true,
     };
 
+    private static readonly string[] Hostnames = [
+        "https://stable-pks.yuh926.com",
+        "http://nokotools.sytes.net",
+    ];
+
     public static async Task<ChesterCurrentVersion> FetchCurrentVersion(DiscordSocketClient client) {
-        var url =
-            $"http://stable-pks.yuh926.com/api/sleep/getOfficalCurrentVersion?token={ConfigHelper.GetChesterApiToken()}";
+        Exception? lastException = null;
 
-        try {
-            var response = await HttpModule.Client.GetAsync(url);
+        foreach (var hostname in Hostnames) {
+            var url = $"{hostname}/api/sleep/getOfficalCurrentVersion?token={ConfigHelper.GetChesterApiToken()}";
 
-            if (response.StatusCode == HttpStatusCode.ServiceUnavailable) {
-                throw new OfficialServerInMaintenanceException();
+            try {
+                return await TryFetchFromUrl(url, client);
+            } catch (OfficialServerInMaintenanceException) {
+                var message = await client.SendMessageInAdminAlertChannel(
+                    message: "Official Server is in Maintenance!"
+                );
+                await message.AutoDeleteAfterSeconds(10);
+
+                throw;
+            } catch (Exception e) when (e is JsonException or HttpRequestException) {
+                lastException = e;
             }
+        }
 
-            response.EnsureSuccessStatusCode();
-
-            var newCurrentVersion = await JsonSerializer.DeserializeAsync<ChesterCurrentVersion>(
-                await response.Content.ReadAsStreamAsync(),
-                JsonOptions
-            );
-
-            if (newCurrentVersion is null) {
+        switch (lastException) {
+            case JsonException:
                 await client.SendMessageInAdminAlertChannel(
-                    message: "Failed to fetch current version! The parsed JSON is null."
+                    message: "Failed to parse game data version JSON response!",
+                    embed: DiscordMessageMakerForError.MakeGeneralException(lastException)
                 );
 
                 throw new FetchVersionNumberFailedException(
-                    "Failed to fetch version number (JSON being null).",
-                    new Dictionary<string, string?>()
+                    $"Failed to fetch version number ({lastException.GetType().Name}).",
+                    new Dictionary<string, string?> { { "exception", lastException.Message } }
                 );
-            }
-
-            var originalCurrentVersion = await ChesterCurrentVersionController.UpdateAndGetOriginal(newCurrentVersion);
-
-            if (newCurrentVersion.IsVersionUpdated(originalCurrentVersion)) {
+            case not null:
                 await client.SendMessageInAdminAlertChannel(
-                    message: "<@503484431437398016>",
-                    embed: DiscordMessageMakerForCurrentVersion.MakeCurrentVersionUpdated(
-                        originalCurrentVersion,
-                        newCurrentVersion
-                    )
+                    message: $"Failed to fetch game data version number! Retrying in {RetryInterval} secs...",
+                    embed: DiscordMessageMakerForError.MakeGeneralException(lastException)
                 );
-            }
 
-            return newCurrentVersion;
-        } catch (OfficialServerInMaintenanceException) {
-            var message = await client.SendMessageInAdminAlertChannel(message: "Official Server is in Maintenance!");
-            await message.AutoDeleteAfterSeconds(10);
+                // Keep running until the attempt limit is exceeded
+                await Task.Delay(RetryInterval);
+                return await FetchCurrentVersion(client);
+        }
 
-            throw;
-        } catch (JsonException e) {
+        throw new FetchVersionNumberFailedException(
+            "All hosts were not able to fetch version number.",
+            new Dictionary<string, string?> { { "hostNames", Hostnames.MergeToSameLine() } }
+        );
+    }
+
+    private static async Task<ChesterCurrentVersion> TryFetchFromUrl(string url, DiscordSocketClient client) {
+        var response = await HttpModule.Client.GetAsync(url);
+
+        if (response.StatusCode == HttpStatusCode.ServiceUnavailable) {
+            throw new OfficialServerInMaintenanceException();
+        }
+
+        response.EnsureSuccessStatusCode();
+
+        var newCurrentVersion = await JsonSerializer.DeserializeAsync<ChesterCurrentVersion>(
+            await response.Content.ReadAsStreamAsync(),
+            JsonOptions
+        );
+
+        if (newCurrentVersion is null) {
             await client.SendMessageInAdminAlertChannel(
-                message: "Failed to parse game data version JSON response!",
-                embed: DiscordMessageMakerForError.MakeGeneralException(e)
+                message: "Failed to fetch current version! The parsed JSON is null."
             );
 
             throw new FetchVersionNumberFailedException(
-                $"Failed to fetch version number ({e.GetType().Name}).",
-                new Dictionary<string, string?> { { "exception", e.Message } }
+                "Failed to fetch version number (JSON being null).",
+                new Dictionary<string, string?>()
             );
-        } catch (Exception e) {
-            await client.SendMessageInAdminAlertChannel(
-                message: $"Failed to fetch game data version number! Retrying in {RetryInterval} secs...",
-                embed: DiscordMessageMakerForError.MakeGeneralException(e)
-            );
-
-            // Keep running until the attempt limit is exceeded
-            await Task.Delay(RetryInterval);
-            return await FetchCurrentVersion(client);
         }
+
+        var originalCurrentVersion = await ChesterCurrentVersionController.UpdateAndGetOriginal(newCurrentVersion);
+
+        if (newCurrentVersion.IsVersionUpdated(originalCurrentVersion)) {
+            await client.SendMessageInAdminAlertChannel(
+                message: "<@503484431437398016>",
+                embed: DiscordMessageMakerForCurrentVersion.MakeCurrentVersionUpdated(
+                    originalCurrentVersion,
+                    newCurrentVersion
+                )
+            );
+        }
+
+        return newCurrentVersion;
     }
 }
