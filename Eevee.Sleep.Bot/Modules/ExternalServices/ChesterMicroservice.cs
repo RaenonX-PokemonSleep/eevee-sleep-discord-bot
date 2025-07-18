@@ -11,7 +11,7 @@ using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 namespace Eevee.Sleep.Bot.Modules.ExternalServices;
 
 public static class ChesterMicroservice {
-    private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(30);
 
     private static readonly JsonSerializerOptions JsonOptions = new() {
         PropertyNameCaseInsensitive = true,

@@ -15,7 +15,7 @@ public class InGameAnnouncementCrawler(
     AnnouncementDetailController<InGameAnnouncementDetailModel> detailController,
     AnnouncementHistoryController<InGameAnnouncementDetailModel> historyController
 ) : IAnnouncementCrawler {
-    private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(10);
+    private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(30);
 
     // Used to run only one process when called by multiple workers at the same time.
     private static readonly SemaphoreSlim Semaphore = new(1, 1);

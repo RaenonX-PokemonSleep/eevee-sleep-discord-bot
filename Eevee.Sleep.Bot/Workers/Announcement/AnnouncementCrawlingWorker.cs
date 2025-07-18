@@ -12,7 +12,7 @@ public abstract class AnnouncementCrawlingWorker(
     ILogger<AnnouncementCrawlingWorker> logger
 ) : BackgroundService {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private readonly TimeSpan _checkInterval = TimeSpan.FromSeconds(60);
+    private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(2);
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
         logger.LogInformation("Starting in-game announcement update crawler.");
