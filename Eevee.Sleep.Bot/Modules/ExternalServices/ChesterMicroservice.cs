@@ -31,11 +31,6 @@ public static class ChesterMicroservice {
             try {
                 return await TryFetchFromUrl(url, client);
             } catch (OfficialServerInMaintenanceException) {
-                var message = await client.SendMessageInAdminAlertChannel(
-                    message: "Official Server is in Maintenance!"
-                );
-                await message.AutoDeleteAfterSeconds(10);
-
                 throw;
             } catch (Exception e) when (e is JsonException or HttpRequestException) {
                 lastException = e;
@@ -99,7 +94,7 @@ public static class ChesterMicroservice {
 
         if (newCurrentVersion.IsVersionUpdated(originalCurrentVersion)) {
             await client.SendMessageInAdminAlertChannel(
-                message: "<@503484431437398016>",
+                message: "<@503484431437398016> Data version updated!",
                 embed: DiscordMessageMakerForCurrentVersion.MakeCurrentVersionUpdated(
                     originalCurrentVersion,
                     newCurrentVersion

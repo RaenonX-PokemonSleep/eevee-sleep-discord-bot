@@ -74,10 +74,8 @@ public abstract class ActivationRemovalWatcher<T>(
                 var linkedDiscordRoleId = ulong.Parse(preset.LinkedDiscordRoleIdString);
 
                 await Task.WhenAll(
-                    [
-                        subscriberOnDiscord.RemoveRoleAsync(linkedDiscordRoleId),
-                        DiscordRoleRecordController.RemoveRoles(discordUserId, [linkedDiscordRoleId]),
-                    ]
+                    subscriberOnDiscord.RemoveRoleAsync(linkedDiscordRoleId),
+                    DiscordRoleRecordController.RemoveRoles(discordUserId, [linkedDiscordRoleId])
                 );
 
                 logger.LogInformation(
