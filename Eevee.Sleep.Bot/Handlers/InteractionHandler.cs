@@ -246,16 +246,13 @@ public class InteractionHandler(
                     return;
                 }
 
-                await component.RespondAsync(
-                    ephemeral: true,
-                    components: DiscordMessageMakerForRoleChange.MakeRoleSelectButton(
-                        discordPaginationState.Collection.ToArray(),
-                        discordPaginationState.ActionButtonId,
-                        discordPaginationState.CurrentPage + 1,
-                        GlobalConst.DiscordPaginationParams.ItemsPerPage
-                    )
-                );
                 DiscordPaginationContext<TrackedRoleModel>.GotoNextPage(component.User.Id.ToString());
+                await UpdatePaginationMessage(
+                    component,
+                    discordPaginationState.Collection.ToArray(),
+                    discordPaginationState.ActionButtonId,
+                    discordPaginationState.CurrentPage
+                );
 
                 break;
             case ButtonId.PagePrevious:
@@ -267,20 +264,49 @@ public class InteractionHandler(
                     return;
                 }
 
-                await component.RespondAsync(
-                    ephemeral: true,
-                    components: DiscordMessageMakerForRoleChange.MakeRoleSelectButton(
-                        discordPaginationState.Collection.ToArray(),
-                        discordPaginationState.ActionButtonId,
-                        discordPaginationState.CurrentPage - 1,
-                        GlobalConst.DiscordPaginationParams.ItemsPerPage
-                    )
-                );
                 DiscordPaginationContext<TrackedRoleModel>.GotoPreviousPage(component.User.Id.ToString());
+                await UpdatePaginationMessage(
+                    component,
+                    discordPaginationState.Collection.ToArray(),
+                    discordPaginationState.ActionButtonId,
+                    discordPaginationState.CurrentPage
+                );
 
                 break;
             default:
                 throw new ArgumentException($"Unhandled button ID: {buttonId}.");
         }
+    }
+
+    private static async Task UpdatePaginationMessage(
+        SocketMessageComponent component,
+        TrackedRoleModel[] roles,
+        ButtonId actionButtonId,
+        int currentPage
+    ) {
+        string[] headerMessages = actionButtonId switch {
+            ButtonId.RoleChanger => DiscordMessageMakerForRoleChange.Messages.RoleDisplayHeader,
+            ButtonId.RoleAdder => DiscordMessageMakerForRoleChange.Messages.RoleAddHeader,
+            ButtonId.RoleRemover => DiscordMessageMakerForRoleChange.Messages.RoleRemoveHeader,
+            _ => throw new ArgumentException($"Unhandled action button ID: {actionButtonId}")
+        };
+
+        var messages = headerMessages
+            .Concat(DiscordMessageMakerForRoleChange.MakeRoleSelectCorrespondenceList(
+                roles,
+                currentPage,
+                GlobalConst.DiscordPaginationParams.ItemsPerPage
+            ))
+            .ToArray();
+
+        await component.UpdateAsync(x => {
+            x.Content = messages.MergeLines();
+            x.Components = DiscordMessageMakerForRoleChange.MakeRoleSelectButton(
+                roles,
+                actionButtonId,
+                currentPage,
+                GlobalConst.DiscordPaginationParams.ItemsPerPage
+            );
+        });
     }
 }

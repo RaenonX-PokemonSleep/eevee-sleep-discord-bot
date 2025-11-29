@@ -62,11 +62,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         );
 
         string[] messages = [
-            "Select the role to display.",
-            "",
-            "All tracked roles will be removed from after selecting the role to display.",
-            "Role ownership won't get affected by the removal, only the role assignment on Discord is affected.",
-            "",
+            ..DiscordMessageMakerForRoleChange.Messages.RoleDisplayHeader,
             ..DiscordMessageMakerForRoleChange.MakeRoleSelectCorrespondenceList(roles),
         ];
 
@@ -110,9 +106,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         );
 
         string[] messages = [
-            "Select a role to obtain the ownership on Discord.",
-            "This does not guarantee that the selected role will show. To ensure the selected role shows up, use `/role display` instead.",
-            "",
+            ..DiscordMessageMakerForRoleChange.Messages.RoleAddHeader,
             ..DiscordMessageMakerForRoleChange.MakeRoleSelectCorrespondenceList(roles),
         ];
 
@@ -152,9 +146,7 @@ public class RoleManagementSlashModule : InteractionModuleBase<SocketInteraction
         );
 
         string[] messages = [
-            "Select a role to remove the ownership on Discord.",
-            "This does not remove the actual ownership of the role. You can get them back using either `/role add` or `/role display` at any time.",
-            "",
+            ..DiscordMessageMakerForRoleChange.Messages.RoleRemoveHeader,
             ..DiscordMessageMakerForRoleChange.MakeRoleSelectCorrespondenceList(roles),
         ];
 

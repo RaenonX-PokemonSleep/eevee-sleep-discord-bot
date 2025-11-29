@@ -6,10 +6,37 @@ using Eevee.Sleep.Bot.Models;
 namespace Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 
 public static class DiscordMessageMakerForRoleChange {
+    public static class Messages {
+        public static readonly string[] RoleDisplayHeader = [
+            "Select the role to display.",
+            "",
+            "All tracked roles will be removed from after selecting the role to display.",
+            "Role ownership won't get affected by the removal, only the role assignment on Discord is affected.",
+            "",
+        ];
+
+        public static readonly string[] RoleAddHeader = [
+            "Select a role to obtain the ownership on Discord.",
+            "This does not guarantee that the selected role will show. To ensure the selected role shows up, use `/role display` instead.",
+            "",
+        ];
+
+        public static readonly string[] RoleRemoveHeader = [
+            "Select a role to remove the ownership on Discord.",
+            "This does not remove the actual ownership of the role. You can get them back using either `/role add` or `/role display` at any time.",
+            "",
+        ];
+    }
+
     public static IEnumerable<string> MakeRoleSelectCorrespondenceList(
-        TrackedRoleModel[] roles
+        TrackedRoleModel[] roles,
+        int currentPage = 1,
+        int itemsPerPage = GlobalConst.DiscordPaginationParams.ItemsPerPage
     ) {
-        return roles.Select((role, idx) => $"`{idx + 1}` - {MentionUtils.MentionRole(role.RoleId)}");
+        var startIndex = (currentPage - 1) * itemsPerPage;
+        var pageRoles = roles.Skip(startIndex).Take(itemsPerPage).ToArray();
+        
+        return pageRoles.Select((role, idx) => $"`{startIndex + idx + 1}` - {MentionUtils.MentionRole(role.RoleId)}");
     }
 
     public static MessageComponent MakeRoleSelectButton(
