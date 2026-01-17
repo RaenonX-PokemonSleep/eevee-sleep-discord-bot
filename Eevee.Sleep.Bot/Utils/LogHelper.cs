@@ -14,6 +14,6 @@ public static class LogHelper {
     );
 
     public static ILogger CreateLogger(Type @class) {
-        return Factory.CreateLogger(@class.FullName ?? @class.Assembly.Location);
+        return Factory.CreateLogger(@class.FullName ?? @class.Name);
     }
 }
