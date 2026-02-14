@@ -33,6 +33,7 @@ public static class ActivationController {
                 (
                     x.Source == GlobalConst.SubscriptionSource.Github ||
                     x.Source == GlobalConst.SubscriptionSource.Patreon ||
+                    x.Source == GlobalConst.SubscriptionSource.Stripe ||
                     x.Source == GlobalConst.SubscriptionSource.Afdian
                 ) &&
                 x.Contact.Discord != null
@@ -42,6 +43,7 @@ public static class ActivationController {
                 (
                     x.Source == GlobalConst.SubscriptionSource.Github ||
                     x.Source == GlobalConst.SubscriptionSource.Patreon ||
+                    x.Source == GlobalConst.SubscriptionSource.Stripe ||
                     x.Source == GlobalConst.SubscriptionSource.Afdian
                 ) &&
                 x.Contact.Discord != null

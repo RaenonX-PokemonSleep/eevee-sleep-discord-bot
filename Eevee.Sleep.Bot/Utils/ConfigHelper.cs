@@ -56,8 +56,20 @@ public static class ConfigHelper {
         return GetDiscordSection().GetRequiredSection("Roles");
     }
 
+    private static IConfigurationSection GetDiscordSubscriberSection() {
+        return GetDiscordRolesSection().GetRequiredSection("Subscriber");
+    }
+
     public static ulong GetDiscordSubscriberRoleId() {
-        return GetDiscordRolesSection().GetRequiredValue<ulong>("Subscriber");
+        return GetDiscordSubscriberSection().GetRequiredValue<ulong>("Discord");
+    }
+
+    public static ulong GetDiscordStripeSubscriberRoleId() {
+        return GetDiscordSubscriberSection().GetRequiredValue<ulong>("Stripe");
+    }
+
+    public static ulong GetDiscordGithubSubscriberRoleId() {
+        return GetDiscordSubscriberSection().GetRequiredValue<ulong>("Github");
     }
 
     private static IConfigurationSection GetInGameAnnouncementNotificationRoleSection() {
