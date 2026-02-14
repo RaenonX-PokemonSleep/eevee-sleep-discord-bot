@@ -13,7 +13,7 @@ public class SubscribedUserController(
     DiscordSocketClient client
 ) : ControllerBase {
     [HttpGet(Name = "GetSubscribedUsers")]
-    public IEnumerable<SubscribedUserModel> Get() {
+    public async Task<IEnumerable<SubscribedUserModel>> Get() {
         var taggedRoleIds = ActivationPresetController.GetTaggedRolesSubscribersOnly()
             .Select(x => x.RoleId)
             .ToHashSet();
@@ -24,7 +24,19 @@ public class SubscribedUserController(
             taggedRoleIds.Count
         );
 
-        return client.GetCurrentWorkingGuild()
+        var guild = client.GetCurrentWorkingGuild();
+        
+        // Only download if members aren't already cached or cache is stale
+        if (!guild.HasAllMembers || guild.DownloadedMemberCount < guild.MemberCount) {
+            logger.LogInformation(
+                "Downloading guild members (cached: {cached}/{total})",
+                guild.DownloadedMemberCount,
+                guild.MemberCount
+            );
+            await guild.DownloadUsersAsync();
+        }
+
+        return guild
             .Roles
             .Where(x => taggedRoleIds.Contains(x.Id))
             .SelectMany(

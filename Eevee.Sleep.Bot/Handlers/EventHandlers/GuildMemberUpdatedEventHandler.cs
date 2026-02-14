@@ -169,22 +169,37 @@ public static class GuildMemberUpdatedEventHandler {
         Cacheable<SocketGuildUser, ulong> original,
         SocketGuildUser updated
     ) {
+        SocketGuildUser originalUser;
+        
         if (!original.HasValue) {
-            Logger.LogWarning("User data of {UserId} not cached", original.Id);
-            await client.SendMessageInAdminAlertChannel(
-                embed: DiscordMessageMakerForActivation.MakeUserDataNotCached(original.Id, updated)
-            );
-            return;
+            // User not cached - download from Discord API
+            Logger.LogDebug("User data of {UserId} not cached, downloading from API", original.Id);
+            
+            try {
+                originalUser = await original.GetOrDownloadAsync();
+            } catch (Exception ex) {
+                Logger.LogWarning(
+                    ex,
+                    "Failed to download user data for {UserId}, cannot process member update",
+                    original.Id
+                );
+                await client.SendMessageInAdminAlertChannel(
+                    embed: DiscordMessageMakerForActivation.MakeUserDataNotCached(original.Id, updated)
+                );
+                return;
+            }
+        } else {
+            originalUser = original.Value;
         }
 
         var taggedRoles = ActivationPresetController
             .GetTaggedRolesAll();
 
         var rolesAdded = updated.Roles
-            .ExceptBy(original.Value.Roles.Select(x => x.Id), role => role.Id)
+            .ExceptBy(originalUser.Roles.Select(x => x.Id), role => role.Id)
             .Select(x => x.Id)
             .ToArray();
-        var rolesRemoved = original.Value.Roles
+        var rolesRemoved = originalUser.Roles
             .ExceptBy(updated.Roles.Select(x => x.Id), role => role.Id)
             .Select(x => x.Id)
             .ToArray();
