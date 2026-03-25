@@ -11,7 +11,8 @@ namespace Eevee.Sleep.Bot.Workers.ActivationChecker;
 
 public class ActivationCheckerWorker(
     DiscordSocketClient client,
-    ILogger<ActivationCheckerWorker> logger
+    ILogger<ActivationCheckerWorker> logger,
+    IHostEnvironment env
 ) : BackgroundService {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(5);
@@ -281,7 +282,14 @@ public class ActivationCheckerWorker(
                 logger.LogInformation("Checking Discord roles on subscribers");
 
                 try {
-                    await CheckExternalActivations();
+                    if (env.IsDevelopment()) {
+                        logger.LogInformation(
+                            "Skipping {MethodName}() - current environment is Development",
+                            nameof(CheckExternalActivations)
+                        );
+                    } else {
+                        await CheckExternalActivations();
+                    }
                 } catch {
                     await _cancellationTokenSource.CancelAsync();
                     throw;
