@@ -44,11 +44,12 @@ public class InteractionHandler(
 
     private async Task ReadyAsync() {
         if (env.IsDevelopment()) {
+            // Can't register to guild / globally at the same time, or the working guild will duplicate the command
             var guildId = ConfigHelper.GetDiscordWorkingGuild();
             logger.LogInformation("Registering commands to Guild ID #{GuildId}", guildId);
             await handler.RegisterCommandsToGuildAsync(guildId);
         }
-
+        
         if (env.IsProduction()) {
             logger.LogInformation("Globally registering commands");
             await handler.RegisterCommandsGloballyAsync();
