@@ -46,6 +46,10 @@ public class ActivationCheckerWorker(
             return;
         }
 
+        if (externalActivation.DiscordUser.Roles.Any(r => r.Id == linkedDiscordRoleId)) {
+            return;
+        }
+
         if (!trackedRolesOfUser.Add(linkedDiscordRoleId)) {
             return;
         }
@@ -79,6 +83,10 @@ public class ActivationCheckerWorker(
         }
 
         activeUsers.Add(externalActivation.DiscordUser.Id);
+
+        if (externalActivation.DiscordUser.Roles.Any(r => r.Id == platformRoleId)) {
+            return;
+        }
 
         if (!trackedRolesOfUser.Add(platformRoleId)) {
             return;
@@ -216,19 +224,7 @@ public class ActivationCheckerWorker(
 
         var presetDict = ActivationPresetController.GetPresetDictByUuid(targetPresetUuids);
 
-        var roleRecordDict = await DiscordRoleRecordController.GetRoleRecordLookup(
-            externalActivations.Select(x => x.DiscordUser.Id)
-        );
-
-        var trackedRolesByUser = externalActivations
-            .GroupBy(x => x.DiscordUser.Id)
-            .ToDictionary(
-                group => group.Key,
-                group =>
-                    roleRecordDict.TryGetValue(group.Key, out var roleRecord) ?
-                        roleRecord.Roles.ToHashSet() :
-                        group.First().DiscordUser.Roles.Select(x => x.Id).ToHashSet()
-            );
+        var trackedRolesByUser = new Dictionary<ulong, HashSet<ulong>>();
 
         foreach (var externalActivation in externalActivations) {
             var rolesToApply = new List<ActivationPresetRole>();
