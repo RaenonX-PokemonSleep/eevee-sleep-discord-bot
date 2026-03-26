@@ -7,6 +7,7 @@ using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Handlers.EventHandlers;
 using Eevee.Sleep.Bot.Models;
 using Eevee.Sleep.Bot.Models.Pagination;
+using Eevee.Sleep.Bot.Modules.SlashCommands;
 using Eevee.Sleep.Bot.Utils;
 using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using IResult = Discord.Interactions.IResult;
@@ -33,6 +34,10 @@ public class InteractionHandler(
             GuildMemberUpdatedEventHandler.OnEvent(client, env, cached, updated);
         client.UserLeft += (_, user) =>
             GuildMemberLeftEventHandler.OnEvent(client, user);
+        client.ReactionAdded += (cachedMessage, cachedChannel, reaction) =>
+            ReactionRoleEventHandler.OnReactionAdded(client, cachedMessage, cachedChannel, reaction);
+        client.ReactionRemoved += (cachedMessage, cachedChannel, reaction) =>
+            ReactionRoleEventHandler.OnReactionRemoved(client, cachedMessage, cachedChannel, reaction);
 
         handler.SlashCommandExecuted += OnSlashCommandExecuted;
     }
@@ -164,6 +169,52 @@ public class InteractionHandler(
                 await modal.RespondAsync($"Sticker stolen as **{stickerName}**!");
                 break;
             }
+            case ModalId.RoleEventModal: {
+                var designer = components
+                    .First(x => x.CustomId.ToModalFieldId() == ModalFieldId.RoleEventDesigner).Value ?? "";
+                var entriesRaw = components
+                    .First(x => x.CustomId.ToModalFieldId() == ModalFieldId.RoleEventEntries).Value ?? "";
+                var subEntriesRaw = components
+                    .FirstOrDefault(x => x.CustomId.ToModalFieldId() == ModalFieldId.RoleEventSubscriberEntries)
+                    ?.Value;
+                var expiryRaw = components
+                    .FirstOrDefault(x => x.CustomId.ToModalFieldId() == ModalFieldId.RoleEventExpiryEpoch)
+                    ?.Value;
+                var omitLangRaw = components
+                    .FirstOrDefault(x => x.CustomId.ToModalFieldId() == ModalFieldId.RoleEventOmitLangRoles)
+                    ?.Value;
+
+                var guildId = modal.GuildId;
+                if (guildId is null) {
+                    throw new ArgumentException("Guild ID is null from role event modal!");
+                }
+
+                var guild = client.GetGuild(guildId.Value);
+                var resolvedExpiry = long.TryParse(expiryRaw, out var parsedEpoch)
+                    ? parsedEpoch
+                    : DateTimeOffset.UtcNow.AddDays(14).ToUnixTimeSeconds();
+                var resolvedOmitLang = bool.TryParse(omitLangRaw, out var parsedOmit)
+                    ? parsedOmit
+                    : env.IsDevelopment();
+
+                var freeEntries = AdminSlashModule.ParseCsvEntries(entriesRaw);
+                var subEntries = !string.IsNullOrWhiteSpace(subEntriesRaw)
+                    ? AdminSlashModule.ParseCsvEntries(subEntriesRaw)
+                    : (List<RoleEventEntry>)[];
+
+                var validationError = AdminSlashModule.ValidateAll(guild, designer, freeEntries, subEntries);
+                if (validationError is not null) {
+                    await modal.RespondAsync(validationError, ephemeral: true);
+                    break;
+                }
+
+                var normalizedDesigner = AdminSlashModule.NormalizeDesigner(guild, designer);
+
+                await AdminSlashModule.ShowPreview(
+                    modal, modal.User.Id, freeEntries, subEntries, normalizedDesigner, resolvedExpiry, resolvedOmitLang
+                );
+                break;
+            }
             case null:
                 return;
             default:
@@ -174,6 +225,13 @@ public class InteractionHandler(
     private static async Task OnButtonClicked(SocketMessageComponent component) {
         var info = ButtonInteractionInfoSerializer.Deserialize(component.Data.CustomId);
         var buttonId = info?.ButtonId;
+
+        // Handle role event buttons before pagination state check
+        if (buttonId is ButtonId.RoleEventConfirm or ButtonId.RoleEventCancel) {
+            await OnRoleEventButtonClicked(component, buttonId.Value);
+            return;
+        }
+
         var discordPaginationState = DiscordPaginationContext<TrackedRoleModel>.GetState(
             component.User.Id.ToString()
         );
@@ -232,9 +290,7 @@ public class InteractionHandler(
                     ephemeral: true
                 );
 
-                if (discordPaginationState is not null) {
-                    DiscordPaginationContext<TrackedRoleModel>.RemoveState(component.User.Id.ToString());
-                }
+                DiscordPaginationContext<TrackedRoleModel>.RemoveState(component.User.Id.ToString());
 
                 break;
             case ButtonId.PageNext:
@@ -292,21 +348,77 @@ public class InteractionHandler(
         };
 
         var messages = headerMessages
-            .Concat(DiscordMessageMakerForRoleChange.MakeRoleSelectCorrespondenceList(
-                roles,
-                currentPage,
-                GlobalConst.DiscordPaginationParams.ItemsPerPage
-            ))
+            .Concat(
+                DiscordMessageMakerForRoleChange.MakeRoleSelectCorrespondenceList(
+                    roles,
+                    currentPage,
+                    GlobalConst.DiscordPaginationParams.ItemsPerPage
+                )
+            )
             .ToArray();
 
         await component.UpdateAsync(x => {
-            x.Content = messages.MergeLines();
-            x.Components = DiscordMessageMakerForRoleChange.MakeRoleSelectButton(
-                roles,
-                actionButtonId,
-                currentPage,
-                GlobalConst.DiscordPaginationParams.ItemsPerPage
+                x.Content = messages.MergeLines();
+                x.Components = DiscordMessageMakerForRoleChange.MakeRoleSelectButton(
+                    roles,
+                    actionButtonId,
+                    currentPage,
+                    GlobalConst.DiscordPaginationParams.ItemsPerPage
+                );
+            }
+        );
+    }
+
+    private static async Task OnRoleEventButtonClicked(
+        SocketMessageComponent component,
+        ButtonId buttonId
+    ) {
+        var userId = component.User.Id;
+
+        if (buttonId is ButtonId.RoleEventCancel) {
+            RoleEventPendingStore.Remove(userId);
+            await component.UpdateAsync(x => {
+                    x.Content = "Role event cancelled.";
+                    x.Embed = null;
+                    x.Components = new ComponentBuilder().Build();
+                }
             );
-        });
+            return;
+        }
+
+        var pendingData = RoleEventPendingStore.Get(userId);
+        if (pendingData is null) {
+            await component.RespondAsync(
+                "Role event session expired. Please run the command again.",
+                ephemeral: true
+            );
+            return;
+        }
+
+        RoleEventPendingStore.Remove(userId);
+
+        await component.UpdateAsync(x => {
+                x.Content = "Role event confirmed. Processing...";
+                x.Embed = null;
+                x.Components = new ComponentBuilder().Build();
+            }
+        );
+
+        var guild = (component.User as SocketGuildUser)?.Guild;
+        if (guild is null) {
+            await component.FollowupAsync("Could not resolve guild.", ephemeral: true);
+            return;
+        }
+
+        await RoleEventHelper.ExecuteRoleEvent(
+            guild,
+            component,
+            pendingData.FreeEntries,
+            pendingData.SubscriberEntries,
+            pendingData.Designer,
+            pendingData.ExpiryEpoch,
+            pendingData.OmitLangRoles,
+            msg => component.ModifyOriginalResponseAsync(x => x.Content = msg)
+        );
     }
 }

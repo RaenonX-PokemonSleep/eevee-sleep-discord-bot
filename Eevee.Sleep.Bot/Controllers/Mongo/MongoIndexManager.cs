@@ -23,6 +23,8 @@ public static class MongoIndexManager {
             InGameAnnouncementIndexAnnounceIdIndex(),
             InGameAnnouncementDetailAnnounceIdIndex(),
             InGameAnnouncementHistoryAnnounceIdIndex(),
+            DiscordReactionRoleMessageIdIndex(),
+            DiscordSelfDestructEpochIndex(),
         };
     }
 
@@ -173,5 +175,24 @@ public static class MongoIndexManager {
         var indexModel = new CreateIndexModel<InGameAnnouncementDetailModel>(indexKeys);
 
         return MongoConst.InGameAnnouncementHistoryCollection.Indexes.CreateOneAsync(indexModel);
+    }
+
+    private static Task<string> DiscordReactionRoleMessageIdIndex() {
+        var indexKeys = Builders<ReactionRoleMessageModel>.IndexKeys
+            .Ascending(data => data.MessageId);
+        var indexModel = new CreateIndexModel<ReactionRoleMessageModel>(
+            indexKeys,
+            new CreateIndexOptions { Unique = true }
+        );
+
+        return MongoConst.DiscordReactionRoleCollection.Indexes.CreateOneAsync(indexModel);
+    }
+
+    private static Task<string> DiscordSelfDestructEpochIndex() {
+        var indexKeys = Builders<SelfDestructMessageModel>.IndexKeys
+            .Ascending(data => data.DestructAtEpochSec);
+        var indexModel = new CreateIndexModel<SelfDestructMessageModel>(indexKeys);
+
+        return MongoConst.DiscordSelfDestructCollection.Indexes.CreateOneAsync(indexModel);
     }
 }

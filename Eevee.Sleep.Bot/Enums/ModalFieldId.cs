@@ -6,4 +6,9 @@ public enum ModalFieldId {
     StickerName,
     StickerDescription,
     StickerLink,
+    RoleEventDesigner,
+    RoleEventEntries,
+    RoleEventSubscriberEntries,
+    RoleEventExpiryEpoch,
+    RoleEventOmitLangRoles,
 }

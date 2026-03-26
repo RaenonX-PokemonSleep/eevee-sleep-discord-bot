@@ -134,6 +134,33 @@ public static class ConfigHelper {
         return Config.GetRequiredValue<string>("AllowedOrigin");
     }
 
+    private static IConfigurationSection GetRoleEventSection() {
+        return GetDiscordSection().GetRequiredSection("RoleEvent");
+    }
+
+    public static ulong GetRoleEventTargetChannelId() {
+        return GetRoleEventSection().GetRequiredValue<ulong>("TargetChannelId");
+    }
+
+    public static ulong GetRoleEventAnchorRoleId() {
+        return GetRoleEventSection().GetRequiredValue<ulong>("AnchorRoleId");
+    }
+
+    public static ulong[] GetRoleEventSubscriberWhitelistRoleIds() {
+        return GetRoleEventSection()
+            .GetSection("SubscriberWhitelistRoleIds")
+            .Get<ulong[]>() ?? [];
+    }
+
+    public static ulong[] GetAllSubscriberRoleIds() {
+        return [
+            GetDiscordSubscriberRoleId(),
+            GetDiscordStripeSubscriberRoleId(),
+            GetDiscordGithubSubscriberRoleId(),
+            ..GetRoleEventSubscriberWhitelistRoleIds(),
+        ];
+    }
+
     public static string GetMongoDbUrl() {
         return Config.GetRequiredSection("Mongo").GetRequiredValue<string>("Url");
     }

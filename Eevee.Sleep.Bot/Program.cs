@@ -64,6 +64,7 @@ builder.Services
     .AddHostedService<ActivationKeyRemovalWatcher>()
     .AddHostedService<ActivationDataRemovalWatcher>()
     .AddHostedService<DiscordPaginationContextCleanupWorker>()
+    .AddHostedService<DiscordMessageSelfDestructWorker>()
     .AddControllers();
 
 var app = builder

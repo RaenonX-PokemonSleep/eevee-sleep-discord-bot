@@ -69,4 +69,12 @@ public static class MongoConst {
 
     public static readonly IMongoCollection<ChesterCurrentVersion> GameChesterCurrentVersionCollection =
         GameDatabase.GetCollection<ChesterCurrentVersion>("currentVersion/chester");
+
+    public static readonly IMongoCollection<ReactionRoleMessageModel>
+        DiscordReactionRoleCollection =
+            DiscordDatabase.GetCollection<ReactionRoleMessageModel>("reactionRole");
+
+    public static readonly IMongoCollection<SelfDestructMessageModel>
+        DiscordSelfDestructCollection =
+            DiscordDatabase.GetCollection<SelfDestructMessageModel>("selfDestruct");
 }
