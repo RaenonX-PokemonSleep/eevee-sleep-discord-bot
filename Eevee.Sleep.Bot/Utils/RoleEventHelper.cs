@@ -267,10 +267,9 @@ public static class RoleEventHelper {
         );
         sentMessages.Add(msg4);
 
-        await RegisterReactionRoleBindings(msg1, freeItems, null, session);
+        await RegisterReactionRoleBindings(msg1, freeItems, false, session);
         if (msg3 is not null) {
-            var whitelistedRoleIds = ConfigHelper.GetAllSubscriberRoleIds();
-            await RegisterReactionRoleBindings(msg3, subItems, whitelistedRoleIds, session);
+            await RegisterReactionRoleBindings(msg3, subItems, true, session);
         }
 
         await RegisterSelfDestructMessages(
@@ -340,7 +339,7 @@ public static class RoleEventHelper {
     private static async Task RegisterReactionRoleBindings(
         IUserMessage message,
         List<(RoleEventEntry Entry, GuildEmote Emote, IRole Role)> items,
-        ulong[]? whitelistedRoleIds,
+        bool isSubscriberOnly,
         IClientSessionHandle session
     ) {
         var emoteToRoleMap = items.ToDictionary(
@@ -352,7 +351,7 @@ public static class RoleEventHelper {
             MessageId = message.Id,
             ChannelId = message.Channel.Id,
             EmoteToRoleMap = emoteToRoleMap,
-            WhitelistedRoleIds = whitelistedRoleIds,
+            IsSubscriberOnly = isSubscriberOnly,
         };
 
         await ReactionRoleController.InsertReactionRoleMessage(model, session);

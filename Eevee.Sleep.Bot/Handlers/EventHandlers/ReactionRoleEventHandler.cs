@@ -54,7 +54,7 @@ public static class ReactionRoleEventHandler {
             return;
         }
 
-        if (!await ValidateWhitelist(model, user, message, reaction)) {
+        if (!await IsUserEligible(model, user, message, reaction)) {
             return;
         }
 
@@ -125,17 +125,18 @@ public static class ReactionRoleEventHandler {
         }
     }
 
-    private static async Task<bool> ValidateWhitelist(
+    private static async Task<bool> IsUserEligible(
         ReactionRoleMessageModel model,
         SocketGuildUser user,
         IUserMessage message,
         SocketReaction reaction
     ) {
-        if (model.WhitelistedRoleIds is null) {
+        if (!model.IsSubscriberOnly) {
             return true;
         }
 
-        if (user.Roles.Any(r => model.WhitelistedRoleIds.Contains(r.Id))) {
+        var whitelistedRoleIds = ConfigHelper.GetAllSubscriberRoleIds();
+        if (user.Roles.Any(r => whitelistedRoleIds.Contains(r.Id))) {
             return true;
         }
 

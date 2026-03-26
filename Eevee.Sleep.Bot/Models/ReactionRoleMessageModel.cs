@@ -17,5 +17,5 @@ public record ReactionRoleMessageModel {
     public required Dictionary<string, ulong> EmoteToRoleMap { get; init; }
 
     [UsedImplicitly]
-    public ulong[]? WhitelistedRoleIds { get; init; }
+    public bool IsSubscriberOnly { get; init; }
 }

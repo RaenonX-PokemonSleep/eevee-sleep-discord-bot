@@ -146,7 +146,7 @@ public static class ConfigHelper {
         return GetRoleEventSection().GetRequiredValue<ulong>("AnchorRoleId");
     }
 
-    public static ulong[] GetRoleEventSubscriberWhitelistRoleIds() {
+    private static ulong[] GetRoleEventSubscriberWhitelistRoleIds() {
         return GetRoleEventSection()
             .GetSection("SubscriberWhitelistRoleIds")
             .Get<ulong[]>() ?? [];
