@@ -15,7 +15,10 @@ public static class InGameAnnouncementIndexController {
     ) {
         var announcements = models.Select(
             index => new ReplaceOneModel<InGameAnnouncementIndexModel>(
-                Builders<InGameAnnouncementIndexModel>.Filter.Where(x => x.AnnouncementId == index.AnnouncementId),
+                Builders<InGameAnnouncementIndexModel>.Filter.And(
+                    Builders<InGameAnnouncementIndexModel>.Filter.Where(x => x.AnnouncementId == index.AnnouncementId),
+                    Builders<InGameAnnouncementIndexModel>.Filter.Where(x => x.Language == index.Language)
+                ),
                 index
             ) {
                 IsUpsert = true,
@@ -29,13 +32,21 @@ public static class InGameAnnouncementIndexController {
         var modifiedRecords = models
             .Where(
                 updated => existingRecords.Any(
-                    existing => existing.AnnouncementId == updated.AnnouncementId && existing.Hash != updated.Hash
+                    existing => existing.AnnouncementId == updated.AnnouncementId && 
+                    existing.Language == updated.Language &&
+                    existing.Hash != updated.Hash
                 )
             )
             .Select(x => x);
 
         return modifiedRecords
-            .Concat(models.Where(x => existingRecords.All(y => y.AnnouncementId != x.AnnouncementId)));
+            .Concat(
+                models.Where(
+                    x => existingRecords.All(
+                        y => y.AnnouncementId != x.AnnouncementId || y.Language != x.Language
+                    )
+                )
+            );
     }
 
     private static IEnumerable<InGameAnnouncementIndexModel> FindAllByAnnouncementIds(IEnumerable<string> ids) {

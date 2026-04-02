@@ -15,17 +15,30 @@ public class AnnouncementHistoryController<T>(
         try {
             await collection.InsertOneAsync(model);
             var count = await collection
-                .CountDocumentsAsync(Builders<T>.Filter.Where(x => x.AnnouncementId == model.AnnouncementId));
+                .CountDocumentsAsync(
+                    Builders<T>.Filter.And(
+                        Builders<T>.Filter.Where(x => x.AnnouncementId == model.AnnouncementId),
+                        Builders<T>.Filter.Where(x => x.Language == model.Language)
+                    )
+                );
 
             if (count > MaxHistoryCount) {
                 var oldestRecord = await collection
-                    .Find(Builders<T>.Filter.Where(x => x.AnnouncementId == model.AnnouncementId))
+                    .Find(
+                        Builders<T>.Filter.And(
+                            Builders<T>.Filter.Where(x => x.AnnouncementId == model.AnnouncementId),
+                            Builders<T>.Filter.Where(x => x.Language == model.Language)
+                        )
+                    )
                     .Sort(Builders<T>.Sort.Ascending(x => x.RecordCreatedUtc))
                     .Limit(1)
                     .FirstOrDefaultAsync();
 
                 await collection.DeleteOneAsync(
-                    Builders<T>.Filter.Where(x => x.AnnouncementId == oldestRecord.AnnouncementId)
+                    Builders<T>.Filter.And(
+                        Builders<T>.Filter.Where(x => x.AnnouncementId == oldestRecord.AnnouncementId),
+                        Builders<T>.Filter.Where(x => x.Language == oldestRecord.Language)
+                    )
                 );
             }
 

@@ -68,7 +68,7 @@ public class OfficialSiteAnnouncementCrawler(
     ) {
         var detailTasks = indexes
             .AsParallel()
-            .WithDegreeOfParallelism(1)
+            .WithDegreeOfParallelism(5)
             .Select(DetailScraper.GetAsync);
 
         return await Task.WhenAll(detailTasks);
@@ -76,11 +76,11 @@ public class OfficialSiteAnnouncementCrawler(
 
     private async Task SaveDetailsAndHistories(List<OfficialSiteAnnouncementDetailModel> details) {
         var existedDetails = detailController.FindAllByIds(details.Select(x => x.AnnouncementId));
-        var existedDetailsById = existedDetails.ToDictionary(x => x.AnnouncementId);
+        var existedDetailsById = existedDetails.ToDictionary(x => (x.AnnouncementId, x.Language));
 
         var shouldSaveDetail = (
             from detail in details
-            let detailModel = existedDetailsById.GetOrDefault(detail.AnnouncementId, null)
+            let detailModel = existedDetailsById.GetOrDefault((detail.AnnouncementId, detail.Language), null)
             where detailModel?.ContentHash != detail.ContentHash
             select detail
         ).ToList();

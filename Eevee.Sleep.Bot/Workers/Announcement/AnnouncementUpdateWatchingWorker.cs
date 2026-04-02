@@ -19,7 +19,7 @@ public abstract class AnnouncementUpdateWatchingWorker<T>(
 
     protected abstract ulong? GetNotifyRoleId(AnnouncementLanguage language);
 
-    protected abstract Embed MakeAnnouncementUpdateMessage(T detail);
+    protected abstract Embed MakeAnnouncementUpdateMessage(T detail, bool isNew);
 
     protected abstract Task SendMessageInAnnouncementNoticeChannelAsync(
         string? message,
@@ -47,32 +47,39 @@ public abstract class AnnouncementUpdateWatchingWorker<T>(
                 x =>
                     x.OperationType == ChangeStreamOperationType.Update ||
                     x.OperationType == ChangeStreamOperationType.Modify ||
-                    x.OperationType == ChangeStreamOperationType.Insert
+                    x.OperationType == ChangeStreamOperationType.Insert ||
+                    x.OperationType == ChangeStreamOperationType.Replace
             );
 
-        using var cursor = await GetMongoCollection()
-            .WatchAsync(pipeline, options, cancellationToken);
+        while (!cancellationToken.IsCancellationRequested) {
+            try {
+                using var cursor = await GetMongoCollection().WatchAsync(pipeline, options, cancellationToken);
 
-        await cursor.ForEachAsync(
-            async change => {
-                var detail = change.FullDocument;
+                await cursor.ForEachAsync(
+                    async change => {
+                        var detail = change.FullDocument;
 
-                logger.LogInformation(
-                    "Received in-game announcement detail update in {Language} ({Title} / #{Id})",
-                    detail.Language,
-                    detail.Title,
-                    detail.AnnouncementId
+                        logger.LogInformation(
+                            "Received in-game announcement detail update in {Language} ({Title} / #{Id})",
+                            detail.Language,
+                            detail.Title,
+                            detail.AnnouncementId
+                        );
+
+                        var notifyRole = GetNotifyRoleId(detail.Language);
+
+                        await SendMessageInAnnouncementNoticeChannelAsync(
+                            notifyRole is not null ? MentionUtils.MentionRole(notifyRole.Value) : null,
+                            detail.Language,
+                            MakeAnnouncementUpdateMessage(detail, change.OperationType == ChangeStreamOperationType.Insert)
+                        );
+                    },
+                    cancellationToken
                 );
-
-                var notifyRole = GetNotifyRoleId(detail.Language);
-
-                await SendMessageInAnnouncementNoticeChannelAsync(
-                    notifyRole is not null ? MentionUtils.MentionRole(notifyRole.Value) : null,
-                    detail.Language,
-                    MakeAnnouncementUpdateMessage(detail)
-                );
-            },
-            cancellationToken
-        );
+            } catch (Exception e) when (e is not OperationCanceledException) {
+                logger.LogError(e, "An error occurred while watching announcement updates. Restarting the watcher.");
+                await Task.Delay(TimeSpan.FromSeconds(30), cancellationToken);
+            }
+        }
     }
 }

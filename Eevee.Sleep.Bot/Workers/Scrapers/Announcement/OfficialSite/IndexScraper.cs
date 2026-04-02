@@ -1,3 +1,4 @@
+using System;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
@@ -42,12 +43,21 @@ public static class IndexScraper {
                 );
             }
 
+            var langPrefix = language switch {
+                AnnouncementLanguage.JP => "",
+                AnnouncementLanguage.EN => "/en",
+                AnnouncementLanguage.ZH => "/zh",
+                _ => throw new ArgumentOutOfRangeException(nameof(language), language, null),
+            };
+
+            var officialUrl = $"https://www.pokemonsleep.net{langPrefix}/news/{id}/";
             indexModels.Add(
                 new OfficialSiteAnnouncementIndexModel {
                     Title = title,
                     Language = language,
                     AnnouncementId = id,
-                    Url = $"https://www.pokemonsleep.net/news/{id}/",
+                    Url = officialUrl,
+                    Hash = $"{title}{officialUrl}".ToSha256Hash(),
                     RecordCreatedUtc = DateTime.UtcNow,
                     RecordUpdatedUtc = DateTime.UtcNow,
                 }

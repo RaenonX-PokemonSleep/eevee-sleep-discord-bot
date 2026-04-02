@@ -18,7 +18,6 @@ public static class MongoIndexManager {
             DiscordRestrictedRoleRoleIdIndex(),
             OfficialSiteAnnouncementIndexAnnounceIdIndex(),
             OfficialSiteAnnouncementDetailAnnounceIdIndex(),
-            OfficialSiteAnnouncementDetailLanguageAnnounceIdIndex(),
             OfficialSiteAnnouncementHistoryAnnounceIdIndex(),
             InGameAnnouncementIndexAnnounceIdIndex(),
             InGameAnnouncementDetailAnnounceIdIndex(),
@@ -105,6 +104,7 @@ public static class MongoIndexManager {
 
     private static Task<string> OfficialSiteAnnouncementIndexAnnounceIdIndex() {
         var indexKeys = Builders<OfficialSiteAnnouncementIndexModel>.IndexKeys
+            .Ascending(data => data.Language)
             .Ascending(data => data.AnnouncementId);
         var indexModel = new CreateIndexModel<OfficialSiteAnnouncementIndexModel>(
             indexKeys,
@@ -115,17 +115,6 @@ public static class MongoIndexManager {
     }
 
     private static Task<string> OfficialSiteAnnouncementDetailAnnounceIdIndex() {
-        var indexKeys = Builders<OfficialSiteAnnouncementDetailModel>.IndexKeys
-            .Ascending(data => data.AnnouncementId);
-        var indexModel = new CreateIndexModel<OfficialSiteAnnouncementDetailModel>(
-            indexKeys,
-            new CreateIndexOptions { Unique = true }
-        );
-
-        return MongoConst.OfficialSiteAnnouncementDetailCollection.Indexes.CreateOneAsync(indexModel);
-    }
-
-    private static Task<string> OfficialSiteAnnouncementDetailLanguageAnnounceIdIndex() {
         var indexKeys = Builders<OfficialSiteAnnouncementDetailModel>.IndexKeys
             .Ascending(data => data.Language)
             .Ascending(data => data.AnnouncementId);
@@ -148,6 +137,7 @@ public static class MongoIndexManager {
 
     private static Task<string> InGameAnnouncementIndexAnnounceIdIndex() {
         var indexKeys = Builders<InGameAnnouncementIndexModel>.IndexKeys
+            .Ascending(data => data.Language)
             .Ascending(data => data.AnnouncementId);
         var indexModel = new CreateIndexModel<InGameAnnouncementIndexModel>(
             indexKeys,
@@ -159,6 +149,7 @@ public static class MongoIndexManager {
 
     private static Task<string> InGameAnnouncementDetailAnnounceIdIndex() {
         var indexKeys = Builders<InGameAnnouncementDetailModel>.IndexKeys
+            .Ascending(data => data.Language)
             .Ascending(data => data.AnnouncementId);
         var indexModel = new CreateIndexModel<InGameAnnouncementDetailModel>(
             indexKeys,

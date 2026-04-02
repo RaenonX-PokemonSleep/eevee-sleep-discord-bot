@@ -11,7 +11,6 @@ public abstract class AnnouncementCrawlingWorker(
     DiscordSocketClient client,
     ILogger<AnnouncementCrawlingWorker> logger
 ) : BackgroundService {
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(2);
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
@@ -29,8 +28,10 @@ public abstract class AnnouncementCrawlingWorker(
                 await client.SendMessageInAdminAlertChannel(
                     embed: DiscordMessageMakerForAnnouncement.MakeDocumentProcessingErrorMessage(e.InnerException)
                 );
-                await _cancellationTokenSource.CancelAsync();
-                break;
+
+                logger.LogError(e, "Announcement update crawler exceeded max retry count. Waiting for next interval.");
+            } catch (Exception e) when (e is not OperationCanceledException) {
+                logger.LogError(e, "An unexpected error occurred in announcement update crawler. Waiting for next interval.");
             }
 
             await Task.Delay(_checkInterval, cancellationToken);

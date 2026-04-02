@@ -29,10 +29,10 @@ public static class DiscordMessageMakerForAnnouncement {
             .Build();
     }
 
-    public static Embed MakeOfficialSiteAnnouncementUpdateMessage(OfficialSiteAnnouncementDetailModel detail) {
+    public static Embed MakeOfficialSiteAnnouncementUpdateMessage(OfficialSiteAnnouncementDetailModel detail, bool isNew) {
         return new EmbedBuilder()
             .WithColor(Colors.Info)
-            .WithTitle("Official Website Announcement Updated!")
+            .WithTitle(isNew ? "New Official Website Announcement!" : "Official Website Announcement Updated!")
             .AddField("Title", detail.Title)
             .AddField("Announcement ID", detail.AnnouncementId)
             .AddField("Url", detail.Url)
@@ -42,10 +42,10 @@ public static class DiscordMessageMakerForAnnouncement {
             .Build();
     }
 
-    public static Embed MakeInGameAnnouncementUpdateMessage(InGameAnnouncementDetailModel detail) {
+    public static Embed MakeInGameAnnouncementUpdateMessage(InGameAnnouncementDetailModel detail, bool isNew) {
         return new EmbedBuilder()
             .WithColor(Colors.Info)
-            .WithTitle("In-game Announcement Updated!")
+            .WithTitle(isNew ? "New In-game Announcement!" : "In-game Announcement Updated!")
             .AddField("Title", detail.Title)
             .AddField("Announcement ID", detail.AnnouncementId)
             .AddField("Url", ConfigHelper.GetGameAnnouncementProxyUrl(detail.AnnouncementId))

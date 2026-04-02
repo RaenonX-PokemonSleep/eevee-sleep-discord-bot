@@ -5,6 +5,8 @@ namespace Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
 
 [BsonIgnoreExtraElements]
 public record OfficialSiteAnnouncementIndexModel : AnnouncementMetaModel {
+    public required string Hash { get; init; }
+
     public AnnouncementIndexResponse ToApiResponse() {
         return new AnnouncementIndexResponse {
             Title = Title,

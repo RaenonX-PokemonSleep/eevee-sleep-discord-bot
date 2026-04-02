@@ -15,7 +15,10 @@ public class AnnouncementDetailController<T>(
 
         var details = model.Select(
             detail => new ReplaceOneModel<T>(
-                Builders<T>.Filter.Where(x => x.AnnouncementId == detail.AnnouncementId),
+                Builders<T>.Filter.And(
+                    Builders<T>.Filter.Where(x => x.AnnouncementId == detail.AnnouncementId),
+                    Builders<T>.Filter.Where(x => x.Language == detail.Language)
+                ),
                 detail
             ) {
                 IsUpsert = true,

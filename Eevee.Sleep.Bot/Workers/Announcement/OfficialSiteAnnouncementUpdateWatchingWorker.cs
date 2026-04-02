@@ -25,8 +25,8 @@ public class OfficialSiteAnnouncementUpdateWatchingWorker(
         return null;
     }
 
-    protected override Embed MakeAnnouncementUpdateMessage(OfficialSiteAnnouncementDetailModel detail) {
-        return DiscordMessageMakerForAnnouncement.MakeOfficialSiteAnnouncementUpdateMessage(detail);
+    protected override Embed MakeAnnouncementUpdateMessage(OfficialSiteAnnouncementDetailModel detail, bool isNew) {
+        return DiscordMessageMakerForAnnouncement.MakeOfficialSiteAnnouncementUpdateMessage(detail, isNew);
     }
 
     protected override Task SendMessageInAnnouncementNoticeChannelAsync(

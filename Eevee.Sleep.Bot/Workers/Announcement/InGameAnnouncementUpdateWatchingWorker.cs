@@ -26,8 +26,8 @@ public class InGameAnnouncementUpdateWatchingWorker(
         return ConfigHelper.GetInGameAnnouncementNotificationRoleId(language);
     }
 
-    protected override Embed MakeAnnouncementUpdateMessage(InGameAnnouncementDetailModel detail) {
-        return DiscordMessageMakerForAnnouncement.MakeInGameAnnouncementUpdateMessage(detail);
+    protected override Embed MakeAnnouncementUpdateMessage(InGameAnnouncementDetailModel detail, bool isNew) {
+        return DiscordMessageMakerForAnnouncement.MakeInGameAnnouncementUpdateMessage(detail, isNew);
     }
 
     protected override Task SendMessageInAnnouncementNoticeChannelAsync(
