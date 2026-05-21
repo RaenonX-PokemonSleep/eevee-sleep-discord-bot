@@ -12,11 +12,6 @@ public class GitHubIssueSyncWorker(
     ILogger<GitHubIssueSyncWorker> logger,
     IHostEnvironment env
 ) : BackgroundService {
-    // TODO: Update with actual channel ID or configure via settings
-    private const ulong FeedbackChannelId = 12345678912345678912; 
-
-    private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(15);
-
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
         logger.LogInformation("Starting GitHub issue sync worker.");
         cancellationToken.Register(
@@ -42,16 +37,17 @@ public class GitHubIssueSyncWorker(
                 }
             }
 
-            await Task.Delay(_checkInterval, cancellationToken);
+            await Task.Delay(GetCheckInterval(), cancellationToken);
         }
     }
 
     private async Task SyncAsync() {
+        var feedbackChannelId = ConfigHelper.GetGithubIssueSyncFeedbackForumChannelId();
         var guild = client.GetCurrentWorkingGuild();
-        var forumChannel = guild.GetForumChannel(FeedbackChannelId);
+        var forumChannel = guild.GetForumChannel(feedbackChannelId);
 
         if (forumChannel is null) {
-            logger.LogError("Forum channel #{ChannelId} not found.", FeedbackChannelId);
+            logger.LogError("Forum channel #{ChannelId} not found.", feedbackChannelId);
             return;
         }
 
@@ -135,6 +131,10 @@ public class GitHubIssueSyncWorker(
         return appliedTagIds
             .Where(tagLookup.ContainsKey)
             .Select(id => tagLookup[id]);
+    }
+
+    private static TimeSpan GetCheckInterval() {
+        return TimeSpan.FromMinutes(ConfigHelper.GetGithubIssueSyncCheckIntervalMinutes());
     }
 
     private static string BuildIssueBody(ulong guildId, IThreadChannel thread, IMessage? firstMessage) {

@@ -176,4 +176,16 @@ public static class ConfigHelper {
     public static string GetGithubRepoSlug() {
         return GetGithubSection().GetRequiredValue<string>("RepoSlug");
     }
+
+    private static IConfigurationSection GetGithubIssueSyncSection() {
+        return GetGithubSection().GetRequiredSection("IssueSync");
+    }
+
+    public static ulong GetGithubIssueSyncFeedbackForumChannelId() {
+        return GetGithubIssueSyncSection().GetRequiredValue<ulong>("FeedbackForumChannelId");
+    }
+
+    public static double GetGithubIssueSyncCheckIntervalMinutes() {
+        return GetGithubIssueSyncSection().GetRequiredValue<double>("CheckIntervalMinutes");
+    }
 }
