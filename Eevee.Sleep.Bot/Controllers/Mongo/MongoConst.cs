@@ -77,4 +77,8 @@ public static class MongoConst {
     public static readonly IMongoCollection<SelfDestructMessageModel>
         DiscordSelfDestructCollection =
             DiscordDatabase.GetCollection<SelfDestructMessageModel>("selfDestruct");
+
+    public static readonly IMongoCollection<GitHubIssueSyncModel>
+        DiscordGithubIssueSyncCollection =
+            DiscordDatabase.GetCollection<GitHubIssueSyncModel>("github/issueSync");
 }

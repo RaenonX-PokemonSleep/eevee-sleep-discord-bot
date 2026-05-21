@@ -24,6 +24,7 @@ public static class MongoIndexManager {
             InGameAnnouncementHistoryAnnounceIdIndex(),
             DiscordReactionRoleMessageIdIndex(),
             DiscordSelfDestructEpochIndex(),
+            DiscordGithubIssueSyncThreadIdIndex(),
         };
     }
 
@@ -185,5 +186,16 @@ public static class MongoIndexManager {
         var indexModel = new CreateIndexModel<SelfDestructMessageModel>(indexKeys);
 
         return MongoConst.DiscordSelfDestructCollection.Indexes.CreateOneAsync(indexModel);
+    }
+
+    private static Task<string> DiscordGithubIssueSyncThreadIdIndex() {
+        var indexKeys = Builders<GitHubIssueSyncModel>.IndexKeys
+            .Ascending(data => data.DiscordThreadId);
+        var indexModel = new CreateIndexModel<GitHubIssueSyncModel>(
+            indexKeys,
+            new CreateIndexOptions { Unique = true }
+        );
+
+        return MongoConst.DiscordGithubIssueSyncCollection.Indexes.CreateOneAsync(indexModel);
     }
 }

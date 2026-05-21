@@ -164,4 +164,16 @@ public static class ConfigHelper {
     public static string GetMongoDbUrl() {
         return Config.GetRequiredSection("Mongo").GetRequiredValue<string>("Url");
     }
+
+    private static IConfigurationSection GetGithubSection() {
+        return Config.GetRequiredSection("GitHub");
+    }
+
+    public static string GetGithubToken() {
+        return GetGithubSection().GetRequiredValue<string>("Token");
+    }
+
+    public static string GetGithubRepoSlug() {
+        return GetGithubSection().GetRequiredValue<string>("RepoSlug");
+    }
 }
