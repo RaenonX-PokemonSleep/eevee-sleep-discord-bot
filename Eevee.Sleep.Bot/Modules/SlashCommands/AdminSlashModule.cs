@@ -5,6 +5,7 @@ using Discord.WebSocket;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Preconditions;
 using Eevee.Sleep.Bot.Utils;
 using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using JetBrains.Annotations;
@@ -12,7 +13,8 @@ using JetBrains.Annotations;
 namespace Eevee.Sleep.Bot.Modules.SlashCommands;
 
 [Group("admin", "Admin-only commands.")]
-[RequireUserPermission(GuildPermission.Administrator)]
+[RequireUserPermission(GuildPermission.Administrator, Group = "AdminAccess")]
+[RequireAdminRole(Group = "AdminAccess")]
 [CommandContextType(InteractionContextType.Guild)]
 public partial class AdminSlashModule : InteractionModuleBase<SocketInteractionContext> {
     private static readonly Regex EmoteNamePattern = EmoteNameRegex();

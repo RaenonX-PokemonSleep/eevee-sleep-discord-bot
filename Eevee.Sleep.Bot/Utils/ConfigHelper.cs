@@ -56,6 +56,10 @@ public static class ConfigHelper {
         return GetDiscordSection().GetRequiredSection("Roles");
     }
 
+    public static ulong GetDiscordAdminRoleId() {
+        return GetDiscordRolesSection().GetRequiredValue<ulong>("Admin");
+    }
+
     private static IConfigurationSection GetDiscordSubscriberSection() {
         return GetDiscordRolesSection().GetRequiredSection("Subscriber");
     }
