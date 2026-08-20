@@ -8,8 +8,11 @@ namespace Eevee.Sleep.Bot.Workers.Scrapers;
 public static class DocumentLoader {
     private const int TimeoutSeconds = 120;
 
+    private const string UserAgent =
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36";
+
     public static async Task<IDocument> FetchDocumentAsync(string url) {
-        var requester = new DefaultHttpRequester {
+        var requester = new DefaultHttpRequester(UserAgent) {
             Timeout = TimeSpan.FromSeconds(TimeoutSeconds),
         };
         var config = Configuration.Default.With(requester).WithDefaultLoader();
