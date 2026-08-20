@@ -1,7 +1,7 @@
 using Discord;
 using Discord.WebSocket;
+using Eevee.Sleep.Bot.Controllers.Mongo.Announcement;
 using Eevee.Sleep.Bot.Enums;
-using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models.Announcement;
 using Eevee.Sleep.Bot.Workers.Crawlers;
 using MongoDB.Driver;
@@ -10,13 +10,25 @@ namespace Eevee.Sleep.Bot.Workers.Announcement;
 
 public abstract class AnnouncementUpdateWatchingWorker<T>(
     IAnnouncementCrawler crawler,
+    AnnouncementHistoryController<T> historyController,
+    DiscordSocketClient client,
     ILogger<AnnouncementUpdateWatchingWorker<T>> logger
 ) : BackgroundService where T : AnnouncementMetaModel {
+    private readonly AnnouncementDiffAlertSender<T> _diffAlertSender = new(historyController, client, logger);
+
     protected abstract IMongoCollection<T> GetMongoCollection();
 
     protected abstract ulong? GetNotifyRoleId(AnnouncementLanguage language);
 
     protected abstract Embed MakeAnnouncementUpdateMessage(T detail, bool isNew);
+
+    protected abstract bool HasSameContent(T first, T second);
+
+    protected abstract string GetContent(T detail);
+
+    protected abstract string GetSourceName();
+
+    protected abstract string GetDisplayUrl(T detail);
 
     protected abstract Task SendMessageInAnnouncementNoticeChannelAsync(
         string? message,
@@ -31,12 +43,11 @@ public abstract class AnnouncementUpdateWatchingWorker<T>(
 
         var options = new ChangeStreamOptions { FullDocument = ChangeStreamFullDocumentOption.UpdateLookup };
         var pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<T>>()
-            .Match(
-                x =>
-                    x.OperationType == ChangeStreamOperationType.Update ||
-                    x.OperationType == ChangeStreamOperationType.Modify ||
-                    x.OperationType == ChangeStreamOperationType.Insert ||
-                    x.OperationType == ChangeStreamOperationType.Replace
+            .Match(x =>
+                x.OperationType == ChangeStreamOperationType.Update ||
+                x.OperationType == ChangeStreamOperationType.Modify ||
+                x.OperationType == ChangeStreamOperationType.Insert ||
+                x.OperationType == ChangeStreamOperationType.Replace
             );
 
         while (!cancellationToken.IsCancellationRequested) {
@@ -56,10 +67,27 @@ public abstract class AnnouncementUpdateWatchingWorker<T>(
 
                         var notifyRole = GetNotifyRoleId(detail.Language);
 
-                        await SendMessageInAnnouncementNoticeChannelAsync(
+                        var isNew = change.OperationType == ChangeStreamOperationType.Insert;
+                        var publicNotificationTask = SendMessageInAnnouncementNoticeChannelAsync(
                             notifyRole is not null ? MentionUtils.MentionRole(notifyRole.Value) : null,
                             detail.Language,
-                            MakeAnnouncementUpdateMessage(detail, change.OperationType == ChangeStreamOperationType.Insert)
+                            MakeAnnouncementUpdateMessage(detail, isNew)
+                        );
+
+                        if (isNew) {
+                            await publicNotificationTask;
+                            return;
+                        }
+
+                        await Task.WhenAll(
+                            publicNotificationTask,
+                            _diffAlertSender.SendAsync(
+                                detail,
+                                HasSameContent,
+                                GetContent,
+                                GetSourceName(),
+                                GetDisplayUrl(detail)
+                            )
                         );
                     },
                     cancellationToken

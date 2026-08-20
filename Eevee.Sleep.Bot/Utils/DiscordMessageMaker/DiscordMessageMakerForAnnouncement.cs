@@ -2,6 +2,7 @@ using Discord;
 using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
+using Eevee.Sleep.Bot.Models.Announcement;
 using Eevee.Sleep.Bot.Models.Announcement.InGame;
 using Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
 
@@ -18,7 +19,10 @@ public static class DiscordMessageMakerForAnnouncement {
             .Build();
     }
 
-    public static Embed MakeOfficialSiteAnnouncementUpdateMessage(OfficialSiteAnnouncementDetailModel detail, bool isNew) {
+    public static Embed MakeOfficialSiteAnnouncementUpdateMessage(
+        OfficialSiteAnnouncementDetailModel detail,
+        bool isNew
+    ) {
         return new EmbedBuilder()
             .WithColor(Colors.Info)
             .WithTitle(isNew ? "New Official Website Announcement!" : "Official Website Announcement Updated!")
@@ -40,6 +44,25 @@ public static class DiscordMessageMakerForAnnouncement {
             .AddField("Url", ConfigHelper.GetGameAnnouncementProxyUrl(detail.AnnouncementId))
             .AddField("Updated", detail.OriginalUpdatedUtc)
             .AddField("Record Created", detail.RecordCreatedUtc)
+            .WithCurrentTimestamp()
+            .Build();
+    }
+
+    public static Embed MakeAnnouncementContentDiffMessage(
+        string source,
+        string displayUrl,
+        AnnouncementMetaModel previous,
+        AnnouncementMetaModel current
+    ) {
+        return new EmbedBuilder()
+            .WithColor(Colors.Info)
+            .WithTitle($"{source} Announcement Content Updated")
+            .AddField("Title", current.Title)
+            .AddField("Language", current.Language)
+            .AddField("Announcement ID", current.AnnouncementId)
+            .AddField("Url", displayUrl)
+            .AddField("Previous Record", previous.RecordCreatedUtc)
+            .AddField("Current Record", current.RecordCreatedUtc)
             .WithCurrentTimestamp()
             .Build();
     }

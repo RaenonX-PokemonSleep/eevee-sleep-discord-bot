@@ -54,4 +54,22 @@ public class AnnouncementHistoryController<T>(
             await Insert(model);
         }
     }
+
+    public async Task<T?> FindPreviousVersion(T current, Func<T, T, bool> hasSameContent) {
+        var versions = await collection
+            .Find(
+                Builders<T>.Filter.And(
+                    Builders<T>.Filter.Where(x => x.AnnouncementId == current.AnnouncementId),
+                    Builders<T>.Filter.Where(x => x.Language == current.Language)
+                )
+            )
+            .Sort(Builders<T>.Sort.Descending(x => x.RecordCreatedUtc))
+            .Limit(MaxHistoryCount)
+            .ToListAsync();
+
+        return versions.FirstOrDefault(version =>
+            version.RecordCreatedUtc != current.RecordCreatedUtc ||
+            !hasSameContent(version, current)
+        );
+    }
 }
