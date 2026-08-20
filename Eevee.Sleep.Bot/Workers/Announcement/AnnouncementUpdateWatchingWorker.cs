@@ -1,10 +1,8 @@
 using Discord;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Enums;
-using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Models.Announcement;
-using Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 using Eevee.Sleep.Bot.Workers.Crawlers;
 using MongoDB.Driver;
 
@@ -12,7 +10,6 @@ namespace Eevee.Sleep.Bot.Workers.Announcement;
 
 public abstract class AnnouncementUpdateWatchingWorker<T>(
     IAnnouncementCrawler crawler,
-    DiscordSocketClient client,
     ILogger<AnnouncementUpdateWatchingWorker<T>> logger
 ) : BackgroundService where T : AnnouncementMetaModel {
     protected abstract IMongoCollection<T> GetMongoCollection();
@@ -28,18 +25,9 @@ public abstract class AnnouncementUpdateWatchingWorker<T>(
     );
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
-        // If UpdateWatchingWorker enters the waiting state before CrawlingWorker before initialization, 
-        // it will be notified by the number of news, so check the news first and then enter the waiting state.
-        logger.LogInformation("Starting initialization process of the in-game announcement update worker.");
-        try {
-            await crawler.ExecuteAsync();
-        } catch (MaxAttemptExceededException e) {
-            await client.SendMessageInAdminAlertChannel(
-                embed: DiscordMessageMakerForAnnouncement.MakeUpdateWatchingWorkerInitializeFailedMessage(
-                    e.InnerException
-                )
-            );
-        }
+        // The crawling worker owns writes. Ignore bootstrap changes by opening the change stream afterward.
+        logger.LogInformation("Waiting for the initial announcement crawl to complete.");
+        await crawler.InitialCrawlCompleted.WaitAsync(cancellationToken);
 
         var options = new ChangeStreamOptions { FullDocument = ChangeStreamFullDocumentOption.UpdateLookup };
         var pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<T>>()

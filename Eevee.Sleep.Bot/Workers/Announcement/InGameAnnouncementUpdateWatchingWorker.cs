@@ -15,7 +15,7 @@ public class InGameAnnouncementUpdateWatchingWorker(
     InGameAnnouncementCrawler crawler,
     DiscordSocketClient client,
     ILogger<InGameAnnouncementUpdateWatchingWorker> logger
-) : AnnouncementUpdateWatchingWorker<InGameAnnouncementDetailModel>(crawler, client, logger) {
+) : AnnouncementUpdateWatchingWorker<InGameAnnouncementDetailModel>(crawler, logger) {
     private readonly DiscordSocketClient _client = client;
 
     protected override IMongoCollection<InGameAnnouncementDetailModel> GetMongoCollection() {

@@ -55,6 +55,10 @@ public static class MongoConst {
         OfficialSiteAnnouncementHistoryCollection =
             GameDatabase.GetCollection<OfficialSiteAnnouncementDetailModel>("announcement/officialSite/history");
 
+    public static readonly IMongoCollection<OfficialSiteAnnouncementCrawlStateModel>
+        OfficialSiteAnnouncementCrawlStateCollection =
+            GameDatabase.GetCollection<OfficialSiteAnnouncementCrawlStateModel>("announcement/officialSite/crawlState");
+
     public static readonly IMongoCollection<InGameAnnouncementIndexModel>
         InGameAnnouncementIndexCollection =
             GameDatabase.GetCollection<InGameAnnouncementIndexModel>("announcement/inGame/index");

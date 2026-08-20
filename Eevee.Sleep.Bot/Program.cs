@@ -3,10 +3,12 @@ using Discord.Interactions;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Controllers.Mongo.Announcement;
+using Eevee.Sleep.Bot.Controllers.Mongo.Announcement.OfficialSite;
 using Eevee.Sleep.Bot.Extensions;
 using Eevee.Sleep.Bot.Handlers;
 using Eevee.Sleep.Bot.Models.Announcement.InGame;
 using Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
+using Eevee.Sleep.Bot.Modules.ExternalServices;
 using Eevee.Sleep.Bot.Workers;
 using Eevee.Sleep.Bot.Workers.ActivationChecker;
 using Eevee.Sleep.Bot.Workers.ActivationChecker.Removal;
@@ -28,6 +30,13 @@ var builder = WebApplication.CreateBuilder(args)
 
 builder.Services.ConfigureBackgroundServiceExceptionBehaviorToIgnore();
 builder.Services.AddCorsFromConfig();
+builder.Services.AddHttpClient<OfficialSiteNewsClient>(
+    client => {
+        client.Timeout = TimeSpan.FromSeconds(120);
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (compatible; EeveeSleepBot/1.0)");
+        client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+    }
+);
 builder.Services
     .AddSingleton(socketConfig)
     .AddSingleton<DiscordSocketClient>()
@@ -41,6 +50,11 @@ builder.Services
     .AddSingleton(
         new AnnouncementHistoryController<OfficialSiteAnnouncementDetailModel>(
             MongoConst.OfficialSiteAnnouncementHistoryCollection
+        )
+    )
+    .AddSingleton(
+        new OfficialSiteAnnouncementCrawlStateController(
+            MongoConst.OfficialSiteAnnouncementCrawlStateCollection
         )
     )
     .AddSingleton(

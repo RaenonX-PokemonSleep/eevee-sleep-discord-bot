@@ -17,12 +17,18 @@ public class InGameAnnouncementCrawler(
 ) : IAnnouncementCrawler {
     private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(30);
 
+    private readonly TaskCompletionSource _initialCrawlCompleted = new(
+        TaskCreationOptions.RunContinuationsAsynchronously
+    );
+
     // Used to run only one process when called by multiple workers at the same time.
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
-    public async Task ExecuteAsync(int retryCount = 0) {
+    public Task InitialCrawlCompleted => _initialCrawlCompleted.Task;
+
+    public async Task ExecuteAsync(CancellationToken cancellationToken, int retryCount = 0) {
         if (retryCount == 0) {
-            await Semaphore.WaitAsync();
+            await Semaphore.WaitAsync(cancellationToken);
         }
 
         try {
@@ -47,9 +53,11 @@ public class InGameAnnouncementCrawler(
             await detailController.BulkUpsert([..details]);
             await historyController.BulkInsert([..details]);
 
+            _initialCrawlCompleted.TrySetResult();
             retryCount = 0;
         } catch (OfficialServerInMaintenanceException) {
             logger.LogInformation("Official server in maintenance during in-game announcement check.");
+            _initialCrawlCompleted.TrySetResult();
         } catch (DocumentProcessingException e) {
             retryCount++;
             logger.LogError("{Message} Retries: {RetryCount}", e.Message, retryCount);
@@ -61,8 +69,8 @@ public class InGameAnnouncementCrawler(
             }
 
             // Keep running until the attempt limit is exceeded
-            await Task.Delay(RetryInterval);
-            await ExecuteAsync(retryCount);
+            await Task.Delay(RetryInterval, cancellationToken);
+            await ExecuteAsync(cancellationToken, retryCount);
         } finally {
             if (Semaphore.CurrentCount == 0) {
                 Semaphore.Release();

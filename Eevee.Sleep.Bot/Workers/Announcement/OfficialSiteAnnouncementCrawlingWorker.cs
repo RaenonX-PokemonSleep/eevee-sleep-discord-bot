@@ -7,4 +7,6 @@ public class OfficialSiteAnnouncementCrawlingWorker(
     OfficialSiteAnnouncementCrawler crawler,
     DiscordSocketClient client,
     ILogger<OfficialSiteAnnouncementCrawlingWorker> logger
-) : AnnouncementCrawlingWorker(crawler, client, logger);
+) : AnnouncementCrawlingWorker(crawler, client, logger) {
+    protected override TimeSpan CheckInterval => TimeSpan.FromMinutes(5);
+}

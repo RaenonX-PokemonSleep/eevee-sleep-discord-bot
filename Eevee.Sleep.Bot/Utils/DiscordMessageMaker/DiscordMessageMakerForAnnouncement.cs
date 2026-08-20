@@ -8,17 +8,6 @@ using Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
 namespace Eevee.Sleep.Bot.Utils.DiscordMessageMaker;
 
 public static class DiscordMessageMakerForAnnouncement {
-    public static Embed MakeUpdateWatchingWorkerInitializeFailedMessage(DocumentProcessingException exception) {
-        return new EmbedBuilder()
-            .WithColor(Colors.Danger)
-            .WithTitle("Failed to initialize in-game announcement watching worker")
-            .WithDescription("Maximum number of data fetching attempts has been exceeded.")
-            .AddField("Last exception message", exception.Message)
-            .AddField("Last exception Context", exception.Context.ToJsonString())
-            .WithCurrentTimestamp()
-            .Build();
-    }
-
     public static Embed MakeDocumentProcessingErrorMessage(DocumentProcessingException exception) {
         return new EmbedBuilder()
             .WithColor(Colors.Danger)

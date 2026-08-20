@@ -14,7 +14,7 @@ public class OfficialSiteAnnouncementUpdateWatchingWorker(
     OfficialSiteAnnouncementCrawler crawler,
     DiscordSocketClient client,
     ILogger<OfficialSiteAnnouncementUpdateWatchingWorker> logger
-) : AnnouncementUpdateWatchingWorker<OfficialSiteAnnouncementDetailModel>(crawler, client, logger) {
+) : AnnouncementUpdateWatchingWorker<OfficialSiteAnnouncementDetailModel>(crawler, logger) {
     private readonly DiscordSocketClient _client = client;
 
     protected override IMongoCollection<OfficialSiteAnnouncementDetailModel> GetMongoCollection() {

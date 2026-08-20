@@ -11,7 +11,7 @@ public abstract class AnnouncementCrawlingWorker(
     DiscordSocketClient client,
     ILogger<AnnouncementCrawlingWorker> logger
 ) : BackgroundService {
-    private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(2);
+    protected virtual TimeSpan CheckInterval => TimeSpan.FromMinutes(2);
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken) {
         logger.LogInformation("Starting in-game announcement update crawler.");
@@ -23,7 +23,7 @@ public abstract class AnnouncementCrawlingWorker(
             logger.LogInformation("Checking in-game announcement updates.");
 
             try {
-                await crawler.ExecuteAsync();
+                await crawler.ExecuteAsync(cancellationToken);
             } catch (MaxAttemptExceededException e) {
                 await client.SendMessageInAdminAlertChannel(
                     embed: DiscordMessageMakerForAnnouncement.MakeDocumentProcessingErrorMessage(e.InnerException)
@@ -34,7 +34,7 @@ public abstract class AnnouncementCrawlingWorker(
                 logger.LogError(e, "An unexpected error occurred in announcement update crawler. Waiting for next interval.");
             }
 
-            await Task.Delay(_checkInterval, cancellationToken);
+            await Task.Delay(CheckInterval, cancellationToken);
         }
     }
 }
