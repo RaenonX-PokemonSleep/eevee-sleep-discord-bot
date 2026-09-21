@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Extensions;
@@ -14,7 +14,6 @@ public class ActivationCheckerWorker(
     ILogger<ActivationCheckerWorker> logger,
     IHostEnvironment env
 ) : BackgroundService {
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
     private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(5);
 
     private static void TryCollectPresetLinkedRoleToAdd(
@@ -286,9 +285,8 @@ public class ActivationCheckerWorker(
                     } else {
                         await CheckExternalActivations();
                     }
-                } catch {
-                    await _cancellationTokenSource.CancelAsync();
-                    throw;
+                } catch (Exception error) {
+                    logger.LogError(error, "Activation check failed; will retry on the next scan");
                 }
             }
 

@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
 using Eevee.Sleep.Bot.Extensions;
@@ -16,7 +16,7 @@ public static class GuildMemberLeftEventHandler {
             user.Id,
             user.Username
         );
-        var subscriptionDuration = await ActivationController.RemoveDiscordActivationAndGetSubscriptionDuration(
+        var subscriptionDuration = await ActivationController.RevokeDiscordActivationAndGetSubscriptionDuration(
             user.Id.ToString()
         );
 

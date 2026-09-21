@@ -75,7 +75,6 @@ builder.Services
     .AddHostedService<OfficialSiteAnnouncementCrawlingWorker>()
     .AddHostedService<InGameAnnouncementCrawlingWorker>()
     .AddHostedService<ActivationCheckerWorker>()
-    .AddHostedService<ActivationKeyRemovalWatcher>()
     .AddHostedService<ActivationDataRemovalWatcher>()
     .AddHostedService<DiscordPaginationContextCleanupWorker>()
     .AddHostedService<DiscordMessageSelfDestructWorker>()

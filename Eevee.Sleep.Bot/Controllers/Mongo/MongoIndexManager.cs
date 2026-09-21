@@ -1,4 +1,4 @@
-﻿using Eevee.Sleep.Bot.Models;
+using Eevee.Sleep.Bot.Models;
 using Eevee.Sleep.Bot.Models.Announcement.InGame;
 using Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
 using MongoDB.Driver;
@@ -8,7 +8,6 @@ namespace Eevee.Sleep.Bot.Controllers.Mongo;
 public static class MongoIndexManager {
     public static IEnumerable<Task> Initialize() {
         return new[] {
-            ActivationKeySourceIndex(),
             ActivationDataSourceIndex(),
             ActivationPresetSourceIndex(),
             ActivationPresetTagIndex(),
@@ -25,15 +24,6 @@ public static class MongoIndexManager {
             DiscordReactionRoleMessageIdIndex(),
             DiscordSelfDestructEpochIndex(),
         };
-    }
-
-    private static Task<string> ActivationKeySourceIndex() {
-        var indexKeys = Builders<ActivationKeyModel>.IndexKeys
-            .Ascending(data => data.Source);
-
-        var indexModel = new CreateIndexModel<ActivationKeyModel>(indexKeys);
-
-        return MongoConst.AuthActivationKeyCollection.Indexes.CreateOneAsync(indexModel);
     }
 
     private static Task<string> ActivationDataSourceIndex() {

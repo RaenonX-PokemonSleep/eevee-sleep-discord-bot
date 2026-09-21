@@ -1,4 +1,4 @@
-﻿using Discord;
+using Discord;
 using Discord.Net;
 using Discord.WebSocket;
 using Eevee.Sleep.Bot.Controllers.Mongo;
@@ -147,7 +147,7 @@ public static class GuildMemberUpdatedEventHandler {
         IReadOnlyCollection<ulong> roleIds,
         IUser user
     ) {
-        var subscriptionDuration = await ActivationController.RemoveDiscordActivationAndGetSubscriptionDuration(
+        var subscriptionDuration = await ActivationController.RevokeDiscordActivationAndGetSubscriptionDuration(
             user.Id.ToString()
         );
 
@@ -155,7 +155,7 @@ public static class GuildMemberUpdatedEventHandler {
             embed: await DiscordMessageMakerForActivation.MakeUserUnsubscribed(user, subscriptionDuration, roleIds)
         );
         Logger.LogInformation(
-            "User {UserId} (@{Username}) activation expired ({RoleCount} roles dropped: {RoleIds}), removing associated activation",
+            "User {UserId} (@{Username}) activation expired ({RoleCount} roles dropped: {RoleIds}), revoking Discord-source activations",
             user.Id,
             user.Username,
             roleIds.Count,

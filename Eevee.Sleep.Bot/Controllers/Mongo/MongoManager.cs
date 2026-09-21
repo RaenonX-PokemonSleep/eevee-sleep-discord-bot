@@ -1,4 +1,4 @@
-﻿using Eevee.Sleep.Bot.Models.CustomSerializers;
+using Eevee.Sleep.Bot.Models.CustomSerializers;
 using Eevee.Sleep.Bot.Utils;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
@@ -15,9 +15,6 @@ public static class MongoManager {
 
         MongoCollectionConfigManager.EnableChangeStreamPreAndPostImagesOnCollection(
             MongoConst.AuthActivationDataCollection
-        );
-        MongoCollectionConfigManager.EnableChangeStreamPreAndPostImagesOnCollection(
-            MongoConst.AuthActivationKeyCollection
         );
 
         await Task.WhenAll(MongoIndexManager.Initialize());

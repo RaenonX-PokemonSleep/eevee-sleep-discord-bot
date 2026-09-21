@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -8,5 +8,12 @@ namespace Eevee.Sleep.Bot.Models;
 [BsonIgnoreExtraElements]
 public record ActivationDataModel : ActivationKeyModel {
     [UsedImplicitly]
-    public required ObjectId UserId { get; init; }
+    public ObjectId? UserId { get; init; }
+
+    [UsedImplicitly]
+    public ActivationRevocationModel? Revocation { get; init; }
+
+    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+    [UsedImplicitly]
+    public DateTime? ConsumedAt { get; init; }
 }
