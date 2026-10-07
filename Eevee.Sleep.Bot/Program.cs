@@ -1,3 +1,4 @@
+using System.Net;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
@@ -34,9 +35,11 @@ builder.Services.AddHttpClient<OfficialSiteNewsClient>(
     client => {
         client.Timeout = TimeSpan.FromSeconds(120);
         client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (compatible; EeveeSleepBot/1.0)");
-        client.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+        client.DefaultRequestHeaders.Accept.ParseAdd("application/xml, text/html");
     }
-);
+).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler {
+    AutomaticDecompression = DecompressionMethods.All,
+});
 builder.Services
     .AddSingleton(socketConfig)
     .AddSingleton<DiscordSocketClient>()

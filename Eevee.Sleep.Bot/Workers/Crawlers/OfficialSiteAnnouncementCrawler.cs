@@ -1,7 +1,6 @@
 using AngleSharp.Common;
 using Eevee.Sleep.Bot.Controllers.Mongo.Announcement;
 using Eevee.Sleep.Bot.Controllers.Mongo.Announcement.OfficialSite;
-using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
 using Eevee.Sleep.Bot.Modules.ExternalServices;
@@ -16,7 +15,6 @@ public class OfficialSiteAnnouncementCrawler(
     AnnouncementHistoryController<OfficialSiteAnnouncementDetailModel> historyController
 ) : IAnnouncementCrawler {
     private static readonly TimeSpan RetryInterval = TimeSpan.FromSeconds(30);
-    private static readonly TimeSpan WatermarkOverlap = TimeSpan.FromMinutes(5);
     private static readonly SemaphoreSlim Semaphore = new(1, 1);
 
     private readonly TaskCompletionSource _initialCrawlCompleted = new(
@@ -39,11 +37,11 @@ public class OfficialSiteAnnouncementCrawler(
                     logger.LogError("{Message} Retries: {RetryCount}", e.Message, retryCount);
 
                     var status = e.Context.GetValueOrDefault("status");
-                    var isRateBlocked = status is "Forbidden" or "TooManyRequests";
-                    if (isRateBlocked || retryCount >= IAnnouncementCrawler.MaxRetryCount) {
+                    var isAccessBlocked = status is "Unauthorized" or "Forbidden" or "TooManyRequests";
+                    if (isAccessBlocked || retryCount >= IAnnouncementCrawler.MaxRetryCount) {
                         throw new MaxAttemptExceededException(
-                            isRateBlocked
-                                ? "Official website announcement requests were rate blocked."
+                            isAccessBlocked
+                                ? "Official website announcement requests were denied or rate limited."
                                 : "Failed to get official website announcements. Retry count exceeded.",
                             e
                         );
@@ -58,23 +56,21 @@ public class OfficialSiteAnnouncementCrawler(
     }
 
     private async Task CrawlAsync(CancellationToken cancellationToken) {
-        foreach (var language in Enum.GetValues<AnnouncementLanguage>()) {
-            var lastModifiedUtc = crawlStateController.FindLastModifiedUtc(language);
-            var modifiedAfterUtc = lastModifiedUtc - WatermarkOverlap;
-            var responses = await newsClient.FetchAllAsync(language, modifiedAfterUtc, cancellationToken);
+        var entries = await newsClient.FetchEntriesAsync(cancellationToken);
+        var modifiedTimes = await crawlStateController.FindModifiedTimesAsync(
+            entries.Select(entry => entry.Url), cancellationToken
+        );
+        var changed = entries.Where(entry => entry.NeedsFetch(modifiedTimes)).ToArray();
+        logger.LogInformation("Fetching {Count} new or changed official website articles.", changed.Length);
 
-            if (responses.Count == 0) {
-                continue;
-            }
+        foreach (var entry in changed) {
+            var article = await newsClient.FetchArticleAsync(entry, cancellationToken);
+            var (index, detail) = article.ToModels(entry);
+            await OfficialSiteAnnouncementIndexController.BulkUpsert([index]);
+            await SaveDetailsAndHistories([detail]);
 
-            var models = responses.Select(x => x.ToModels(language)).ToList();
-            await OfficialSiteAnnouncementIndexController.BulkUpsert([..models.Select(x => x.Index)]);
-            await SaveDetailsAndHistories(models.Select(x => x.Detail).ToList());
-
-            await crawlStateController.Upsert(
-                language,
-                responses.Max(x => x.GetModifiedUtc())
-            );
+            // Checkpoint only after persistence succeeds, so failed/interrupted crawls can resume per article.
+            await crawlStateController.Upsert(entry, cancellationToken);
         }
     }
 

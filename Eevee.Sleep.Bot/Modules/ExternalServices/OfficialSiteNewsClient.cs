@@ -1,109 +1,92 @@
-using System.Globalization;
-using System.Net.Http.Json;
-using System.Text.Json;
-using Eevee.Sleep.Bot.Enums;
 using Eevee.Sleep.Bot.Exceptions;
 using Eevee.Sleep.Bot.Models.Announcement.OfficialSite;
 
 namespace Eevee.Sleep.Bot.Modules.ExternalServices;
 
 public class OfficialSiteNewsClient(HttpClient client) {
-    private const int PageSize = 100;
+    private const string SitemapIndexUrl = "https://www.pokemonsleep.net/wp-sitemap.xml";
 
-    private static readonly IReadOnlyDictionary<AnnouncementLanguage, string> EndpointByLanguage =
-        new Dictionary<AnnouncementLanguage, string> {
-            { AnnouncementLanguage.JP, "https://www.pokemonsleep.net/wp-json/wp/v2/news" },
-            { AnnouncementLanguage.EN, "https://www.pokemonsleep.net/en/wp-json/wp/v2/news" },
-            { AnnouncementLanguage.ZH, "https://www.pokemonsleep.net/zh/wp-json/wp/v2/news" },
-        };
+    private static readonly TimeSpan RequestInterval = TimeSpan.FromSeconds(2);
+    private static readonly SemaphoreSlim RequestSemaphore = new(1, 1);
 
-    public async Task<IReadOnlyList<OfficialSiteNewsResponse>> FetchAllAsync(
-        AnnouncementLanguage language,
-        DateTime? modifiedAfterUtc = null,
+    private static DateTimeOffset _nextRequestUtc = DateTimeOffset.MinValue;
+
+    public async Task<IReadOnlyList<OfficialSiteNewsEntry>> FetchEntriesAsync(
         CancellationToken cancellationToken = default
     ) {
-        var items = new List<OfficialSiteNewsResponse>();
-        var page = 1;
-        string? currentUrl = null;
+        var index = await FetchDocumentAsync(SitemapIndexUrl, cancellationToken);
+        var sitemapUrls = OfficialSiteSitemapParser.ParseIndex(index, SitemapIndexUrl);
+        var entries = new List<OfficialSiteNewsEntry>();
 
-        try {
-            int totalPages;
-            do {
-                currentUrl = BuildUrl(language, page, modifiedAfterUtc);
-                using var response = await client.GetAsync(currentUrl, cancellationToken);
+        foreach (var url in sitemapUrls) {
+            var xml = await FetchDocumentAsync(url, cancellationToken);
+            entries.AddRange(OfficialSiteSitemapParser.ParseEntries(xml, url));
+        }
 
-                if (!response.IsSuccessStatusCode) {
-                    throw new FetchDocumentFailedException(
-                        "Failed to fetch official website announcements.",
-                        new Dictionary<string, string?> {
-                            { "url", currentUrl },
-                            { "language", language.ToString() },
-                            { "status", response.StatusCode.ToString() },
-                            { "cloudFrontId", GetHeader(response, "X-Amz-Cf-Id") },
-                            { "retryAfter", GetHeader(response, "Retry-After") },
-                        }
-                    );
-                }
-
-                totalPages = ParseTotalPages(response, language);
-                items.AddRange(
-                    await response.Content.ReadFromJsonAsync<OfficialSiteNewsResponse[]>(
-                        cancellationToken: cancellationToken
-                    ) ?? []
-                );
-                page++;
-            } while (page <= totalPages);
-        } catch (DocumentProcessingException) {
-            throw;
-        } catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) {
-            throw;
-        } catch (Exception e) when (e is HttpRequestException or JsonException or OperationCanceledException) {
-            throw new FetchDocumentFailedException(
-                "Failed to fetch official website announcements.",
-                new Dictionary<string, string?> {
-                    { "url", currentUrl },
-                    { "language", language.ToString() },
-                    { "exception", e.Message },
-                }
+        if (entries.Count == 0) {
+            throw new ContentStructureChangedException(
+                "Official website news sitemaps contained no supported articles.",
+                new Dictionary<string, string?> { { "url", SitemapIndexUrl } }
             );
         }
 
-        return items
-            .GroupBy(x => x.Slug)
-            .Select(
-                duplicates => duplicates
-                    .OrderByDescending(x => x.GetModifiedUtc())
-                    .ThenByDescending(x => x.Id)
-                    .First()
-            )
-            .OrderBy(x => x.GetModifiedUtc())
-            .ToList();
+        return entries.GroupBy(entry => entry.Url)
+            .Select(group => group.MaxBy(entry => entry.LastModifiedUtc)!)
+            .OrderBy(entry => entry.LastModifiedUtc)
+            .ThenBy(entry => entry.Url, StringComparer.Ordinal)
+            .ToArray();
     }
 
-    private static string BuildUrl(AnnouncementLanguage language, int page, DateTime? modifiedAfterUtc) {
-        var modifiedAfter = modifiedAfterUtc is null
-            ? string.Empty
-            : $"&modified_after={Uri.EscapeDataString(modifiedAfterUtc.Value.ToString("O", CultureInfo.InvariantCulture))}";
-
-        return $"{EndpointByLanguage[language]}?per_page={PageSize}&page={page}" +
-               "&orderby=modified&order=asc" +
-               "&_fields=id,slug,link,date,modified_gmt,title,content" +
-               modifiedAfter;
+    public async Task<OfficialSiteNewsArticle> FetchArticleAsync(
+        OfficialSiteNewsEntry entry,
+        CancellationToken cancellationToken = default
+    ) {
+        var html = await FetchDocumentAsync(entry.Url, cancellationToken);
+        return OfficialSiteArticleParser.Parse(html, entry);
     }
 
-    private static int ParseTotalPages(HttpResponseMessage response, AnnouncementLanguage language) {
-        var value = GetHeader(response, "X-WP-TotalPages");
-        if (int.TryParse(value, out var totalPages)) {
-            return totalPages;
-        }
+    private async Task<string> FetchDocumentAsync(string url, CancellationToken cancellationToken) {
+        // Share pacing across client instances, languages, polls, and retries. Never burst concurrent requests.
+        await RequestSemaphore.WaitAsync(cancellationToken);
 
-        throw new FetchDocumentFailedException(
-            "Official website announcement response omitted its page count.",
-            new Dictionary<string, string?> {
-                { "language", language.ToString() },
-                { "totalPages", value },
+        try {
+            var delay = _nextRequestUtc - DateTimeOffset.UtcNow;
+            if (delay > TimeSpan.Zero) {
+                await Task.Delay(delay, cancellationToken);
             }
-        );
+
+            using var response = await client.GetAsync(url, cancellationToken);
+            var retryAfter = response.Headers.RetryAfter;
+            _nextRequestUtc = retryAfter?.Date ?? DateTimeOffset.UtcNow + (retryAfter?.Delta ?? TimeSpan.Zero);
+
+            if (!response.IsSuccessStatusCode) {
+                throw new FetchDocumentFailedException(
+                    "Failed to fetch official website announcements.",
+                    new Dictionary<string, string?> {
+                        { "url", url },
+                        { "status", response.StatusCode.ToString() },
+                        { "cloudFrontId", GetHeader(response, "X-Amz-Cf-Id") },
+                        { "retryAfter", GetHeader(response, "Retry-After") },
+                    }
+                );
+            }
+
+            return await response.Content.ReadAsStringAsync(cancellationToken);
+        } catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) {
+            throw;
+        } catch (Exception e) when (e is HttpRequestException or OperationCanceledException) {
+            throw new FetchDocumentFailedException(
+                "Failed to fetch official website announcements.",
+                new Dictionary<string, string?> { { "url", url }, { "exception", e.Message } }
+            );
+        } finally {
+            var nextRequestUtc = DateTimeOffset.UtcNow + RequestInterval;
+            if (_nextRequestUtc < nextRequestUtc) {
+                _nextRequestUtc = nextRequestUtc;
+            }
+
+            RequestSemaphore.Release();
+        }
     }
 
     private static string? GetHeader(HttpResponseMessage response, string name) {
